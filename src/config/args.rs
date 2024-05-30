@@ -16,7 +16,7 @@ pub fn get() -> Args {
     match Args::parse_args(&args[1..], ParsingStyle::AllOptions) {
         Ok(args) => {
             if args.help_requested() {
-                println!("{} {}\n", super::NAME, super::VERSION);
+                eprintln!("{} {}\n", super::NAME, super::VERSION);
                 Args::parse_args_default_or_exit();
             }
             args
@@ -26,4 +26,8 @@ pub fn get() -> Args {
             std::process::exit(0);
         },
     }
+}
+
+pub fn usage() {
+    eprintln!("{}", Args::usage());
 }

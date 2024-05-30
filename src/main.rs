@@ -2,7 +2,6 @@ use eframe::egui;
 
 #[macro_use]
 mod util;
-
 mod app;
 mod config;
 mod wm;
@@ -15,14 +14,21 @@ fn main() -> eframe::Result<()> {
         std::process::exit(0);
     }
 
-    info!("{:#?}", args);
+    if args.config.is_none() {
+        config::args::usage();
+        std::process::exit(1);
+    }
+
+    let path = args.config.as_ref().expect("unreachable");
+
+    let script = config::script::load(path);
 
     wm::xcb::window_patch();
 
     let native_options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
             .with_title("xcake-root")
-            .with_inner_size([10.0, 10.0])
+            .with_inner_size([1.0, 1.0])
             .with_window_level(egui::WindowLevel::AlwaysOnBottom)
             .with_decorations(false)
             .with_resizable(false)
