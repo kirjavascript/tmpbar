@@ -24,6 +24,7 @@ gumdrop = "0.8.1"
 xrandr = "0.2.0"
 mlua = { version = "0.9.8", features = ["luajit52"] }
 ansi_term = "0.12.1"
+inotify = "0.10.2"
 
 # You only need serde if you want app persistence:
 serde = { version = "1", features = ["derive"] }

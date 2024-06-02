@@ -38,7 +38,7 @@ pub fn window_patch() {
             ],
         });
 
-        conn.flush().unwrap();
+        // conn.flush().unwrap();
 
         let cookie = conn.send_request(&xcb::x::GetWindowAttributes {
             window: *cake_root,
@@ -50,16 +50,37 @@ pub fn window_patch() {
         println!("{:#?}", value);
 
 
-        // xcb::atoms_struct! {
-        //     #[derive(Copy, Clone, Debug)]
-        //     pub(crate) struct Atoms {
-        //         pub windowtype_dock => b"_NET_WM_WINDOW_TYPE_DOCK",
-        //         pub strut_partial => b"_NET_WM_STRUT_PARTIAL",
-        //         pub strut => b"_NET_WM_STRUT",
-        //         pub windowtype => b"_NET_WM_WINDOW_TYPE",
-        //     }
-        // }
-        // let atoms = Atoms::intern_all(&conn).unwrap();
+        xcb::atoms_struct! {
+            #[derive(Copy, Clone, Debug)]
+            pub(crate) struct Atoms {
+                // pub windowtype_dock => b"_NET_WM_WINDOW_TYPE_DOCK",
+                // pub strut_partial => b"_NET_WM_STRUT_PARTIAL",
+                // pub strut => b"_NET_WM_STRUT",
+                // pub windowtype => b"_NET_WM_WINDOW_TYPE",
+                pub shadow => b"_COMPTON_SHADOW",
+            }
+        }
+        let atoms = Atoms::intern_all(&conn).unwrap();
+
+        std::thread::sleep(std::time::Duration::from_millis(100));
+
+        // picom.conf shadow-exclude "_COMPTON_SHADOW@:32c = 0"
+
+        conn.send_request(&xcb::x::ChangeProperty {
+            mode: xcb::x::PropMode::Replace,
+            window: *cake_0,
+            property: atoms.shadow,
+            r#type: xcb::x::ATOM_CARDINAL,
+            data: &[0u32],
+        });
+
+        conn.send_request(&xcb::x::ChangeProperty {
+            mode: xcb::x::PropMode::Replace,
+            window: *cake_1,
+            property: atoms.shadow,
+            r#type: xcb::x::ATOM_ATOM,
+            data: &[0u32],
+        });
 
         // let width = 1920;
         // let height = 1080;
@@ -74,13 +95,6 @@ pub fn window_patch() {
         //     0u32, 0, 0, 21
         // ];
 
-        // conn.send_request(&xcb::x::ChangeProperty {
-        //     mode: xcb::x::PropMode::Replace,
-        //     window: *window,
-        //     property: atoms.strut_partial,
-        //     r#type: xcb::x::ATOM_CARDINAL,
-        //     data: &data,
-        // });
 
         // conn.send_request(&xcb::x::ChangeProperty {
         //     mode: xcb::x::PropMode::Replace,

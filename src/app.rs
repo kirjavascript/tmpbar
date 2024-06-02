@@ -45,6 +45,11 @@ impl eframe::App for TmpBar {
 
     /// Called each time the UI needs repainting, which may be many times per second.
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+
+        // crate::wm::xcb::window_patch();
+        // ctx.request_repaint_after(std::time::Duration::from_secs(1));
+
+        // println!("render");
         // Put your widgets into a `SidePanel`, `TopBottomPanel`, `CentralPanel`, `Window` or `Area`.
         // For inspiration and more examples, go to https://emilk.github.io/egui
 
@@ -67,6 +72,8 @@ impl eframe::App for TmpBar {
         //     });
         // });
 
+
+        // TODO: change to deferred
         ctx.show_viewport_immediate(
             egui::ViewportId::from_hash_of("immediate_viewport0"),
             egui::ViewportBuilder::default()
@@ -81,8 +88,11 @@ impl eframe::App for TmpBar {
                 //     "This egui backend doesn't support multiple viewports"
                 // );
 
-                egui::CentralPanel::default().show(ctx, |ui| {
-                    ui.label("Hello from immediate viewport0");
+                // TODO: change to Window
+                egui::CentralPanel::default()
+                    .frame(egui::Frame::none().fill(egui::Color32::TRANSPARENT))
+                    .show(ctx, |ui| {
+                    ui.label("bar 0");
                 });
 
             },
@@ -94,6 +104,7 @@ impl eframe::App for TmpBar {
             .with_title("xcake-1")
             .with_window_type(egui::viewport::X11WindowType::Dock)
             .with_position(egui::Pos2 { x: 0., y: 1060. })
+            .with_transparent(true)
             .with_inner_size([1920.0, 20.0]),
             |ctx, class| {
                 // assert!(
@@ -101,8 +112,10 @@ impl eframe::App for TmpBar {
                 //     "This egui backend doesn't support multiple viewports"
                 // );
 
-                egui::CentralPanel::default().show(ctx, |ui| {
-                    ui.label("Hello from immediate viewport1");
+                egui::CentralPanel::default()
+                    .frame(egui::Frame::none().fill(egui::Color32::TRANSPARENT))
+                    .show(ctx, |ui| {
+                    ui.label("bar 1");
                 });
 
             },
@@ -135,18 +148,8 @@ impl eframe::App for TmpBar {
         //     });
         // });
     }
-}
 
-fn powered_by_egui_and_eframe(ui: &mut egui::Ui) {
-    ui.horizontal(|ui| {
-        ui.spacing_mut().item_spacing.x = 0.0;
-        ui.label("Powered by ");
-        ui.hyperlink_to("egui", "https://github.com/emilk/egui");
-        ui.label(" and ");
-        ui.hyperlink_to(
-            "eframe",
-            "https://github.com/emilk/egui/tree/master/crates/eframe",
-        );
-        ui.label(".");
-    });
+    fn clear_color(&self, _visuals: &egui::Visuals) -> [f32; 4] {
+        egui::Color32::TRANSPARENT.to_normalized_gamma_f32()
+    }
 }

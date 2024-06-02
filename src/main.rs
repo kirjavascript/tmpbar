@@ -21,7 +21,7 @@ fn main() -> eframe::Result<()> {
 
     let path = args.config.as_ref().expect("unreachable");
 
-    let script = config::script::load(path);
+    let (poll, config) = config::script::load(path);
 
     wm::xcb::window_patch();
 
@@ -40,6 +40,10 @@ fn main() -> eframe::Result<()> {
     eframe::run_native(
         "🍰",
         native_options,
-        Box::new(|cc| Box::new(app::TmpBar::new(cc))),
+        Box::new(|cc| Box::new(app::TmpBar::new(
+            cc,
+            // poll,
+            // config,
+        ))),
     )
 }

@@ -1,30 +1,12 @@
-function dump(o)
-   if type(o) == 'table' then
-      local s = '{ '
-      for k,v in pairs(o) do
-         if type(k) ~= 'number' then k = '"'..k..'"' end
-         s = s .. '['..k..'] = ' .. dump(v) .. ','
-      end
-      return s .. '} '
-   else
-      return tostring(o)
-   end
-end
-
-function bar()
-end
-
-print("foo")
-
-print(dump(monitors))
-
-for _, monitor in ipairs(monitors) do
-
+for _, monitor in monitors() do
     bar({
-        monitor = monitor.name,
+        monitor,
         position = "top",
         minHeight = 20,
         -- children
     })
-
 end
+
+
+-- TODO
+-- title, get i3mode from i3blocks code
