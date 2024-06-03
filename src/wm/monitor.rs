@@ -1,3 +1,4 @@
+#[derive(Clone)]
 pub struct Monitor {
     pub name: String,
     pub width: i32,
@@ -6,18 +7,15 @@ pub struct Monitor {
     pub y: i32,
 }
 
-pub fn print_info() -> Result<(), xrandr::XrandrError> {
-
-    for (i, monitor) in list()?.iter().enumerate() {
+pub fn print_info() {
+    for (i, monitor) in list().iter().enumerate() {
         let &Monitor {ref name, width, height, x, y, .. } = monitor;
 
         println!("Monitor {i} {name} {width}x{height} x: {x} y: {y}");
     }
-
-    Ok(())
 }
 
-pub fn list() -> Result<Vec<Monitor>, xrandr::XrandrError> {
+pub fn list_query() -> Result<Vec<Monitor>, xrandr::XrandrError> {
     let mut handle = xrandr::XHandle::open()?;
 
     Ok(handle.monitors()?.iter().map(|monitor| {
@@ -31,4 +29,8 @@ pub fn list() -> Result<Vec<Monitor>, xrandr::XrandrError> {
             height: height_px,
         }
     }).collect())
+}
+
+pub fn list() -> Vec<Monitor> {
+    list_query().unwrap_or_else(|_| Vec::new())
 }

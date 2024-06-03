@@ -1,10 +1,6 @@
 use std::fs::File;
 use std::io::prelude::*;
-use mlua::Lua;
-
-pub struct ConfigScript {
-    path: String,
-}
+use super::parse::{ConfigScript, parse_script};
 
 impl ConfigScript {
     pub fn reload(&mut self) -> Result<(), String> {
@@ -50,7 +46,7 @@ pub fn load_raw(path: &str) -> Result<ConfigScript, String> {
 }
 
 pub fn eval(path: &str, script: String) -> mlua::Result<ConfigScript> {
-    let lua = Lua::new();
+    let lua = mlua::Lua::new();
     let globals = lua.globals();
 
     let bars = lua.create_table()?;
@@ -62,34 +58,17 @@ pub fn eval(path: &str, script: String) -> mlua::Result<ConfigScript> {
 
     lua.load(script).exec()?;
 
-    let bars: mlua::Table = globals.get("xcake_bars")?;
-
-    // let bar_list = Vec::new();
-
-    // for pair in bars.pairs::<i32, mlua::Table>() {
-    //     let (_, value) = pair?;
-
-    //     bar_list.push(value);
-    // }
-
-    info!("{:?}", bars.len());
-
-    Ok(ConfigScript {
-        path: path.to_string(),
-    })
+    parse_script(path, &lua)
 }
 
-fn set_monitors(lua: &Lua, globals: &mlua::Table) -> mlua::Result<()> {
+fn set_monitors(lua: &mlua::Lua, globals: &mlua::Table) -> mlua::Result<()> {
     let monitors = lua.create_table()?;
-    let monitor_list = crate::wm::monitor::list().expect("XrandrError");
+    let monitor_list = crate::wm::monitor::list();
 
     for (i, monitor) in monitor_list.iter().enumerate() {
         let monitor_table = lua.create_table()?;
 
-        monitor_table.set("x", monitor.x)?;
-        monitor_table.set("y", monitor.y)?;
-        monitor_table.set("width", monitor.width)?;
-        monitor_table.set("height", monitor.height)?;
+        monitor_table.set("index", i + 1)?;
         monitor_table.set("name", monitor.name.to_string())?;
 
         monitors.set(i + 1, monitor_table)?;

@@ -10,7 +10,7 @@ fn main() -> eframe::Result<()> {
     let args = config::args::get();
 
     if args.monitors {
-        wm::monitor::print_info().expect("XrandrError");
+        wm::monitor::print_info();
         std::process::exit(0);
     }
 
@@ -43,7 +43,7 @@ fn main() -> eframe::Result<()> {
         Box::new(|cc| Box::new(app::TmpBar::new(
             cc,
             // poll,
-            // config,
+            config,
         ))),
     )
 }
