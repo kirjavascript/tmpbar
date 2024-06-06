@@ -4,7 +4,7 @@ pub mod script;
 pub mod parse;
 pub mod watch;
 
-pub use parse::ConfigScript;
+pub use parse::*;
 
 pub static NAME: &str = env!("CARGO_PKG_NAME");
 pub static VERSION: &str = env!("CARGO_PKG_VERSION");

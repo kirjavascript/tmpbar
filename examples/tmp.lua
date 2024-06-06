@@ -2,7 +2,7 @@ for _, monitor in monitors() do
     bar({
         monitor,
         position = "top",
-        height = 20,
+        height = 25,
         -- children
     })
 end

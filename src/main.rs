@@ -21,9 +21,7 @@ fn main() -> eframe::Result<()> {
 
     let path = args.config.as_ref().expect("unreachable");
 
-    let (poll, config) = config::script::load(path);
-
-    wm::xcb::window_patch();
+    let (poll_watch, config) = config::script::load(path);
 
     let native_options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
@@ -42,8 +40,8 @@ fn main() -> eframe::Result<()> {
         native_options,
         Box::new(|cc| Box::new(app::TmpBar::new(
             cc,
-            // poll,
             config,
+            poll_watch,
         ))),
     )
 }

@@ -1,19 +1,33 @@
 use crate::wm::monitor;
 
+#[derive(Clone)]
 pub struct ConfigScript {
     pub path: String,
     pub bars: Vec<Bar>,
 }
 
+#[derive(Clone, PartialEq)]
 pub enum Position {
     Top,
     Bottom,
 }
 
+#[derive(Clone)]
 pub struct Bar {
     pub position: Position,
-    pub height: u32,
+    pub height: i32,
     pub monitor: monitor::Monitor,
+}
+
+impl Bar {
+    pub fn y(&self) -> i32 {
+
+        if self.position == Position::Top {
+            0
+        } else {
+            self.monitor.height - self.height
+        }
+    }
 }
 
 pub fn parse_script(path: &str, lua: &mlua::Lua) -> mlua::Result<ConfigScript> {
@@ -28,7 +42,7 @@ pub fn parse_script(path: &str, lua: &mlua::Lua) -> mlua::Result<ConfigScript> {
 
         let position: String = value.get("position").unwrap_or_else(|_| "top".to_string());
         let position = if position == "top".to_string() { Position::Top } else { Position::Bottom };
-        let height: u32 = value.get("height").unwrap_or(20);
+        let height: i32 = value.get("height").unwrap_or(25);
 
         let empty_table = lua.create_table()?;
         let monitor: mlua::Table = value.get("monitor").unwrap_or_else(|_| empty_table);

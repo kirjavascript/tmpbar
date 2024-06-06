@@ -1,87 +1,81 @@
 use std::collections::HashMap;
+use crate::config::ConfigScript;
 
-pub fn window_patch() {
-    std::thread::spawn(|| {
+pub fn window_patch(config: &ConfigScript) {
+    let config = config.clone();
+
+    std::thread::spawn(move || {
+        xcb::atoms_struct! {
+            #[derive(Copy, Clone, Debug)]
+            pub(crate) struct Atoms {
+                // pub strut_partial => b"_NET_WM_STRUT_PARTIAL",
+                // pub strut => b"_NET_WM_STRUT",
+                pub shadow => b"_COMPTON_SHADOW",
+            }
+        }
+
         let (conn, screen_num) = xcb::Connection::connect(None).unwrap();
         let setup = conn.get_setup();
         let screen = setup.roots().nth(screen_num as usize).unwrap();
         let root = screen.root();
+        let atoms = Atoms::intern_all(&conn).unwrap();
 
         let mut windows = get_windows(&conn, root);
 
-        // TODO use highest bar number
-        while windows.get("xcake-1").is_none() {
+        // it is completely ridiculous to use window titles to find windows,
+        // but to get a direct X window reference we have to fork eframe
+        while windows.get(&("xcake-".to_string() + &(config.bars.len() - 1).to_string())).is_none() {
             windows = get_windows(&conn, root);
 
-            std::thread::sleep(std::time::Duration::from_millis(5));
+            std::thread::sleep(std::time::Duration::from_millis(25));
         }
 
 
-        println!("{:#?}", windows.get("xcake-root"));
-        println!("{:#?}", windows.get("xcake-0"));
-        println!("{:#?}", windows.get("xcake-1"));
-
         let cake_root = windows.get("xcake-root").unwrap();
-        let cake_0 = windows.get("xcake-0").unwrap();
-        let cake_1 = windows.get("xcake-1").unwrap();
 
         conn.send_request(&xcb::x::UnmapWindow { window: *cake_root });
         conn.flush().unwrap();
 
-        conn.send_request(&xcb::x::ConfigureWindow {
-            window: *cake_1,
-            value_list: &[
-                xcb::x::ConfigWindow::X(0),
-                xcb::x::ConfigWindow::Y(1080 - 20),
-                xcb::x::ConfigWindow::Width(1920),
-                xcb::x::ConfigWindow::Height(20),
-            ],
-        });
+        for (i, bar) in config.bars.iter().enumerate() {
+            let window = windows.get(&("xcake-".to_string() + &(i.to_string()))).unwrap();
 
-        // conn.flush().unwrap();
+            conn.send_request(&xcb::x::ConfigureWindow {
+                window: *window,
+                value_list: &[
+                    xcb::x::ConfigWindow::X(bar.monitor.x as _),
+                    xcb::x::ConfigWindow::Y(bar.y() as _),
+                    xcb::x::ConfigWindow::Width(bar.monitor.width as _),
+                    xcb::x::ConfigWindow::Height(bar.height as _),
+                ],
+            });
 
-        let cookie = conn.send_request(&xcb::x::GetWindowAttributes {
-            window: *cake_root,
-        });
+            conn.flush().unwrap();
 
-        let reply = conn.wait_for_reply(cookie).unwrap();
-        let value = reply.map_state();
-        // let title = String::from_utf8_lossy(value);
-        println!("{:#?}", value);
+            std::thread::sleep(std::time::Duration::from_millis(100));
 
+            // picom.conf shadow-exclude "_COMPTON_SHADOW@:32c = 0"
 
-        xcb::atoms_struct! {
-            #[derive(Copy, Clone, Debug)]
-            pub(crate) struct Atoms {
-                // pub windowtype_dock => b"_NET_WM_WINDOW_TYPE_DOCK",
-                // pub strut_partial => b"_NET_WM_STRUT_PARTIAL",
-                // pub strut => b"_NET_WM_STRUT",
-                // pub windowtype => b"_NET_WM_WINDOW_TYPE",
-                pub shadow => b"_COMPTON_SHADOW",
-            }
+            conn.send_request(&xcb::x::ChangeProperty {
+                mode: xcb::x::PropMode::Replace,
+                window: *window,
+                property: atoms.shadow,
+                r#type: xcb::x::ATOM_CARDINAL,
+                data: &[0u32],
+            });
+
+            conn.send_request(&xcb::x::ChangeProperty {
+                mode: xcb::x::PropMode::Replace,
+                window: *window,
+                property: atoms.shadow,
+                r#type: xcb::x::ATOM_ATOM,
+                data: &[0u32],
+            });
+
+            conn.flush().unwrap();
         }
-        let atoms = Atoms::intern_all(&conn).unwrap();
 
-        std::thread::sleep(std::time::Duration::from_millis(100));
 
-        // picom.conf shadow-exclude "_COMPTON_SHADOW@:32c = 0"
-
-        conn.send_request(&xcb::x::ChangeProperty {
-            mode: xcb::x::PropMode::Replace,
-            window: *cake_0,
-            property: atoms.shadow,
-            r#type: xcb::x::ATOM_CARDINAL,
-            data: &[0u32],
-        });
-
-        conn.send_request(&xcb::x::ChangeProperty {
-            mode: xcb::x::PropMode::Replace,
-            window: *cake_1,
-            property: atoms.shadow,
-            r#type: xcb::x::ATOM_ATOM,
-            data: &[0u32],
-        });
-
+        // TODO: finish STRUT
         // let width = 1920;
         // let height = 1080;
 
@@ -111,11 +105,6 @@ pub fn window_patch() {
         //     r#type: xcb::x::ATOM_ATOM,
         //     data: &[atoms.windowtype_dock],
         // });
-
-        conn.flush().unwrap();
-        // conn.send_request(&xcb::x::MapWindow { window: *window });
-        // conn.flush().unwrap();
-
     });
 }
 
