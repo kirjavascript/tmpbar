@@ -24,7 +24,7 @@ pub fn window_patch(config: &ConfigScript) {
 
         // it is completely ridiculous to use window titles to find windows,
         // but to get a direct X window reference we have to fork eframe
-        while windows.get(&("xcake-".to_string() + &(config.bars.len() - 1).to_string())).is_none() {
+        while windows.get(&config.bars.last().unwrap().id()).is_none() {
             windows = get_windows(&conn, root);
 
             std::thread::sleep(std::time::Duration::from_millis(25));
@@ -36,8 +36,8 @@ pub fn window_patch(config: &ConfigScript) {
         conn.send_request(&xcb::x::UnmapWindow { window: *cake_root });
         conn.flush().unwrap();
 
-        for (i, bar) in config.bars.iter().enumerate() {
-            let window = windows.get(&("xcake-".to_string() + &(i.to_string()))).unwrap();
+        for bar in config.bars.iter() {
+            let window = windows.get(&bar.id()).unwrap();
 
             conn.send_request(&xcb::x::ConfigureWindow {
                 window: *window,

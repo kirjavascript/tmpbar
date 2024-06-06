@@ -35,9 +35,9 @@ impl eframe::App for TmpBar {
             }
         }
 
-        for (i, bar) in self.config.bars.iter().enumerate() {
+        for bar in self.config.bars.iter() {
 
-            let id = "xcake-".to_string() + &i.to_string();
+            let id = bar.id();
 
             ctx.show_viewport_immediate(
                 egui::ViewportId::from_hash_of(&id),
@@ -56,11 +56,10 @@ impl eframe::App for TmpBar {
                         "This egui backend doesn't support multiple viewports"
                     );
 
-                    // TODO: change to Window? Area?
                     egui::CentralPanel::default()
                         .frame(egui::Frame::none().fill(egui::Color32::TRANSPARENT))
                         .show(ctx, |ui| {
-                        ui.label("xcake-".to_string() + &i.to_string());
+                        ui.label(id);
                     });
                 },
             );

@@ -1,4 +1,7 @@
 use crate::wm::monitor;
+use std::sync::atomic::{AtomicUsize, Ordering};
+
+static NEXT_ID: AtomicUsize = AtomicUsize::new(0);
 
 #[derive(Clone)]
 pub struct ConfigScript {
@@ -17,16 +20,20 @@ pub struct Bar {
     pub position: Position,
     pub height: i32,
     pub monitor: monitor::Monitor,
+    id: usize,
 }
 
 impl Bar {
     pub fn y(&self) -> i32 {
-
         if self.position == Position::Top {
             0
         } else {
             self.monitor.height - self.height
         }
+    }
+
+    pub fn id(&self) -> String {
+        "xcake-".to_string() + &self.id.to_string()
     }
 }
 
@@ -61,6 +68,7 @@ pub fn parse_script(path: &str, lua: &mlua::Lua) -> mlua::Result<ConfigScript> {
             position,
             height,
             monitor: monitor.clone(),
+            id: NEXT_ID.fetch_add(1, Ordering::Relaxed),
         });
     }
 
