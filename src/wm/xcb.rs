@@ -72,6 +72,7 @@ pub fn window_patch(config: &ConfigScript) {
             });
 
             conn.flush().unwrap();
+
         }
 
 
@@ -127,12 +128,14 @@ fn get_windows(conn: &xcb::Connection, root: xcb::x::Window) -> HashMap<String, 
                     long_offset: 0,
                     long_length: 1024,
                 });
-                let reply = conn.wait_for_reply(cookie).unwrap();
-                let value = reply.value();
-                let title = String::from_utf8_lossy(value);
-                let title = title.trim_end();
 
-                windows.insert(title.to_string(), *window);
+                if let Ok(reply) = conn.wait_for_reply(cookie) {
+                    let value = reply.value();
+                    let title = String::from_utf8_lossy(value);
+                    let title = title.trim_end();
+
+                    windows.insert(title.to_string(), *window);
+                }
 
                 query(&conn, *window, windows);
             });

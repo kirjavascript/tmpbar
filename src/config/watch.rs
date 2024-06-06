@@ -12,14 +12,14 @@ pub fn init(path: &str) -> Receiver<()> {
 
         inotify
             .watches()
-            .add(path, WatchMask::MODIFY | WatchMask::CLOSE)
+            .add(path, WatchMask::MODIFY)
             .expect("error adding watcher");
 
         let mut buffer = [0; 1024];
         loop {
             match inotify.read_events(&mut buffer) {
                 Ok(_) => {
-                    tx.send(()).inspect_err(|e| error!("{e}")).unwrap();
+                    tx.send(()).unwrap();
                 }
                 Err(_) => {},
             }

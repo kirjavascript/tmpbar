@@ -65,13 +65,6 @@ impl eframe::App for TmpBar {
                 },
             );
         }
-
-        // crate::wm::xcb::window_patch();
-
-        // println!("render");
-        // Put your widgets into a `SidePanel`, `TopBottomPanel`, `CentralPanel`, `Window` or `Area`.
-        // For inspiration and more examples, go to https://emilk.github.io/egui
-
     }
 
     fn clear_color(&self, _visuals: &egui::Visuals) -> [f32; 4] {
