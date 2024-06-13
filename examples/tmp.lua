@@ -3,7 +3,22 @@ for _, monitor in monitors() do
         monitor,
         position = "top",
         height = 25,
-        -- layout
+        layout = {
+            {
+                "label",
+                text = "foo",
+            },
+            {
+                "container",
+                layout = {
+                    "label",
+                    text = "foo",
+                },
+                foo = {
+                    bar = "bar"
+                },
+            },
+        }
     })
 end
 

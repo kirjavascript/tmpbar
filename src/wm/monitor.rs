@@ -1,4 +1,4 @@
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Monitor {
     pub name: String,
     pub width: i32,

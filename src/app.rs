@@ -26,6 +26,7 @@ impl eframe::App for TmpBar {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         // rerender every half second minimum to poll config watcher
         ctx.request_repaint_after(std::time::Duration::from_millis(500));
+        // TODO: use repaint_signal
 
         if (self.poll_watch)() {
             if let Err(err) = self.config.reload() {
@@ -36,7 +37,6 @@ impl eframe::App for TmpBar {
         }
 
         for bar in self.config.bars.iter() {
-
             let id = bar.id();
 
             ctx.show_viewport_immediate(

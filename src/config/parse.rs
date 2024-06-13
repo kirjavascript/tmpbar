@@ -1,5 +1,7 @@
 use crate::wm::monitor;
 use std::sync::atomic::{AtomicUsize, Ordering};
+use std::collections::HashMap;
+use mlua::{Value, Table};
 
 static NEXT_ID: AtomicUsize = AtomicUsize::new(0);
 
@@ -17,10 +19,26 @@ pub enum Position {
 
 #[derive(Clone)]
 pub struct Bar {
+    id: usize,
     pub position: Position,
     pub height: i32,
     pub monitor: monitor::Monitor,
-    id: usize,
+    pub layout: Vec<Component>,
+}
+
+#[derive(Clone, Debug)]
+pub struct Component(String, HashMap<String, Property>);
+
+#[derive(Clone, Debug)]
+pub enum Property {
+    Component(Component),
+    String(String),
+    Integer(i64),
+    Float(f64),
+    Array(Vec<Property>),
+    Boolean(bool),
+    Object(HashMap<String, Property>),
+    Null,
 }
 
 impl Bar {
@@ -41,10 +59,10 @@ pub fn parse_script(path: &str, lua: &mlua::Lua) -> mlua::Result<ConfigScript> {
     let monitors = monitor::list();
     let globals = lua.globals();
 
-    let xcake_bars: mlua::Table = globals.get("xcake_bars")?;
+    let xcake_bars: Table = globals.get("xcake_bars")?;
     let mut bars = Vec::new();
 
-    for pair in xcake_bars.pairs::<i32, mlua::Table>() {
+    for pair in xcake_bars.pairs::<i32, Table>() {
         let (_, value) = pair?;
 
         let position: String = value.get("position").unwrap_or_else(|_| "top".to_string());
@@ -52,7 +70,7 @@ pub fn parse_script(path: &str, lua: &mlua::Lua) -> mlua::Result<ConfigScript> {
         let height: i32 = value.get("height").unwrap_or(25);
 
         let empty_table = lua.create_table()?;
-        let monitor: mlua::Table = value.get("monitor").unwrap_or_else(|_| empty_table);
+        let monitor: Table = value.get("monitor").unwrap_or_else(|_| empty_table);
         let monitor_name: Result<String, mlua::prelude::LuaError> = monitor.get("name");
         let monitor_index = monitor.get("index").unwrap_or(1);
         let monitor = if let Ok(name) = monitor_name {
@@ -64,11 +82,24 @@ pub fn parse_script(path: &str, lua: &mlua::Lua) -> mlua::Result<ConfigScript> {
             monitors.get(monitor_index - 1).unwrap_or(&monitors[0])
         });
 
+        let empty_table = lua.create_table()?;
+        let layout: mlua::Table = value.get("layout").unwrap_or_else(|_| empty_table);
+
+        let mut components = Vec::new();
+
+        for table in layout.sequence_values::<mlua::Table>() {
+            let value = Value::Table(table?);
+            if let Property::Component(component) = to_property(value) {
+                components.push(component);
+            }
+        }
+
         bars.push(Bar {
+            id: NEXT_ID.fetch_add(1, Ordering::Relaxed),
             position,
             height,
             monitor: monitor.clone(),
-            id: NEXT_ID.fetch_add(1, Ordering::Relaxed),
+            layout: components,
         });
     }
 
@@ -76,4 +107,57 @@ pub fn parse_script(path: &str, lua: &mlua::Lua) -> mlua::Result<ConfigScript> {
         path: path.to_string(),
         bars,
     })
+}
+
+fn to_property(value: Value) -> Property {
+    match value {
+        Value::Nil => Property::Null,
+        Value::Boolean(b) => Property::Boolean(b),
+        Value::Integer(i) => Property::Integer(i),
+        Value::Number(n) => Property::Float(n),
+        Value::String(s) => Property::String(s.to_str().unwrap().to_string()),
+        Value::Table(t) => {
+            let mut map = HashMap::new();
+            let mut array = Vec::new();
+            let mut is_array = true;
+            let mut component_name = None;
+            for pair in t.pairs::<Value, Value>() {
+                match pair {
+                    Ok((key, val)) => {
+                        let prop = to_property(val);
+                        match key {
+                            Value::Integer(idx) => {
+                                if idx < 1 {
+                                    is_array = false;
+                                } else {
+                                    if idx == 1 {
+                                        if let Property::String(ref name) = prop {
+                                            component_name = Some(name.clone())
+                                        }
+                                    }
+                                    array.push((idx as usize, prop));
+                                }
+
+                            },
+                            Value::String(s) => {
+                                map.insert(s.to_str().unwrap().to_string(), prop);
+                                is_array = false;
+                            }
+                            _ => is_array = false,
+                        }
+                    }
+                    Err(_) => is_array = false,
+                }
+            }
+            if is_array {
+                array.sort_by_key(|&(idx, _)| idx);
+                Property::Array(array.into_iter().map(|(_, prop)| prop).collect())
+            } else if component_name.is_some() {
+                Property::Component(Component(component_name.unwrap(), map))
+            } else {
+                Property::Object(map)
+            }
+        }
+        _ => Property::Null,
+    }
 }
