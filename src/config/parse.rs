@@ -32,6 +32,7 @@ pub struct Component(String, HashMap<String, Property>);
 #[derive(Clone, Debug)]
 pub enum Property {
     Component(Component),
+    // Function(mlua::Function),
     String(String),
     Integer(i64),
     Float(f64),
@@ -112,6 +113,7 @@ pub fn parse_script(path: &str, lua: &mlua::Lua) -> mlua::Result<ConfigScript> {
 fn to_property(value: Value) -> Property {
     match value {
         Value::Nil => Property::Null,
+        // Value::Function() => Proper
         Value::Boolean(b) => Property::Boolean(b),
         Value::Integer(i) => Property::Integer(i),
         Value::Number(n) => Property::Float(n),
@@ -137,7 +139,6 @@ fn to_property(value: Value) -> Property {
                                     }
                                     array.push((idx as usize, prop));
                                 }
-
                             },
                             Value::String(s) => {
                                 map.insert(s.to_str().unwrap().to_string(), prop);

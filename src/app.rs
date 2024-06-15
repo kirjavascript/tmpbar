@@ -28,6 +28,7 @@ impl eframe::App for TmpBar {
         ctx.request_repaint_after(std::time::Duration::from_millis(500));
         // TODO: use repaint_signal
 //https://github.com/lucasmerlin/hello_egui/tree/bd18788be1c0e7bad7bcc75f3088715fad1e0279/crates/egui_inbox
+// TODO: fork egui::run_simple_native
 
         if (self.poll_watch)() {
             if let Err(err) = self.config.reload() {
@@ -39,6 +40,8 @@ impl eframe::App for TmpBar {
 
         for bar in self.config.bars.iter() {
             let id = bar.id();
+
+            dbg!(&bar.layout);
 
             ctx.show_viewport_immediate(
                 egui::ViewportId::from_hash_of(&id),
