@@ -27,6 +27,7 @@ impl eframe::App for TmpBar {
         // rerender every half second minimum to poll config watcher
         ctx.request_repaint_after(std::time::Duration::from_millis(500));
         // TODO: use repaint_signal
+//https://github.com/lucasmerlin/hello_egui/tree/bd18788be1c0e7bad7bcc75f3088715fad1e0279/crates/egui_inbox
 
         if (self.poll_watch)() {
             if let Err(err) = self.config.reload() {
@@ -59,7 +60,10 @@ impl eframe::App for TmpBar {
                     egui::CentralPanel::default()
                         .frame(egui::Frame::none().fill(egui::Color32::TRANSPARENT))
                         .show(ctx, |ui| {
-                        ui.label(id);
+                            ui.horizontal(|ui| {
+                                ui.label(id.clone());
+                                ui.label(id);
+                            });
                     });
                 },
             );

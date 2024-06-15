@@ -2,7 +2,7 @@ for _, monitor in monitors() do
     bar({
         monitor,
         position = "top",
-        height = 25,
+        height = 28,
         layout = {
             {
                 "label",
