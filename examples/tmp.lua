@@ -6,8 +6,7 @@ for _, monitor in monitors() do
         layout = {
             {
                 "label",
-                text = "foo",
-                text2 = function() return os.date("%Y-%m-%d %X") end
+                text = function() return os.date("%Y-%m-%d %X") end
             },
             {
                 "container",

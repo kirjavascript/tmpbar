@@ -2,7 +2,9 @@ use eframe::egui;
 
 #[macro_use]
 mod util;
+
 mod app;
+mod components;
 mod config;
 mod wm;
 
@@ -19,9 +21,7 @@ fn main() -> eframe::Result<()> {
         std::process::exit(1);
     }
 
-    let path = args.config.as_ref().expect("unreachable");
-
-    let (poll_watch, config) = config::script::load(path);
+    let path = args.config.as_ref().expect("unreachable").to_string();
 
     let native_options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
@@ -40,8 +40,7 @@ fn main() -> eframe::Result<()> {
         native_options,
         Box::new(|cc| Box::new(app::TmpBar::new(
             cc,
-            config,
-            poll_watch,
+            path,
         ))),
     )
 }

@@ -8,11 +8,10 @@ pub struct TmpBar {
 }
 
 impl TmpBar {
-    pub fn new<F>(_cc: &eframe::CreationContext<'_>, config: config::ConfigScript, poll_watch: F) -> Self
-    where
-        F: Fn() -> bool + Send + 'static,
-    {
+    pub fn new(_cc: &eframe::CreationContext<'_>, path: String) -> Self {
         // `cc.egui_ctx.set_visuals` and `cc.egui_ctx.set_fonts`.
+        let (poll_watch, config) = config::script::load(&path);
+
         crate::wm::xcb::window_patch(&config);
 
         TmpBar {
@@ -43,7 +42,6 @@ impl eframe::App for TmpBar {
 
             // dbg!(&bar.layout);
 
-            // TODO: use a single lua instance
             if let Some(crate::config::Property::Function(func)) = bar.layout[0].props().get("text2") {
                 println!("{:#?}", func.call::<(), String>(()));
             }
@@ -69,8 +67,9 @@ impl eframe::App for TmpBar {
                         .frame(egui::Frame::none().fill(egui::Color32::TRANSPARENT))
                         .show(ctx, |ui| {
                             ui.horizontal(|ui| {
-                                ui.label(id.clone());
-                                ui.label(id);
+                                for comp in bar.layout.iter() {
+                                    crate::components::render(&comp, ui);
+                                }
                             });
                     });
                 },

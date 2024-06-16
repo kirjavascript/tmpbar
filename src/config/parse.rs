@@ -24,15 +24,18 @@ pub struct Bar {
     pub layout: Vec<Component>,
 }
 
+pub type Props = HashMap<String, Property>;
+
 #[derive(Debug)]
-pub struct Component(String, HashMap<String, Property>);
+pub struct Component(String, Props);
+
 
 impl Component {
     pub fn name(&self) -> &str {
         &self.0
     }
 
-    pub fn props(&self) -> &HashMap<String, Property> {
+    pub fn props(&self) -> &Props {
         &self.1
     }
 }
