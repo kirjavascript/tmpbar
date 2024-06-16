@@ -9,6 +9,10 @@ for _, monitor in monitors() do
                 text = function() return os.date("%Y-%m-%d %X") end
             },
             {
+                "label",
+                text = function() return exec("xdotool getactivewindow getwindowname") end
+            },
+            {
                 "container",
                 layout = {
                     "label",

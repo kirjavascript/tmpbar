@@ -44,7 +44,7 @@ pub fn window_patch(config: &ConfigScript) {
         while windows.get(&bars.last().unwrap().id).is_none() {
             windows = get_windows(&conn, root);
 
-            std::thread::sleep(std::time::Duration::from_millis(25));
+            std::thread::sleep(std::time::Duration::from_millis(50));
         }
 
 

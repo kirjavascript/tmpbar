@@ -11,6 +11,13 @@ dump = function(o)
    end
 end
 
+function exec(cmd)
+    local handle = io.popen(cmd)
+    local result = handle:read("*a")
+    handle:close()
+    return result
+end
+
 monitors = function()
     return ipairs(xcake_monitors)
 end
