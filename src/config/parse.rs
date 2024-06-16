@@ -5,19 +5,17 @@ use mlua::{Value, Table};
 
 static BAR_ID: AtomicUsize = AtomicUsize::new(0);
 
-#[derive(Clone)]
 pub struct ConfigScript {
     pub path: String,
     pub bars: Vec<Bar>,
 }
 
-#[derive(Clone, PartialEq)]
+#[derive(PartialEq)]
 pub enum Position {
     Top,
     Bottom,
 }
 
-#[derive(Clone)]
 pub struct Bar {
     id: usize,
     pub position: Position,
@@ -26,7 +24,7 @@ pub struct Bar {
     pub layout: Vec<Component>,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub struct Component(String, HashMap<String, Property>);
 
 impl Component {
@@ -39,10 +37,10 @@ impl Component {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub enum Property {
     Component(Component),
-    Function(OwnedFunction),
+    Function(mlua::OwnedFunction),
     String(String),
     Integer(i64),
     Float(f64),
@@ -51,11 +49,6 @@ pub enum Property {
     Object(HashMap<String, Property>),
     Null,
 }
-
-#[derive(Clone, Debug)]
-pub struct OwnedFunction(pub mlua::OwnedFunction);
-
-unsafe impl Send for OwnedFunction {}
 
 impl Bar {
     pub fn y(&self) -> i32 {
@@ -131,9 +124,7 @@ pub fn parse_script(path: &str, lua: &mlua::Lua) -> mlua::Result<ConfigScript> {
 fn to_property(value: Value) -> Property {
     match value {
         Value::Nil => Property::Null,
-        Value::Function(f) => {
-            Property::Function(OwnedFunction(f.into_owned()))
-        },
+        Value::Function(f) => Property::Function(f.into_owned()),
         Value::Boolean(b) => Property::Boolean(b),
         Value::Integer(i) => Property::Integer(i),
         Value::Number(n) => Property::Float(n),

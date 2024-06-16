@@ -43,8 +43,9 @@ impl eframe::App for TmpBar {
 
             // dbg!(&bar.layout);
 
+            // TODO: use a single lua instance
             if let Some(crate::config::Property::Function(func)) = bar.layout[0].props().get("text2") {
-                println!("{:#?}", func.0.call::<(), String>(()));
+                println!("{:#?}", func.call::<(), String>(()));
             }
 
             ctx.show_viewport_immediate(

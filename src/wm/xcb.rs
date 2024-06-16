@@ -1,8 +1,25 @@
 use std::collections::HashMap;
 use crate::config::ConfigScript;
+use crate::wm::monitor::Monitor;
+
+struct SendBar {
+    id: String,
+    y: i32,
+    height: i32,
+    monitor: Monitor,
+}
 
 pub fn window_patch(config: &ConfigScript) {
-    let config = config.clone();
+    if config.bars.len() == 0 {
+        return
+    }
+
+    let bars: Vec<SendBar> = config.bars.iter().map(|bar| SendBar {
+        id: bar.id(),
+        y: bar.y(),
+        height: bar.height,
+        monitor: bar.monitor.clone(),
+    }).collect();
 
     std::thread::spawn(move || {
         xcb::atoms_struct! {
@@ -24,7 +41,7 @@ pub fn window_patch(config: &ConfigScript) {
 
         // it is completely ridiculous to use window titles to find windows,
         // but to get a direct X window reference we have to fork eframe
-        while windows.get(&config.bars.last().unwrap().id()).is_none() {
+        while windows.get(&bars.last().unwrap().id).is_none() {
             windows = get_windows(&conn, root);
 
             std::thread::sleep(std::time::Duration::from_millis(25));
@@ -36,14 +53,14 @@ pub fn window_patch(config: &ConfigScript) {
         conn.send_request(&xcb::x::UnmapWindow { window: *cake_root });
         conn.flush().unwrap();
 
-        for bar in config.bars.iter() {
-            let window = windows.get(&bar.id()).unwrap();
+        for bar in bars.iter() {
+            let window = windows.get(&bar.id).unwrap();
 
             conn.send_request(&xcb::x::ConfigureWindow {
                 window: *window,
                 value_list: &[
                     xcb::x::ConfigWindow::X(bar.monitor.x as _),
-                    xcb::x::ConfigWindow::Y(bar.y() as _),
+                    xcb::x::ConfigWindow::Y(bar.y as _),
                     xcb::x::ConfigWindow::Width(bar.monitor.width as _),
                     xcb::x::ConfigWindow::Height(bar.height as _),
                 ],
@@ -60,14 +77,6 @@ pub fn window_patch(config: &ConfigScript) {
                 window: *window,
                 property: atoms.shadow,
                 r#type: xcb::x::ATOM_CARDINAL,
-                data: &[0u32],
-            });
-
-            conn.send_request(&xcb::x::ChangeProperty {
-                mode: xcb::x::PropMode::Replace,
-                window: *window,
-                property: atoms.shadow,
-                r#type: xcb::x::ATOM_ATOM,
                 data: &[0u32],
             });
 
