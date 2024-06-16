@@ -23,8 +23,7 @@ for _, monitor in monitors() do
     })
 end
 
-
 -- TODO
 -- title, get i3mode from i3blocks code
 -- WebView ?! File Menu (everything from cakey)
--- system() function for menus / buttons
+-- os.execute() function for menus / buttons

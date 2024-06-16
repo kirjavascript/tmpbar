@@ -20,7 +20,7 @@ egui-winit = { version = "0.27.2", features = ["x11"] }
 xcb = "1.4.0"
 gumdrop = "0.8.1"
 xrandr = "0.2.0"
-mlua = { version = "0.9.8", features = ["luajit52"] }
+mlua = { version = "0.9.8", features = ["luajit52", "unstable"] }
 ansi_term = "0.12.1"
 inotify = "0.10.2"
 

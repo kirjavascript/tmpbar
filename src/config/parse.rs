@@ -3,7 +3,7 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 use std::collections::HashMap;
 use mlua::{Value, Table};
 
-static NEXT_ID: AtomicUsize = AtomicUsize::new(0);
+static BAR_ID: AtomicUsize = AtomicUsize::new(0);
 
 #[derive(Clone)]
 pub struct ConfigScript {
@@ -29,10 +29,20 @@ pub struct Bar {
 #[derive(Clone, Debug)]
 pub struct Component(String, HashMap<String, Property>);
 
+impl Component {
+    pub fn name(&self) -> &str {
+        &self.0
+    }
+
+    pub fn props(&self) -> &HashMap<String, Property> {
+        &self.1
+    }
+}
+
 #[derive(Clone, Debug)]
 pub enum Property {
     Component(Component),
-    // Function(mlua::Function),
+    Function(OwnedFunction),
     String(String),
     Integer(i64),
     Float(f64),
@@ -41,6 +51,11 @@ pub enum Property {
     Object(HashMap<String, Property>),
     Null,
 }
+
+#[derive(Clone, Debug)]
+pub struct OwnedFunction(pub mlua::OwnedFunction);
+
+unsafe impl Send for OwnedFunction {}
 
 impl Bar {
     pub fn y(&self) -> i32 {
@@ -80,7 +95,10 @@ pub fn parse_script(path: &str, lua: &mlua::Lua) -> mlua::Result<ConfigScript> {
             None
         };
         let monitor = monitor.unwrap_or_else(|| {
-            monitors.get(monitor_index - 1).unwrap_or(&monitors[0])
+            monitors.get(monitor_index - 1).unwrap_or_else(|| {
+                info!("cannot find monitor, defaulting to {}", monitors[0].name);
+                &monitors[0]
+            })
         });
 
         let empty_table = lua.create_table()?;
@@ -96,7 +114,7 @@ pub fn parse_script(path: &str, lua: &mlua::Lua) -> mlua::Result<ConfigScript> {
         }
 
         bars.push(Bar {
-            id: NEXT_ID.fetch_add(1, Ordering::Relaxed),
+            id: BAR_ID.fetch_add(1, Ordering::Relaxed),
             position,
             height,
             monitor: monitor.clone(),
@@ -113,7 +131,9 @@ pub fn parse_script(path: &str, lua: &mlua::Lua) -> mlua::Result<ConfigScript> {
 fn to_property(value: Value) -> Property {
     match value {
         Value::Nil => Property::Null,
-        // Value::Function() => Proper
+        Value::Function(f) => {
+            Property::Function(OwnedFunction(f.into_owned()))
+        },
         Value::Boolean(b) => Property::Boolean(b),
         Value::Integer(i) => Property::Integer(i),
         Value::Number(n) => Property::Float(n),

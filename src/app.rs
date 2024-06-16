@@ -41,7 +41,11 @@ impl eframe::App for TmpBar {
         for bar in self.config.bars.iter() {
             let id = bar.id();
 
-            dbg!(&bar.layout);
+            // dbg!(&bar.layout);
+
+            if let Some(crate::config::Property::Function(func)) = bar.layout[0].props().get("text2") {
+                println!("{:#?}", func.0.call::<(), String>(()));
+            }
 
             ctx.show_viewport_immediate(
                 egui::ViewportId::from_hash_of(&id),
