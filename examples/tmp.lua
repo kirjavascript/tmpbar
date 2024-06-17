@@ -2,11 +2,16 @@ for _, monitor in monitors() do
     bar({
         monitor = monitor,
         position = "top",
-        height = 28,
+        height = 26,
         layout = {
             {
                 "label",
                 text = function() return os.date("%Y-%m-%d %X") end
+            },
+            {
+                "button",
+                text = "important",
+                onclick = function() return exec("xdg-open 'https://e621.net/posts'") end
             },
             {
                 "label",

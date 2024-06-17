@@ -24,11 +24,24 @@ pub struct Bar {
     pub layout: Vec<Component>,
 }
 
+impl Bar {
+    pub fn y(&self) -> i32 {
+        if self.position == Position::Top {
+            0
+        } else {
+            self.monitor.height - self.height
+        }
+    }
+
+    pub fn id(&self) -> String {
+        "xcake-".to_string() + &self.id.to_string()
+    }
+}
+
 pub type Props = HashMap<String, Property>;
 
 #[derive(Debug)]
 pub struct Component(String, Props);
-
 
 impl Component {
     pub fn name(&self) -> &str {
@@ -51,20 +64,6 @@ pub enum Property {
     Boolean(bool),
     Object(HashMap<String, Property>),
     Null,
-}
-
-impl Bar {
-    pub fn y(&self) -> i32 {
-        if self.position == Position::Top {
-            0
-        } else {
-            self.monitor.height - self.height
-        }
-    }
-
-    pub fn id(&self) -> String {
-        "xcake-".to_string() + &self.id.to_string()
-    }
 }
 
 pub fn parse_script(path: &str, lua: &mlua::Lua) -> mlua::Result<ConfigScript> {
@@ -174,5 +173,18 @@ fn to_property(value: Value) -> Property {
             }
         }
         _ => Property::Null,
+    }
+}
+
+pub fn get_text(props: &Props, attr: &str) -> String {
+    match props.get(attr) {
+        Some(Property::Function(func)) => {
+            func.call::<(), String>(())
+                .unwrap_or("invalid function".to_string())
+        }
+        Some(Property::String(text)) => {
+            text.to_owned()
+        }
+        _ => "invalid text".to_string()
     }
 }
