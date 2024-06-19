@@ -2,31 +2,37 @@ for _, monitor in monitors() do
     bar({
         monitor = monitor,
         position = "top",
-        height = 26,
+        height = 18,
         layout = {
+            {
+                "button",
+                text = "shutdown",
+                click = function() return exec("~/.config/i3/scripts/powermenu") end
+            },
             {
                 "label",
                 text = function() return os.date("%Y-%m-%d %X") end
             },
+            -- {
+            --     "text-input",
+            --     submit = function(text) return exec(text) end
+            -- },
             {
-                "button",
-                text = "important",
-                onclick = function() return exec("xdg-open 'https://e621.net/posts'") end
-            },
-            {
-                "label",
+                "label", -- active-window
                 text = function() return exec("xdotool getactivewindow getwindowname") end
             },
-            {
-                "container",
-                layout = {
-                    "label",
-                    text = "foo",
-                },
-                foo = {
-                    bar = "bar"
-                },
-            },
+            { "label", text = function() return "disk " ..exec("~/.config/i3/scripts/disk") end },
+            { "label", text = function() return "temp" ..exec("~/.config/i3/scripts/temperature") end },
+            -- {
+            --     "container",
+            --     layout = {
+            --         "label",
+            --         text = "foo",
+            --     },
+            --     foo = {
+            --         bar = "bar"
+            --     },
+            -- },
         }
     })
 end
@@ -34,4 +40,4 @@ end
 -- TODO
 -- title, get i3mode from i3blocks code
 -- WebView ?! File Menu (everything from cakey)
--- os.execute() function for menus / buttons
+-- window collapse

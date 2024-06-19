@@ -48,8 +48,8 @@ impl Component {
         &self.0
     }
 
-    pub fn props(&self) -> &Props {
-        &self.1
+    pub fn props(&mut self) -> &mut Props {
+        &mut self.1
     }
 }
 
@@ -91,7 +91,7 @@ pub fn parse_script(path: &str, lua: &mlua::Lua) -> mlua::Result<ConfigScript> {
         };
         let monitor = monitor.unwrap_or_else(|| {
             monitors.get(monitor_index - 1).unwrap_or_else(|| {
-                info!("cannot find monitor, defaulting to {}", monitors[0].name);
+                warn!("cannot find monitor, defaulting to {}", monitors[0].name);
                 &monitors[0]
             })
         });
@@ -180,11 +180,22 @@ pub fn get_text(props: &Props, attr: &str) -> String {
     match props.get(attr) {
         Some(Property::Function(func)) => {
             func.call::<(), String>(())
-                .unwrap_or("invalid function".to_string())
+                .unwrap_or("[error function]".to_string())
         }
         Some(Property::String(text)) => {
             text.to_owned()
         }
-        _ => "invalid text".to_string()
+        _ => "[error text]".to_string()
+    }
+}
+
+pub fn text_mut<'a>(props: &'a mut Props, attr: &str) -> &'a mut String {
+    match props.get_mut(attr) {
+        Some(Property::String(_)) => {},
+        _ => { props.insert(attr.to_string(), Property::String("".to_string())); },
+    };
+    match props.get_mut(attr) {
+        Some(Property::String(text)) => text,
+        _ => unreachable!(),
     }
 }

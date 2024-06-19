@@ -37,14 +37,8 @@ impl eframe::App for TmpBar {
             }
         }
 
-        for bar in self.config.bars.iter() {
+        for bar in self.config.bars.iter_mut() {
             let id = bar.id();
-
-            // dbg!(&bar.layout);
-
-            if let Some(crate::config::Property::Function(func)) = bar.layout[0].props().get("text2") {
-                println!("{:#?}", func.call::<(), String>(()));
-            }
 
             ctx.show_viewport_immediate(
                 egui::ViewportId::from_hash_of(&id),
@@ -67,8 +61,8 @@ impl eframe::App for TmpBar {
                         .frame(egui::Frame::none().fill(egui::Color32::TRANSPARENT))
                         .show(ctx, |ui| {
                             ui.horizontal(|ui| {
-                                for comp in bar.layout.iter() {
-                                    crate::components::render(&comp, ui);
+                                for comp in bar.layout.iter_mut() {
+                                    crate::components::render(comp, ui);
                                 }
                             });
                     });

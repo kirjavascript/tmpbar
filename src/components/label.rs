@@ -1,7 +1,7 @@
 use eframe::egui;
-use egui::{Ui, Response};
+use egui::Ui;
 use crate::config::{Props, get_text};
 
-pub fn render(props: &Props, ui: &mut Ui) -> Response {
-    ui.label(get_text(props, "text"))
+pub fn render(props: &mut Props, ui: &mut Ui) {
+    ui.label(get_text(props, "text"));
 }
