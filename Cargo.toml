@@ -4,10 +4,6 @@ version = "0.0.1"
 edition = "2021"
 rust-version = "1.76"
 
-[package.metadata.docs.rs]
-all-features = true
-targets = ["x86_64-unknown-linux-gnu", "wasm32-unknown-unknown"]
-
 [dependencies]
 egui = "0.27.2"
 eframe = { version = "0.27.2", default-features = false, features = [
@@ -15,25 +11,18 @@ eframe = { version = "0.27.2", default-features = false, features = [
     "glow",
 ] }
 log = "0.4"
-egui-winit = { version = "0.27.2", features = ["x11"] }
+egui-winit = { version = "0.27.2", features=["x11", "wayland"] }
 
 xcb = "1.4.0"
 gumdrop = "0.8.1"
-xrandr = "0.2.0"
+display-info = "0.5.1"
 mlua = { version = "0.9.8", features = ["luajit52", "unstable"] }
 ansi_term = "0.12.1"
 inotify = "0.10.2"
 
-# You only need serde if you want app persistence:
+# egui features
 serde = { version = "1", features = ["derive"] }
-
-# native:
-[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 env_logger = "0.10"
-
-# web:
-[target.'cfg(target_arch = "wasm32")'.dependencies]
-wasm-bindgen-futures = "0.4"
 
 
 [profile.release]

@@ -29,6 +29,10 @@ impl eframe::App for TmpBar {
 //https://github.com/lucasmerlin/hello_egui/tree/bd18788be1c0e7bad7bcc75f3088715fad1e0279/crates/egui_inbox
 // TODO: fork egui::run_simple_native
 
+        // TODO:
+        // styles
+        // push rendering (non-polling)
+
         if (self.poll_watch)() {
             if let Err(err) = self.config.reload() {
                 error!("{}", err);

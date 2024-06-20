@@ -5,7 +5,7 @@ use crate::wm::monitor::Monitor;
 struct SendBar {
     id: String,
     y: i32,
-    height: i32,
+    height: u32,
     monitor: Monitor,
 }
 

@@ -19,7 +19,7 @@ pub enum Position {
 pub struct Bar {
     id: usize,
     pub position: Position,
-    pub height: i32,
+    pub height: u32,
     pub monitor: monitor::Monitor,
     pub layout: Vec<Component>,
 }
@@ -29,7 +29,7 @@ impl Bar {
         if self.position == Position::Top {
             0
         } else {
-            self.monitor.height - self.height
+            (self.monitor.height - self.height) as i32
         }
     }
 
@@ -78,7 +78,7 @@ pub fn parse_script(path: &str, lua: &mlua::Lua) -> mlua::Result<ConfigScript> {
 
         let position: String = value.get("position").unwrap_or_else(|_| "top".to_string());
         let position = if position == "top".to_string() { Position::Top } else { Position::Bottom };
-        let height: i32 = value.get("height").unwrap_or(25);
+        let height: u32 = value.get("height").unwrap_or(25);
 
         let empty_table = lua.create_table()?;
         let monitor: Table = value.get("monitor").unwrap_or_else(|_| empty_table);

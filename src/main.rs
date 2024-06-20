@@ -29,7 +29,6 @@ fn main() -> eframe::Result<()> {
             .with_inner_size([1.0, 1.0])
             .with_window_level(egui::WindowLevel::AlwaysOnBottom)
             .with_decorations(false)
-            .with_resizable(false)
             .with_transparent(true)
             .with_window_type(egui::viewport::X11WindowType::Toolbar)
             ,
