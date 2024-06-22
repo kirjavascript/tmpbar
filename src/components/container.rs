@@ -4,11 +4,33 @@ use egui_extras::{Size, Strip, StripBuilder};
 use crate::config::{Property, Props};
 
 pub fn render(props: &mut Props, ui: &mut Ui) {
-    // TODO: make top level a container, move this maybe (or store a Property
-    //
-    // TODO :disable flex? or horizontal
+    let is_horizontal = if let Some(Property::String(dir)) = props.get("direction") { dir.starts_with("h") } else { true };
+    let is_flex: bool = props.get("flex").unwrap_or_default().into();
 
-    let is_horizontal = if let Some(Property::String(dir)) = props.get("dir") { dir.starts_with("h") } else { true };
+    if !is_flex {
+        fn render_components(props: &mut Props, ui: &mut Ui) {
+            if let Some(Property::Array(list)) = props.get_mut("items") {
+                for prop in list {
+                    if let Property::Component(comp) = prop {
+                        super::render(comp, ui);
+                    }
+                }
+            }
+
+        }
+
+        if is_horizontal {
+            ui.horizontal(|ui| {
+                render_components(props, ui);
+            });
+        } else {
+            ui.vertical(|ui| {
+                render_components(props, ui);
+            });
+        }
+
+        return;
+    }
 
     let mut builder = StripBuilder::new(ui);
 
@@ -61,7 +83,7 @@ pub fn render(props: &mut Props, ui: &mut Ui) {
 fn layout_from_props(props: &Props) -> egui::Layout {
     let mut layout = egui::Layout::left_to_right(egui::Align::Center);
 
-    if let Some(Property::String(dir)) = props.get("dir") {
+    if let Some(Property::String(dir)) = props.get("flow") {
         layout.main_dir = match dir.as_str() {
             "left-right" => egui::Direction::LeftToRight,
             "right-left" => egui::Direction::RightToLeft,

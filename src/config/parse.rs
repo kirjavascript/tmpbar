@@ -21,7 +21,7 @@ pub struct Bar {
     pub position: Position,
     pub height: u32,
     pub monitor: monitor::Monitor,
-    pub layout: Vec<Component>,
+    pub container: Component,
 }
 
 impl Bar {
@@ -96,24 +96,29 @@ pub fn parse_script(path: &str, lua: &mlua::Lua) -> mlua::Result<ConfigScript> {
             })
         });
 
-        let empty_table = lua.create_table()?;
-        let layout: mlua::Table = value.get("items").unwrap_or_else(|_| empty_table);
+        value.set("monitor", Value::Nil)?;
+        value.set("height", Value::Nil)?;
+        value.set("position", Value::Nil)?;
 
-        let mut components = Vec::new();
+        // get props for top level container
 
-        for table in layout.sequence_values::<mlua::Table>() {
-            let value = Value::Table(table?);
-            if let Property::Component(component) = to_property(value) {
-                components.push(component);
-            }
-        }
+        let top_props = to_property(Value::Table(value));
+
+        let top_props = if let Property::Object(props) = top_props {
+            props
+        } else {
+            HashMap::new()
+        };
 
         bars.push(Bar {
             id: BAR_ID.fetch_add(1, Ordering::Relaxed),
             position,
             height,
             monitor: monitor.clone(),
-            layout: components,
+            container: Component(
+                "container".to_string(),
+                top_props,
+            ),
         });
     }
 

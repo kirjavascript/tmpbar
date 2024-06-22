@@ -2,11 +2,11 @@ for _, monitor in monitors() do
     bar({
             monitor = monitor,
             position = "top",
-            height = 100,
+            height = 50,
             items = {
                 {
                     "container",
-                    flex = true,
+                    -- flex = true,
                     -- wrap = true,
                     -- justify = true,
                     -- dir = "left-right",
@@ -14,7 +14,7 @@ for _, monitor in monitors() do
                     -- crossDir = "left-right",
                     crossAlign = "end",
                     -- crossJustify = true,
-                    dir = "h",
+                    direction = "h",
                     items = {
                         {
                             "label",
