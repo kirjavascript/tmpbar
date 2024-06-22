@@ -30,6 +30,7 @@ impl eframe::App for TmpBar {
 // TODO: fork egui::run_simple_native
 
         // TODO:
+        // layout
         // styles
         // push rendering (non-polling)
 
@@ -64,11 +65,9 @@ impl eframe::App for TmpBar {
                     egui::CentralPanel::default()
                         .frame(egui::Frame::none().fill(egui::Color32::TRANSPARENT))
                         .show(ctx, |ui| {
-                            ui.horizontal(|ui| {
-                                for comp in bar.layout.iter_mut() {
-                                    crate::components::render(comp, ui);
-                                }
-                            });
+                            for comp in bar.layout.iter_mut() {
+                                crate::components::render(comp, ui);
+                            }
                     });
                 },
             );

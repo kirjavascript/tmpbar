@@ -4,6 +4,7 @@ use super::parse::{ConfigScript, parse_script};
 
 impl ConfigScript {
     pub fn reload(&mut self) -> Result<(), String> {
+        info!("reloading config");
         let _ = std::mem::replace(self, load_raw(&self.path)?);
         Ok(())
     }

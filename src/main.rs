@@ -27,12 +27,11 @@ fn main() -> eframe::Result<()> {
         viewport: egui::ViewportBuilder::default()
             .with_title("xcake-root")
             .with_inner_size([1.0, 1.0])
-            .with_window_level(egui::WindowLevel::AlwaysOnBottom)
             .with_decorations(false)
             .with_transparent(true)
+            .with_window_level(egui::WindowLevel::AlwaysOnBottom)
             .with_window_type(egui::viewport::X11WindowType::Toolbar)
-            ,
-            ..Default::default()
+            ,..Default::default()
     };
     eframe::run_native(
         "🍰",

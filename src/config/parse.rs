@@ -97,7 +97,7 @@ pub fn parse_script(path: &str, lua: &mlua::Lua) -> mlua::Result<ConfigScript> {
         });
 
         let empty_table = lua.create_table()?;
-        let layout: mlua::Table = value.get("layout").unwrap_or_else(|_| empty_table);
+        let layout: mlua::Table = value.get("items").unwrap_or_else(|_| empty_table);
 
         let mut components = Vec::new();
 
@@ -185,7 +185,7 @@ pub fn get_text(props: &Props, attr: &str) -> String {
         Some(Property::String(text)) => {
             text.to_owned()
         }
-        _ => "[error text]".to_string()
+        _ => "[no text]".to_string()
     }
 }
 
@@ -197,5 +197,47 @@ pub fn text_mut<'a>(props: &'a mut Props, attr: &str) -> &'a mut String {
     match props.get_mut(attr) {
         Some(Property::String(text)) => text,
         _ => unreachable!(),
+    }
+}
+
+impl Default for &Property {
+    fn default() -> Self {
+        &Property::Null
+    }
+}
+
+impl Into<String> for &Property {
+    fn into(self) -> String {
+        match self {
+            Property::String(s) => s.to_owned(),
+            _ => String::default(),
+        }
+    }
+}
+
+impl Into<i64> for &Property {
+    fn into(self) -> i64 {
+        match self {
+            Property::Integer(i) => *i,
+            _ => i64::default(),
+        }
+    }
+}
+
+impl Into<f64> for &Property {
+    fn into(self) -> f64 {
+        match self {
+            Property::Float(f) => *f,
+            _ => f64::default(),
+        }
+    }
+}
+
+impl Into<bool> for &Property {
+    fn into(self) -> bool {
+        match self {
+            Property::Boolean(b) => *b,
+            _ => bool::default(),
+        }
     }
 }
