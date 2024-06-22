@@ -18,6 +18,10 @@ function exec(cmd)
     return result
 end
 
+function trim(s)
+    return (s:gsub("^%s*(.-)%s*$", "%1"))
+end
+
 monitors = function()
     return ipairs(xcake_monitors)
 end

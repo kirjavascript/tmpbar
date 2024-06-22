@@ -3,62 +3,47 @@ for _, monitor in monitors() do
             monitor = monitor,
             position = "top",
             height = 50,
+            flex = true,
             items = {
                 {
-                    "container",
-                    -- flex = true,
-                    -- wrap = true,
-                    -- justify = true,
-                    -- dir = "left-right",
+                    "button",
+                    text = "shutdown",
+                    size = 100,
+                    click = function() return exec("~/.config/i3/scripts/powermenu") end
+                },
+                {
+                    "label", -- active-window
                     align = "end",
-                    -- crossDir = "left-right",
-                    crossAlign = "end",
+                    size = 1/1.9,
+                    text = function() return trim(exec("xdotool getactivewindow getwindowname")) end
+                },
+                {
+                    "container",
+                    flex = true,
+                    -- wrap = true,
+                    -- justify = false,
+                    -- dir = "right-left",
+                    -- align = "end",
+                    -- crossDir = "right-left",
+                    -- crossAlign = "end",
                     -- crossJustify = true,
-                    direction = "h",
+                    -- direction = "h",
+                    -- debugLayout = true,
                     items = {
                         {
                             "label",
-                            align = "start",
+                            text = "foo bar baz",
+                        },
+                        -- { "label", text = function() return "disk " ..trim(exec("~/.config/i3/scripts/disk")) end },
+                        -- { "label", text = function() return "temp" ..trim(exec("~/.config/i3/scripts/temperature")) end },
+                        {
+                            "label",
+                            align = "end",
+                            -- size = 100,
                             text = function() return os.date("%Y-%m-%d %X") end
-                        },
-                        {
-                            "label",
-                            text = "bar",
-                        },
-                        {
-                            "label",
-                            text = "[12345]",
-                            align = "end"
                         },
                     },
                 },
-                -- {
-                --         "label",
-                --         text = "foo",
-                -- },
-                -- {
-                --         "label",
-                --         text = "bar",
-                -- },
-                -- {
-                    --     "button",
-                    --     text = "shutdown",
-                    --     click = function() return exec("~/.config/i3/scripts/powermenu") end
-                -- },
-                -- {
-                    --     "label",
-                    --     text = function() return os.date("%Y-%m-%d %X") end
-                -- },
-                -- -- {
-                    -- --     "text-input",
-                    -- --     submit = function(text) return exec(text) end
-                -- -- },
-                -- {
-                    --     "label", -- active-window
-                    --     text = function() return exec("xdotool getactivewindow getwindowname") end
-                -- },
-                -- { "label", text = function() return "disk " ..exec("~/.config/i3/scripts/disk") end },
-                -- { "label", text = function() return "temp" ..exec("~/.config/i3/scripts/temperature") end },
             },
         })
 end
@@ -67,3 +52,4 @@ end
 -- title, get i3mode from i3blocks code
 -- WebView ?! File Menu (everything from cakey)
 -- window collapse
+-- animated SVG for battery monitor, CPU graph

@@ -8,25 +8,16 @@ pub fn render(props: &mut Props, ui: &mut Ui) {
     let is_flex: bool = props.get("flex").unwrap_or_default().into();
 
     if !is_flex {
-        fn render_components(props: &mut Props, ui: &mut Ui) {
-            if let Some(Property::Array(list)) = props.get_mut("items") {
-                for prop in list {
-                    if let Property::Component(comp) = prop {
-                        super::render(comp, ui);
+        if let Some(Property::Array(list)) = props.get_mut("items") {
+            for prop in list {
+                if let Property::Component(comp) = prop {
+                    let props = comp.props();
+                    if props.get("debugLayout").unwrap_or_default().into() {
+                        debug_layout(ui);
                     }
+                    super::render(comp, ui);
                 }
             }
-
-        }
-
-        if is_horizontal {
-            ui.horizontal(|ui| {
-                render_components(props, ui);
-            });
-        } else {
-            ui.vertical(|ui| {
-                render_components(props, ui);
-            });
         }
 
         return;
@@ -54,12 +45,11 @@ pub fn render(props: &mut Props, ui: &mut Ui) {
             for prop in list {
                 if let Property::Component(comp) = prop {
                     strip.cell(|ui| {
-                        ui.painter().rect_filled(
-                            ui.available_rect_before_wrap(),
-                            0.0,
-                            Color32::GREEN,
-                        );
-                        ui.with_layout(layout_from_props(comp.props()), |ui| {
+                        let props = comp.props();
+                        if props.get("debugLayout").unwrap_or_default().into() {
+                            debug_layout(ui);
+                        }
+                        ui.with_layout(layout_from_props(props), |ui| {
                             super::render(comp, ui);
                         });
 
@@ -119,4 +109,12 @@ fn layout_from_props(props: &Props) -> egui::Layout {
     }
 
     layout
+}
+
+fn debug_layout(ui: &mut Ui) {
+    ui.painter().rect_filled(
+        ui.available_rect_before_wrap(),
+        0.0,
+        Color32::PLACEHOLDER,
+    );
 }

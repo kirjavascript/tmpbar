@@ -30,6 +30,7 @@ impl eframe::App for TmpBar {
 // TODO: fork egui::run_simple_native
 
         // TODO:
+        // images
         // styles
         // push rendering (non-polling)
 
