@@ -12,14 +12,12 @@ function readFile(filePath)
         return nil, err
     end
 
-    print(1)
     local content = {}
     local byte = file:read(1)
     while byte do
         table.insert(content, string.byte(byte))
         byte = file:read(1)
     end
-    print(2)
 
     file:close()
     return content
@@ -36,10 +34,10 @@ function trim(s)
     return (s:gsub("^%s*(.-)%s*$", "%1"))
 end
 
-monitors = function()
+function monitors()
     return ipairs(xcake_monitors)
 end
 
-bar = function(config)
+function bar(config)
     table.insert(xcake_bars, config)
 end
