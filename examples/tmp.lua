@@ -3,44 +3,46 @@ for _, monitor in monitors() do
             monitor = monitor,
             position = "top",
             height = 50,
+
             flex = true,
+            -- orientation = "h",
+
+            -- wrap = true,
+            -- direction = "top-down",
+            -- justify = true,
+            -- crossJustify = true,
+            -- align = "end",
+            -- crossAlign = "end",
+            -- debugLayout
+
             items = {
                 {
                     "button",
                     text = "shutdown",
+                    justify = true,
+                    crossJustify = true,
                     size = 100,
                     click = function() return exec("~/.config/i3/scripts/powermenu") end
                 },
                 {
                     "label", -- active-window
                     align = "end",
+                    justify = true,
                     size = 1/1.9,
                     text = function() return trim(exec("xdotool getactivewindow getwindowname")) end
                 },
                 {
                     "container",
-                    flex = true,
-                    -- wrap = true,
-                    -- justify = false,
-                    -- dir = "right-left",
-                    -- align = "end",
-                    -- crossDir = "right-left",
-                    -- crossAlign = "end",
-                    -- crossJustify = true,
-                    -- direction = "h",
-                    -- debugLayout = true,
+                    direction = "<",
                     items = {
                         {
                             "label",
-                            text = "foo bar baz",
+                            align = "end",
+                            text = function() return os.date("%Y-%m-%d %X") end
                         },
-                        -- { "label", text = function() return "disk " ..trim(exec("~/.config/i3/scripts/disk")) end },
-                        -- { "label", text = function() return "temp" ..trim(exec("~/.config/i3/scripts/temperature")) end },
                         {
                             "label",
-                            align = "end",
-                            -- size = 100,
-                            text = function() return os.date("%Y-%m-%d %X") end
+                            text = "foo bar baz",
                         },
                     },
                 },

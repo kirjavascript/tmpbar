@@ -33,6 +33,7 @@ impl eframe::App for TmpBar {
         // images
         // styles
         // push rendering (non-polling)
+        // for input: https://docs.rs/xcb/latest/xcb/x/struct.GrabKeyboard.html
 
         if (self.poll_watch)() {
             if let Err(err) = self.config.reload() {

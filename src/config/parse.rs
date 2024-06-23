@@ -242,6 +242,7 @@ impl Into<bool> for &Property {
     fn into(self) -> bool {
         match self {
             Property::Boolean(b) => *b,
+            Property::Integer(i) => if *i > 0 { true } else { false },
             _ => bool::default(),
         }
     }
