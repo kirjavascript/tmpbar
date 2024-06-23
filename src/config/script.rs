@@ -1,4 +1,5 @@
-use std::fs::File;
+use std::fs::{File, canonicalize};
+use std::path::Path;
 use std::io::prelude::*;
 use super::parse::{ConfigScript, parse_script};
 
@@ -50,8 +51,10 @@ pub fn eval(path: &str, script: String) -> mlua::Result<ConfigScript> {
     let lua = mlua::Lua::new();
     let globals = lua.globals();
 
-    let bars = lua.create_table()?;
-    globals.set("xcake_bars", bars)?;
+    if let Ok(path) = canonicalize(Path::new(path)) {
+        let parent = path.parent().map(|p| p.to_path_buf());
+        globals.set("xcake_parent_path", parent.unwrap().to_string_lossy() + "/")?;
+    }
 
     lua.load(include_str!("./prelude.lua")).exec()?;
 

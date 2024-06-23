@@ -40,7 +40,7 @@ impl Bar {
 
 pub type Props = HashMap<String, Property>;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Component(String, Props);
 
 impl Component {
@@ -53,7 +53,7 @@ impl Component {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Property {
     Component(Component),
     Function(mlua::OwnedFunction),
@@ -71,6 +71,7 @@ pub fn parse_script(path: &str, lua: &mlua::Lua) -> mlua::Result<ConfigScript> {
     let globals = lua.globals();
 
     let xcake_bars: Table = globals.get("xcake_bars")?;
+    let xcake_parent_path: Value = globals.get("xcake_parent_path")?;
     let mut bars = Vec::new();
 
     for pair in xcake_bars.pairs::<i32, Table>() {
@@ -100,9 +101,19 @@ pub fn parse_script(path: &str, lua: &mlua::Lua) -> mlua::Result<ConfigScript> {
         value.set("height", Value::Nil)?;
         value.set("position", Value::Nil)?;
 
+        let id = BAR_ID.fetch_add(1, Ordering::Relaxed);
+
+        // default props for every component
+
+        let mut default_props = HashMap::new();
+
+        default_props.insert("_bar_id".to_string(), Property::String(format!("xcake-{}", id)));
+
+        default_props.insert("_parent_path".to_string(), Property::String(xcake_parent_path.to_string()?));
+
         // get props for top level container
 
-        let top_props = to_property(Value::Table(value));
+        let top_props = to_property(Value::Table(value), &default_props);
 
         let top_props = if let Property::Object(props) = top_props {
             props
@@ -111,7 +122,7 @@ pub fn parse_script(path: &str, lua: &mlua::Lua) -> mlua::Result<ConfigScript> {
         };
 
         bars.push(Bar {
-            id: BAR_ID.fetch_add(1, Ordering::Relaxed),
+            id,
             position,
             height,
             monitor: monitor.clone(),
@@ -128,7 +139,7 @@ pub fn parse_script(path: &str, lua: &mlua::Lua) -> mlua::Result<ConfigScript> {
     })
 }
 
-fn to_property(value: Value) -> Property {
+fn to_property(value: Value, default_props: &HashMap<String, Property>) -> Property {
     match value {
         Value::Nil => Property::Null,
         Value::Function(f) => Property::Function(f.into_owned()),
@@ -144,7 +155,7 @@ fn to_property(value: Value) -> Property {
             for pair in t.pairs::<Value, Value>() {
                 match pair {
                     Ok((key, val)) => {
-                        let prop = to_property(val);
+                        let prop = to_property(val, default_props);
                         match key {
                             Value::Integer(idx) => {
                                 if idx < 1 {
@@ -172,6 +183,9 @@ fn to_property(value: Value) -> Property {
                 array.sort_by_key(|&(idx, _)| idx);
                 Property::Array(array.into_iter().map(|(_, prop)| prop).collect())
             } else if component_name.is_some() {
+                map.extend(default_props.iter().map(|(key, val)| {
+                    (key.to_owned(), val.clone())
+                }));
                 Property::Component(Component(component_name.unwrap(), map))
             } else {
                 Property::Object(map)

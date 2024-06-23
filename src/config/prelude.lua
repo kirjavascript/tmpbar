@@ -1,14 +1,28 @@
-dump = function(o)
-   if type(o) == 'table' then
-      local s = '{ '
-      for k,v in pairs(o) do
-         if type(k) ~= 'number' then k = '"'..k..'"' end
-         s = s .. '['..k..'] = ' .. dump(v) .. ','
-      end
-      return s .. '} '
-   else
-      return tostring(o)
-   end
+xcake_bars = {}
+
+function readFile(filePath)
+    if rawget(_G, "xcake_parent_path") ~= nil then
+        if filePath:sub(1, 1) ~= '/' then
+            filePath = xcake_parent_path .. filePath
+        end
+    end
+
+    local file, err = io.open(filePath, "r")
+    if not file then
+        return nil, err
+    end
+
+    print(1)
+    local content = {}
+    local byte = file:read(1)
+    while byte do
+        table.insert(content, string.byte(byte))
+        byte = file:read(1)
+    end
+    print(2)
+
+    file:close()
+    return content
 end
 
 function exec(cmd)

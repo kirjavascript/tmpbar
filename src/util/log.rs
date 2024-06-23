@@ -15,10 +15,10 @@ macro_rules! message {
 #[macro_export]
 macro_rules! error {
     ( $x:expr, $( $y:expr ),* $(,)? ) => {
-        message!(Red, "error", format!($x, $($y),*));
+        message!(Blue, "error", format!($x, $($y),*));
     };
     ( $x:expr ) => {
-        message!(Red, "error", format!($x));
+        message!(Blue, "error", format!($x));
     };
 }
 
