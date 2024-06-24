@@ -21,8 +21,6 @@ pub fn render(comp: &mut Component, ui: &mut Ui) {
         "button" => button::render(comp.props(), ui),
         "image" => image::render(comp.props(), ui),
         "label" => label::render(comp.props(), ui),
-        _ => {
-            ui.label(format!("[unknown {:?}]", comp.name()));
-        },
+        _ => { ui.label(format!("[unknown {:?}]", comp.name())); },
     }
 }

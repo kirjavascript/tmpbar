@@ -10,12 +10,9 @@ pub struct TmpBar {
 impl TmpBar {
     pub fn new(cc: &eframe::CreationContext<'_>, path: String) -> Self {
         // `cc.egui_ctx.set_visuals` and `cc.egui_ctx.set_fonts`.
-        let now = std::time::SystemTime::now();
         let (poll_watch, config) = config::script::load(&path);
 
         egui_extras::install_image_loaders(&cc.egui_ctx);
-
-        info!("config loaded ({:?})", now.elapsed().unwrap());
 
         crate::wm::xcb::window_patch(&config);
 
@@ -35,10 +32,10 @@ impl eframe::App for TmpBar {
 // TODO: fork egui::run_simple_native
 
         // TODO:
-        // styles
         // push rendering (non-polling)
         // absolute positioning in stripbuilder
-        // for input: https://docs.rs/xcb/latest/xcb/x/struct.GrabKeyboard.html & pass bar id to every component
+        // input: pressing enter doesnt unfocus properly
+        // styles
 
         if (self.poll_watch)() {
             if let Err(err) = self.config.reload() {

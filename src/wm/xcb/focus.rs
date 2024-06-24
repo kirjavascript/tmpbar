@@ -13,6 +13,8 @@ pub fn window_focus(id: String, state: bool) {
 
         let mut windows = super::window::get_windows(&conn, root);
 
+        // it is completely ridiculous to use window titles to find windows,
+        // but to get a direct X window reference we have to fork eframe
         while windows.get(&id).is_none() {
             windows = super::get_windows(&conn, root);
 
