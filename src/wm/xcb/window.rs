@@ -118,7 +118,7 @@ pub fn window_patch(config: &ConfigScript) {
     });
 }
 
-fn get_windows(conn: &xcb::Connection, root: xcb::x::Window) -> HashMap<String, xcb::x::Window> {
+pub fn get_windows(conn: &xcb::Connection, root: xcb::x::Window) -> HashMap<String, xcb::x::Window> {
     let mut windows = HashMap::new();
 
     fn query(conn: &xcb::Connection, window: xcb::x::Window, windows: &mut HashMap<String, xcb::x::Window>) {

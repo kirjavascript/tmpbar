@@ -27,15 +27,18 @@ for _, monitor in monitors() do
                 {
                     "image",
                     size = 50,
-                    -- justify = true,
-                    -- crossJustify = true,
                     path = "./demo.gif",
+                },
+                {
+                    "input",
+                    size = 150,
+                    submit = print,
                 },
                 {
                     "label", -- active-window
                     align = "end",
                     justify = true,
-                    size = 1/1.9,
+                    -- size = 1/1.9,
                     text = function() return trim(exec("xdotool getactivewindow getwindowname")) end
                 },
                 {
