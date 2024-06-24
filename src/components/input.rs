@@ -10,15 +10,13 @@ pub fn render(props: &mut Props, ui: &mut Ui) {
     let text = text.to_owned();
 
     if response.gained_focus() || response.clicked() {
-        println!("focus");
         crate::wm::xcb::window_focus(props.get("_bar_id").unwrap_or_default().into(), true);
     }
 
-
     if response.lost_focus() {
-        println!("unfocus");
         crate::wm::xcb::window_focus(props.get("_bar_id").unwrap_or_default().into(), false);
     }
+
 
     if response.changed() {
         if let Some(Property::Function(func)) = props.get("change") {
