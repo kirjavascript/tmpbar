@@ -1,25 +1,40 @@
 use std::fs::{File, canonicalize};
 use std::path::Path;
 use std::io::prelude::*;
-use super::parse::{ConfigScript, parse_script};
+use super::parse::{Bar, parse_bars};
+use crate::util::Signal;
+
+pub struct ConfigScript {
+    pub path: String,
+    pub bars: Vec<Bar>,
+    pub reload_signal: Signal<()>,
+    lua: mlua::Lua,
+}
 
 impl ConfigScript {
     pub fn reload(&mut self) -> Result<(), String> {
-        info!("reloading config");
-        let _ = std::mem::replace(self, load_raw(&self.path)?);
+        load(self)?;
         Ok(())
     }
 }
 
-pub fn load(path: &str) -> (impl Fn() -> bool, ConfigScript) {
-    let script = load_raw(path);
+pub fn init(path: &str, ctx: egui::Context) -> ConfigScript {
+    let mut script = ConfigScript {
+        path: path.to_owned(),
+        bars: Vec::new(),
+        reload_signal: Signal::new(ctx),
+        lua: mlua::Lua::new(),
+    };
 
-    match script {
-        Ok(script) => {
-            let rx = super::watch::init(path);
-            let poll = move || rx.try_recv().is_ok();
+    script.lua.load(include_str!("./prelude.lua")).exec().unwrap();
 
-            (poll, script)
+    let load_result = load(&mut script);
+
+    match load_result {
+        Ok(_) => {
+            super::watch::init(path, script.reload_signal.clone());
+
+            script
         },
         Err(err) => {
             eprintln!("{}", err);
@@ -28,12 +43,12 @@ pub fn load(path: &str) -> (impl Fn() -> bool, ConfigScript) {
     }
 }
 
-pub fn load_raw(path: &str) -> Result<ConfigScript, String> {
-    let script = {
-        let path = std::path::Path::new(path);
+fn load(script: &mut ConfigScript) -> Result<(), String> {
+    let code = {
+        let path = std::path::Path::new(&script.path);
 
         let mut file_result = File::open(path).map_err(|x| {
-            format!("{}: {}", path.display(), x.to_string().to_lowercase())
+            format!("{}: {}", path.display(), x.to_string())
         })?;
 
         let mut script = String::new();
@@ -44,25 +59,27 @@ pub fn load_raw(path: &str) -> Result<ConfigScript, String> {
         script
     };
 
-    eval(path, script).map_err(|err| err.to_string())
+    eval(script, code).map_err(|err| err.to_string())
 }
 
-pub fn eval(path: &str, script: String) -> mlua::Result<ConfigScript> {
-    let lua = mlua::Lua::new();
-    let globals = lua.globals();
+fn eval(script: &mut ConfigScript, code: String) -> mlua::Result<()> {
+    let globals = script.lua.globals();
 
-    if let Ok(path) = canonicalize(Path::new(path)) {
+    if let Ok(path) = canonicalize(Path::new(&script.path)) {
         let parent = path.parent().map(|p| p.to_path_buf());
         globals.set("xcake_parent_path", parent.unwrap().to_string_lossy() + "/")?;
     }
 
-    lua.load(include_str!("./prelude.lua")).exec()?;
+    set_monitors(&script.lua, &globals)?;
 
-    set_monitors(&lua, &globals)?;
+    let set_state: mlua::Function = script.lua.globals().get("xcake_reset_state")?;
+    set_state.call(())?;
 
-    lua.load(script).exec()?;
+    script.lua.load(code).exec()?;
 
-    parse_script(path, &lua)
+    script.bars = parse_bars(&script.lua)?;
+
+    Ok(())
 }
 
 fn set_monitors(lua: &mlua::Lua, globals: &mlua::Table) -> mlua::Result<()> {

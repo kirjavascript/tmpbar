@@ -1,16 +1,14 @@
 use crate::config;
 use eframe::egui;
-use std::sync::Arc;
 
 pub struct TmpBar {
     config: config::ConfigScript,
-    poll_watch: Arc<dyn Fn() -> bool + Send>,
 }
 
 impl TmpBar {
     pub fn new(cc: &eframe::CreationContext<'_>, path: String) -> Self {
         // `cc.egui_ctx.set_visuals` and `cc.egui_ctx.set_fonts`.
-        let (poll_watch, config) = config::script::load(&path);
+        let config = config::script::init(&path, cc.egui_ctx.clone());
 
         egui_extras::install_image_loaders(&cc.egui_ctx);
 
@@ -18,26 +16,20 @@ impl TmpBar {
 
         TmpBar {
             config,
-            poll_watch: Arc::new(poll_watch),
         }
     }
 }
 
 impl eframe::App for TmpBar {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        // rerender every half second minimum to poll config watcher
-        ctx.request_repaint_after(std::time::Duration::from_millis(500));
-        // TODO: use repaint_signal
-//https://github.com/lucasmerlin/hello_egui/tree/bd18788be1c0e7bad7bcc75f3088715fad1e0279/crates/egui_inbox
-// TODO: fork egui::run_simple_native
-
         // TODO:
-        // push rendering (non-polling)
         // absolute positioning in stripbuilder
         // input: pressing enter doesnt unfocus properly
         // styles
 
-        if (self.poll_watch)() {
+        if self.config.reload_signal.read().is_some() {
+            info!("reloading config");
+
             if let Err(err) = self.config.reload() {
                 error!("{}", err);
             } else {

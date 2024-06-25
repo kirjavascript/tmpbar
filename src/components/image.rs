@@ -1,8 +1,9 @@
 use eframe::egui;
 use egui::Ui;
-use crate::config::Props;
+use crate::config::Component;
 
-pub fn render(props: &mut Props, ui: &mut Ui) {
+pub fn render(comp: &mut Component, ui: &mut Ui) {
+    let props = comp.props();
     let parent: String = props.get("_parent_path").unwrap_or_default().into();
     let path: String = props.get("path").unwrap_or_default().into();
 

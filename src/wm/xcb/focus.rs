@@ -11,16 +11,9 @@ pub fn window_focus(id: String, state: bool) {
         let screen = setup.roots().nth(screen_num as usize).unwrap();
         let root = screen.root();
 
-        let mut windows = super::window::get_windows(&conn, root);
+        let windows = super::window::get_windows(&conn, root);
 
-        // it is completely ridiculous to use window titles to find windows,
-        // but to get a direct X window reference we have to fork eframe
-        while windows.get(&id).is_none() {
-            windows = super::get_windows(&conn, root);
-
-            std::thread::sleep(std::time::Duration::from_millis(50));
-        }
-
+        // window should definitely exist
         let bar = windows.get(&id).unwrap();
 
         if state {

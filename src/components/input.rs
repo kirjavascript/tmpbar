@@ -1,8 +1,9 @@
 use eframe::egui;
 use egui::Ui;
-use crate::config::{Property, Props, text_mut};
+use crate::config::{Component, Property, text_mut};
 
-pub fn render(props: &mut Props, ui: &mut Ui) {
+pub fn render(comp: &mut Component, ui: &mut Ui) {
+    let props = comp.props();
     let text = text_mut(props, "text");
 
     let response = ui.add(egui::TextEdit::singleline(text));

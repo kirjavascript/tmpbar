@@ -5,11 +5,6 @@ use mlua::{Value, Table};
 
 static BAR_ID: AtomicUsize = AtomicUsize::new(0);
 
-pub struct ConfigScript {
-    pub path: String,
-    pub bars: Vec<Bar>,
-}
-
 #[derive(PartialEq)]
 pub enum Position {
     Top,
@@ -56,17 +51,17 @@ impl Component {
 #[derive(Debug, Clone)]
 pub enum Property {
     Component(Component),
+    Object(HashMap<String, Property>),
+    Array(Vec<Property>),
     Function(mlua::OwnedFunction),
     String(String),
     Integer(i64),
     Float(f64),
-    Array(Vec<Property>),
     Boolean(bool),
-    Object(HashMap<String, Property>),
     Null,
 }
 
-pub fn parse_script(path: &str, lua: &mlua::Lua) -> mlua::Result<ConfigScript> {
+pub fn parse_bars(lua: &mlua::Lua) -> mlua::Result<Vec<Bar>> {
     let monitors = monitor::list();
     let globals = lua.globals();
 
@@ -133,10 +128,7 @@ pub fn parse_script(path: &str, lua: &mlua::Lua) -> mlua::Result<ConfigScript> {
         });
     }
 
-    Ok(ConfigScript {
-        path: path.to_string(),
-        bars,
-    })
+    Ok(bars)
 }
 
 fn to_property(value: Value, default_props: &HashMap<String, Property>) -> Property {
@@ -199,7 +191,7 @@ pub fn get_text(props: &Props, attr: &str) -> String {
     match props.get(attr) {
         Some(Property::Function(func)) => {
             func.call::<(), String>(())
-                .unwrap_or("[error function]".to_string())
+                .unwrap_or_else(|e| e.to_string())
         }
         Some(Property::String(text)) => {
             text.to_owned()

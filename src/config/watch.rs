@@ -1,9 +1,7 @@
 use inotify::{Inotify, WatchMask};
-use std::sync::mpsc::{channel, Receiver};
+use crate::util::Signal;
 
-pub fn init(path: &str) -> Receiver<()> {
-    let (tx, rx) = channel();
-
+pub fn init(path: &str, reload_signal: Signal<()>) {
     let path = path.to_string();
 
     std::thread::spawn(move || {
@@ -19,7 +17,7 @@ pub fn init(path: &str) -> Receiver<()> {
         loop {
             match inotify.read_events(&mut buffer) {
                 Ok(_) => {
-                    tx.send(()).unwrap();
+                    reload_signal.send(());
                 }
                 Err(_) => {},
             }
@@ -27,6 +25,4 @@ pub fn init(path: &str) -> Receiver<()> {
             std::thread::sleep(std::time::Duration::from_millis(50));
         }
     });
-
-    rx
 }

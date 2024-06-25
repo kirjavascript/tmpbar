@@ -1,4 +1,16 @@
-xcake_bars = {}
+function xcake_reset_state()
+    xcake_bars = {}
+end
+
+xcake_windowtitle = ""
+
+-- function xcake_set_window_title(text)
+--     xcake_windowtitle = text
+-- end
+
+function windowTitle()
+    return xcake_windowtitle
+end
 
 function readFile(filePath)
     if rawget(_G, "xcake_parent_path") ~= nil then

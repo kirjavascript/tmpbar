@@ -1,10 +1,11 @@
 use eframe::egui;
 use egui::Ui;
 use egui_extras::{Size, Strip, StripBuilder};
-use crate::config::{Property, Props};
+use crate::config::{Property, Props, Component};
 use crate::components::util;
 
-pub fn render(props: &mut Props, ui: &mut Ui) {
+pub fn render(comp: &mut Component, ui: &mut Ui) {
+    let props = comp.props();
     let is_horizontal = if let Some(Property::String(dir)) = props.get("orientation") { dir.starts_with("h") } else { true };
     let is_flex: bool = props.get("flex").unwrap_or_default().into();
 

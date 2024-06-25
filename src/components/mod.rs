@@ -16,11 +16,11 @@ pub fn render(comp: &mut Component, ui: &mut Ui) {
     }
 
     match comp.name() {
-        "input" => input::render(comp.props(), ui),
-        "container" => container::render(comp.props(), ui),
-        "button" => button::render(comp.props(), ui),
-        "image" => image::render(comp.props(), ui),
-        "label" => label::render(comp.props(), ui),
+        "input" => input::render(comp, ui),
+        "container" => container::render(comp, ui),
+        "button" => button::render(comp, ui),
+        "image" => image::render(comp, ui),
+        "label" => label::render(comp, ui),
         _ => { ui.label(format!("[unknown {:?}]", comp.name())); },
     }
 }
