@@ -2,7 +2,7 @@ use eframe::egui;
 use egui::Ui;
 use egui_extras::{Size, Strip, StripBuilder};
 use crate::config::{Property, Props, Component};
-use crate::components::util;
+use crate::util;
 
 pub fn render(comp: &mut Component, ui: &mut Ui) {
     let props = comp.props();

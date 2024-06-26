@@ -14,6 +14,9 @@ impl TmpBar {
 
         crate::wm::xcb::window_patch(&config);
 
+        // TODO: testing
+        crate::wm::wm_util::WMUtil::new(cc.egui_ctx.clone());
+
         TmpBar {
             config,
         }

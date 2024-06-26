@@ -4,11 +4,14 @@ use std::io::prelude::*;
 use super::parse::{Bar, parse_bars};
 use crate::util::Signal;
 
+pub struct Global(u8);
+
 pub struct ConfigScript {
     pub path: String,
     pub bars: Vec<Bar>,
     pub reload_signal: Signal<()>,
     lua: mlua::Lua,
+    pub global: Global,
 }
 
 impl ConfigScript {
@@ -24,6 +27,7 @@ pub fn init(path: &str, ctx: egui::Context) -> ConfigScript {
         bars: Vec::new(),
         reload_signal: Signal::new(ctx),
         lua: mlua::Lua::new(),
+        global: Global(0),
     };
 
     script.lua.load(include_str!("./prelude.lua")).exec().unwrap();

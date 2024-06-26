@@ -129,19 +129,8 @@ pub fn get_windows(conn: &xcb::Connection, root: xcb::x::Window) -> HashMap<Stri
 
         reply
             .children().iter().for_each(|window| {
-                let cookie = conn.send_request(&xcb::x::GetProperty {
-                    delete: false,
-                    window: *window,
-                    property: xcb::x::ATOM_WM_NAME,
-                    r#type: xcb::x::ATOM_STRING,
-                    long_offset: 0,
-                    long_length: 1024,
-                });
-
-                if let Ok(reply) = conn.wait_for_reply(cookie) {
-                    let value = reply.value();
-                    let title = String::from_utf8_lossy(value);
-                    let title = title.trim_end();
+                if let Some(name) = get_wm_name(&conn, &window) {
+                    let title = name.trim_end();
 
                     windows.insert(title.to_string(), *window);
                 }
@@ -153,4 +142,22 @@ pub fn get_windows(conn: &xcb::Connection, root: xcb::x::Window) -> HashMap<Stri
     query(conn, root, &mut windows);
 
     windows
+}
+
+pub fn get_wm_name(conn: &xcb::Connection, window: &xcb::x::Window) -> Option<String> {
+    let cookie = conn.send_request(&xcb::x::GetProperty {
+        delete: false,
+        window: *window,
+        property: xcb::x::ATOM_WM_NAME,
+        r#type: xcb::x::ATOM_STRING,
+        long_offset: 0,
+        long_length: 1024,
+    });
+
+    if let Ok(reply) = conn.wait_for_reply(cookie) {
+        let value = reply.value();
+        Some(String::from_utf8_lossy(value).into_owned())
+    } else {
+        None
+    }
 }

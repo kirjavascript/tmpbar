@@ -8,11 +8,9 @@ mod label;
 mod image;
 mod input;
 
-mod util;
-
 pub fn render(comp: &mut Component, ui: &mut Ui) {
     if comp.props().get("debugLayout").unwrap_or_default().into() {
-        util::debug_layout(ui);
+        crate::util::debug_layout(ui);
     }
 
     match comp.name() {
