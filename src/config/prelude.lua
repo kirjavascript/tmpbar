@@ -2,14 +2,10 @@ function xcake_reset_state()
     xcake_bars = {}
 end
 
-xcake_windowtitle = ""
-
--- function xcake_set_window_title(text)
---     xcake_windowtitle = text
--- end
+xcake_window_title = ""
 
 function windowTitle()
-    return xcake_windowtitle
+    return xcake_window_title
 end
 
 function readFile(filePath)

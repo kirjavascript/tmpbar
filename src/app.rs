@@ -1,24 +1,24 @@
-use crate::config;
+use crate::{global, config};
 use eframe::egui;
 
 pub struct TmpBar {
     config: config::ConfigScript,
+    global: global::Global,
 }
 
 impl TmpBar {
     pub fn new(cc: &eframe::CreationContext<'_>, path: String) -> Self {
         // `cc.egui_ctx.set_visuals` and `cc.egui_ctx.set_fonts`.
         let config = config::script::init(&path, cc.egui_ctx.clone());
+        let global = global::Global::new(cc.egui_ctx.clone());
 
         egui_extras::install_image_loaders(&cc.egui_ctx);
 
         crate::wm::xcb::window_patch(&config);
 
-        // TODO: testing
-        crate::wm::wm_util::WMUtil::new(cc.egui_ctx.clone());
-
         TmpBar {
             config,
+            global,
         }
     }
 }
@@ -30,7 +30,7 @@ impl eframe::App for TmpBar {
         // input: pressing enter doesnt unfocus properly
         // styles
 
-        if self.config.reload_signal.read().is_some() {
+        if self.config.reload_signal.has() {
             info!("reloading config");
 
             if let Err(err) = self.config.reload() {
@@ -39,6 +39,8 @@ impl eframe::App for TmpBar {
                 crate::wm::xcb::window_patch(&self.config);
             }
         }
+
+        self.global.signals(&self.config.lua);
 
         for bar in self.config.bars.iter_mut() {
             let id = bar.id();

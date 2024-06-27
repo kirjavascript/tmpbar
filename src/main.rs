@@ -6,6 +6,7 @@ mod util;
 mod app;
 mod components;
 mod config;
+mod global;
 mod wm;
 
 fn main() -> eframe::Result<()> {
