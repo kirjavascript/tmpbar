@@ -28,6 +28,7 @@ impl eframe::App for TmpBar {
         // TODO:
         // absolute positioning in stripbuilder
         // input: pressing enter doesnt unfocus properly
+        // firefox window title + active window tracking
         // styles
 
         if self.config.reload_signal.has() {
