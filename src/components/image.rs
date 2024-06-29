@@ -1,8 +1,18 @@
 use eframe::egui;
 use egui::Ui;
-use crate::config::Component;
+use crate::config::{Component, Property};
+use crate::components::core;
 
 pub fn render(comp: &mut Component, ui: &mut Ui) {
+    // SVG render
+    if let Some(Property::Function(func)) = comp.props().get("contents") {
+        let rect = ui.available_rect_before_wrap();
+
+        ui.add(core::svg_image(func, &rect));
+        return;
+    }
+
+    // from file
     let props = comp.props();
     let parent: String = props.get("_parent_path").unwrap_or_default().into();
     let path: String = props.get("path").unwrap_or_default().into();

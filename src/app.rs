@@ -26,10 +26,13 @@ impl TmpBar {
 impl eframe::App for TmpBar {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         // TODO:
+        // colours
         // absolute positioning in stripbuilder
+        // styles?
+        // redo structure
+        //
+        // workspace data
         // input: pressing enter doesnt unfocus properly
-        // firefox window title + active window tracking
-        // styles
 
         if self.config.reload_signal.has() {
             info!("reloading config");

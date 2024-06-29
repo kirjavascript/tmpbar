@@ -3,9 +3,8 @@ for _, monitor in monitors() do
         monitor = monitor,
         position = "top",
         height = 50,
-
         flex = true,
-        -- orientation = "h",
+        -- orientation = "v",
 
         -- wrap = true,
         -- direction = "top-down",
@@ -13,7 +12,11 @@ for _, monitor in monitors() do
         -- crossJustify = true,
         -- align = "end",
         -- crossAlign = "end",
-        -- debugLayout
+        margin = 5,
+
+        background = function(width, height) return string.format([[
+          <rect x="0" y="0" width="%d" height="%d" rx="15" fill="none" stroke="#996699" stroke-width="5"/>
+        ]], width, height) end,
 
         items = {
             {
@@ -30,6 +33,13 @@ for _, monitor in monitors() do
                 path = "./demo.gif",
             },
             {
+                "image",
+                size = 50,
+                contents = function(width, height) return string.format([[
+                    <rect x="0" y="0" width="%d" height="%d" fill="none" stroke="#FFAA00" stroke-width="5"/>
+                ]], width, height) end,
+            },
+            {
                 "input",
                 size = 150,
                 submit = print,
@@ -38,8 +48,7 @@ for _, monitor in monitors() do
                 "label",
                 align = "end",
                 justify = true,
-                text = function() return "« "..windowTitle().." »" end
-                -- size = 1/1.9,
+                text = function() return "« "..windowTitle().." »" end,
             },
             {
                 "container",

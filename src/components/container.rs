@@ -2,7 +2,7 @@ use eframe::egui;
 use egui::Ui;
 use egui_extras::{Size, Strip, StripBuilder};
 use crate::config::{Property, Props, Component};
-use crate::util;
+use crate::components::core;
 
 pub fn render(comp: &mut Component, ui: &mut Ui) {
     let props = comp.props();
@@ -10,7 +10,7 @@ pub fn render(comp: &mut Component, ui: &mut Ui) {
     let is_flex: bool = props.get("flex").unwrap_or_default().into();
 
     if !is_flex {
-        let layout = util::layout_from_props(props);
+        let layout = core::layout_from_props(props);
 
         if let Some(Property::Array(list)) = props.get_mut("items") {
 
@@ -49,10 +49,9 @@ pub fn render(comp: &mut Component, ui: &mut Ui) {
                 if let Property::Component(comp) = prop {
                     strip.cell(|ui| {
 
-                        ui.with_layout(util::layout_from_props(comp.props()), |ui| {
+                        core::render_layout(comp, ui, |comp, ui| {
                             super::render(comp, ui);
                         });
-
                     });
                 }
             }

@@ -2,6 +2,7 @@ use eframe::egui;
 use egui::Ui;
 use crate::config::Component;
 
+mod core;
 mod button;
 mod container;
 mod label;
@@ -9,10 +10,13 @@ mod image;
 mod input;
 
 pub fn render(comp: &mut Component, ui: &mut Ui) {
-    if comp.props().get("debugLayout").unwrap_or_default().into() {
-        crate::util::debug_layout(ui);
-    }
+    core::render_background(comp, ui);
+    core::render_frame(comp, ui, |comp, ui| {
+        render_comp(comp, ui);
+    });
+}
 
+fn render_comp(comp: &mut Component, ui: &mut Ui) {
     match comp.name() {
         "input" => input::render(comp, ui),
         "container" => container::render(comp, ui),

@@ -1,6 +1,12 @@
 use eframe::egui;
-use egui::{Color32, Ui};
-use crate::config::{Property, Props};
+use egui::Ui;
+use crate::config::{Component, Property, Props};
+
+pub fn render_layout(comp: &mut Component, ui: &mut Ui, func: impl FnOnce(&mut Component, &mut Ui)) {
+    ui.with_layout(layout_from_props(comp.props()), |ui| {
+        func(comp, ui);
+    });
+}
 
 pub fn layout_from_props(props: &Props) -> egui::Layout {
     let mut layout = egui::Layout::left_to_right(egui::Align::Center);
@@ -43,12 +49,4 @@ pub fn layout_from_props(props: &Props) -> egui::Layout {
     }
 
     layout
-}
-
-pub fn debug_layout(ui: &mut Ui) {
-    ui.painter().rect_filled(
-        ui.available_rect_before_wrap(),
-        0.0,
-        Color32::PLACEHOLDER,
-    );
 }

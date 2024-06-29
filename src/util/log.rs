@@ -1,12 +1,15 @@
 macro_rules! message {
     ($c:ident, $m:expr, $p:expr) => {{
         let padding = String::from_utf8(vec![b' '; 7 - $m.len()]).unwrap();
+        #[cfg(not(debug_assertions))]
+        let file_line = "".to_string();
+        #[cfg(debug_assertions)]
         let file_line = format!("{}:{}", file!(), line!());
         if *$crate::config::env::no_color() {
-            eprintln!(" {}{} {} {}", $m, padding, $p, file_line);
+            eprintln!(" {}{} {} {}", padding, $m, $p, file_line);
         } else {
             use ansi_term::Colour::{$c, Fixed};
-            eprint!(" {}{} {}", $c.bold().paint($m), padding, $p);
+            eprint!(" {}{} {}", padding, $c.bold().paint($m), $p);
             eprintln!(" {}", Fixed(240).paint(file_line));
         }
     }};

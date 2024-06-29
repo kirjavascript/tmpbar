@@ -230,6 +230,7 @@ impl Into<i64> for &Property {
     fn into(self) -> i64 {
         match self {
             Property::Integer(i) => *i,
+            Property::Float(f) => *f as _,
             _ => i64::default(),
         }
     }
@@ -239,7 +240,18 @@ impl Into<f64> for &Property {
     fn into(self) -> f64 {
         match self {
             Property::Float(f) => *f,
+            Property::Integer(i) => *i as _,
             _ => f64::default(),
+        }
+    }
+}
+
+impl Into<f32> for &Property {
+    fn into(self) -> f32 {
+        match self {
+            Property::Integer(i) => *i as _,
+            Property::Float(f) => *f as _,
+            _ => f32::default(),
         }
     }
 }
