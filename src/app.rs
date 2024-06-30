@@ -27,14 +27,14 @@ impl eframe::App for TmpBar {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         // TODO:
         // colours
-        // absolute positioning in stripbuilder
         // styles?
+        // absolute positioning in stripbuilder
         // redo structure
         //
         // workspace data
         // input: pressing enter doesnt unfocus properly
 
-        if self.config.reload_signal.has() {
+        if self.config.reload_signal.has_consume() {
             info!("reloading config");
 
             if let Err(err) = self.config.reload() {

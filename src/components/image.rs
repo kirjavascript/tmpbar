@@ -5,7 +5,7 @@ use crate::components::core;
 
 pub fn render(comp: &mut Component, ui: &mut Ui) {
     // SVG render
-    if let Some(Property::Function(func)) = comp.props().get("contents") {
+    if let Some(Property::Function(func)) = comp.props().get("markup") {
         let rect = ui.available_rect_before_wrap();
 
         ui.add(core::svg_image(func, &rect));

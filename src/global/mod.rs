@@ -13,7 +13,7 @@ impl Global {
     pub fn new(ctx: egui::Context) -> Self {
         let signal: Signal<Event> = Signal::new(ctx);
 
-        crate::wm::xcb::watch_window_title(signal.clone());
+        crate::wm::xcb::listen(signal.clone());
 
         Self {
             signal,

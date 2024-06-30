@@ -15,7 +15,7 @@ for _, monitor in monitors() do
         margin = 5,
 
         background = function(width, height) return string.format([[
-          <rect x="0" y="0" width="%d" height="%d" rx="15" fill="none" stroke="#996699" stroke-width="5"/>
+          <rect x="0" y="0" width="%d" height="%d" rx="5" fill="none" stroke="#996699" stroke-width="5"/>
         ]], width, height) end,
 
         items = {
@@ -35,7 +35,7 @@ for _, monitor in monitors() do
             {
                 "image",
                 size = 50,
-                contents = function(width, height) return string.format([[
+                markup = function(width, height) return string.format([[
                     <rect x="0" y="0" width="%d" height="%d" fill="none" stroke="#FFAA00" stroke-width="5"/>
                 ]], width, height) end,
             },

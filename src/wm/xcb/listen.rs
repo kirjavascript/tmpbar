@@ -3,7 +3,7 @@ use xcb::{x, Xid};
 use crate::global::Event;
 use crate::util::Signal;
 
-pub fn watch_window_title(signal: Signal<Event>) {
+pub fn listen(signal: Signal<Event>) {
     std::thread::spawn(move || {
         let (conn, screen_num) = xcb::Connection::connect(None).unwrap();
         let setup = conn.get_setup();
@@ -28,6 +28,8 @@ pub fn watch_window_title(signal: Signal<Event>) {
                     match event {
                         xcb::Event::X(x::Event::PropertyNotify(event)) => {
                             let atom = event.atom();
+
+
 
                             let is_active = atom == atoms.active_window;
                             let is_title = is_active || atom == x::ATOM_WM_NAME;
@@ -107,3 +109,5 @@ pub fn watch_window_title(signal: Signal<Event>) {
         }
     });
 }
+
+fn handle_title(atom: x::atoms)

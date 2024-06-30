@@ -12,11 +12,11 @@ mod input;
 pub fn render(comp: &mut Component, ui: &mut Ui) {
     core::render_background(comp, ui);
     core::render_frame(comp, ui, |comp, ui| {
-        render_comp(comp, ui);
+        render_impl(comp, ui);
     });
 }
 
-fn render_comp(comp: &mut Component, ui: &mut Ui) {
+fn render_impl(comp: &mut Component, ui: &mut Ui) {
     match comp.name() {
         "input" => input::render(comp, ui),
         "container" => container::render(comp, ui),
