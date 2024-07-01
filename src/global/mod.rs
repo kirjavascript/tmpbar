@@ -4,7 +4,7 @@ pub struct Global {
     signal: Signal<Event>,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum Event {
     WindowTitle(String),
 }
