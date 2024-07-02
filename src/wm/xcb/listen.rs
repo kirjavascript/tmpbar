@@ -29,13 +29,15 @@ pub fn listen(signal: Signal<Event>) {
                             subscribe_events(&conn, &event.window());
                         },
                         xcb::Event::X(x::Event::PropertyNotify(event)) => {
-                            workspaces::handle_event(
+                            if let Some(event) = workspaces::handle_event(
                                 &event,
                                 &root,
                                 &conn,
                                 &ewmh_conn,
                                 &icccm_conn,
-                            );
+                            ) {
+                                signal.send(event);
+                            }
 
                             if let Some(title) = window_title::handle_event(
                                 &event,

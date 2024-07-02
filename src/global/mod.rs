@@ -36,7 +36,18 @@ impl Global {
                 Event::WindowTitle(title) => {
                     config.lua.globals().set("xcake_window_title", title).ok();
                 },
-                _ => {},
+                Event::WorkspaceCurrent(current) => {
+                    self.workspaces.current = current;
+        println!("{:?}", self.workspaces);
+                },
+                Event::WorkspaceDesktops(desktops) => {
+                    self.workspaces.desktops = desktops;
+        println!("{:?}", self.workspaces);
+                },
+                Event::WorkspaceUrgency(urgency) => {
+                    self.workspaces.urgency = urgency;
+        println!("{:?}", self.workspaces);
+                },
             }
         }
     }
