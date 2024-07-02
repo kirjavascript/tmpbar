@@ -2,7 +2,7 @@ pub mod window_title;
 pub mod workspaces;
 
 use xcb::{x, Xid};
-use xcb_wm::{ewmh, icccm};
+use xcb_wm::ewmh;
 
 use crate::global::Event;
 use crate::util::Signal;
@@ -18,7 +18,6 @@ pub fn listen(signal: Signal<Event>) {
         subscribe_windows(&conn, &root);
 
         let ewmh_conn = ewmh::Connection::connect(&conn);
-        let icccm_conn = icccm::Connection::connect(&conn);
         let mut active_window = x::Window::none();
 
         loop {
@@ -34,7 +33,6 @@ pub fn listen(signal: Signal<Event>) {
                                 &root,
                                 &conn,
                                 &ewmh_conn,
-                                &icccm_conn,
                             ) {
                                 signal.send(event);
                             }

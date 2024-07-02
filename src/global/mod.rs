@@ -38,17 +38,16 @@ impl Global {
                 },
                 Event::WorkspaceCurrent(current) => {
                     self.workspaces.current = current;
-        println!("{:?}", self.workspaces);
                 },
                 Event::WorkspaceDesktops(desktops) => {
                     self.workspaces.desktops = desktops;
-        println!("{:?}", self.workspaces);
                 },
                 Event::WorkspaceUrgency(urgency) => {
                     self.workspaces.urgency = urgency;
-        println!("{:?}", self.workspaces);
                 },
             }
         }
+
+        println!("{:?}", self.workspaces);
     }
 }

@@ -16,7 +16,6 @@ impl Workspaces {
         let screen = setup.roots().nth(screen_num as usize).unwrap();
         let root = screen.root();
         let ewmh_conn = ewmh::Connection::connect(&conn);
-        let icccm_conn = icccm::Connection::connect(&conn);
 
         let names = get_desktop_names(&ewmh_conn);
         let origins = get_desktop_origins(&conn, &ewmh_conn, &root);
@@ -24,7 +23,7 @@ impl Workspaces {
         Workspaces {
             current: get_current_desktop(&ewmh_conn),
             desktops: zip_names_origins(names, origins),
-            urgency: get_desktop_urgency(&icccm_conn, &ewmh_conn),
+            urgency: get_desktop_urgency(&conn, &ewmh_conn),
         }
     }
 }
@@ -34,7 +33,6 @@ pub fn handle_event(
     root: &x::Window,
     conn: &xcb::Connection,
     ewmh_conn: &ewmh::Connection,
-    icccm_conn: &icccm::Connection,
 ) -> Option<Event> {
     let atom = event.atom();
 
@@ -46,12 +44,11 @@ pub fn handle_event(
         let names = get_desktop_names(&ewmh_conn);
         let origins = get_desktop_origins(&conn, &ewmh_conn, &root);
 
-
         return Some(Event::WorkspaceDesktops(zip_names_origins(names, origins)));
     }
 
     if atom == x::ATOM_WM_HINTS {
-        return Some(Event::WorkspaceUrgency(get_desktop_urgency(icccm_conn, ewmh_conn)));
+        return Some(Event::WorkspaceUrgency(get_desktop_urgency(conn, ewmh_conn)));
     }
 
     return None
@@ -99,22 +96,31 @@ pub fn get_client_list(ewmh_conn: &ewmh::Connection) -> Vec<x::Window> {
     ewmh_conn.wait_for_reply(cookie).unwrap().clients
 }
 
-pub fn get_desktop_urgency(icccm_conn: &icccm::Connection, ewmh_conn: &ewmh::Connection) -> Vec<u32> {
+pub fn get_desktop_urgency(conn: &xcb::Connection, ewmh_conn: &ewmh::Connection) -> Vec<u32> {
     let mut urgent_desktops = std::collections::HashSet::new();
 
-    // for window in get_client_list(&ewmh_conn) {
-    //     let request = icccm::proto::GetWmHints::new(window);
-    //     let cookie = icccm_conn.send_request(&request);
-    //     let mut reply = icccm_conn.wait_for_reply(cookie).unwrap();
+    for window in get_client_list(&ewmh_conn) {
+        if let Ok(reply) = conn.wait_for_reply(conn.send_request(&x::GetProperty {
+            delete: false,
+            window,
+            property: xcb::x::ATOM_WM_HINTS,
+            r#type: xcb::x::ATOM_WM_HINTS,
+            long_offset: 0,
+            long_length: 256,
+        })) {
+            let value = reply.value::<u32>();
 
-    //     if reply.size_hints.is_urgent() {
-    //         let request = ewmh::proto::GetWmDesktop(window);
-    //         let cookie = ewmh_conn.send_request(&request);
-    //         let desktop = ewmh_conn.wait_for_reply(cookie).unwrap().desktop;
+            if value.len() > 0 {
+                if icccm::proto::WmHints::from_reply(reply).is_urgent() {
+                    let request = ewmh::proto::GetWmDesktop(window);
+                    let cookie = ewmh_conn.send_request(&request);
+                    let desktop = ewmh_conn.wait_for_reply(cookie).unwrap().desktop;
 
-    //         urgent_desktops.insert(desktop);
-    //     }
-    // }
+                    urgent_desktops.insert(desktop);
+                }
+            }
+        }
+    }
 
     urgent_desktops.into_iter().collect()
 }
