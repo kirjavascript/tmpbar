@@ -142,7 +142,7 @@ pub fn get_wm_name(conn: &xcb::Connection, window: &xcb::x::Window) -> Option<St
         property: xcb::x::ATOM_WM_NAME,
         r#type: xcb::x::ATOM_STRING,
         long_offset: 0,
-        long_length: 1024,
+        long_length: 4,
     });
 
     if let Ok(reply) = conn.wait_for_reply(cookie) {

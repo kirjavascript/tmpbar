@@ -44,7 +44,7 @@ impl eframe::App for TmpBar {
             }
         }
 
-        self.global.signals(&self.config.lua);
+        self.global.signals(&mut self.config);
 
         for bar in self.config.bars.iter_mut() {
             let id = bar.id();

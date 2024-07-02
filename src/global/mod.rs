@@ -1,13 +1,22 @@
 use crate::util::Signal;
+use crate::config::ConfigScript;
+use crate::wm::xcb::workspaces::Workspaces;
 
 pub struct Global {
     signal: Signal<Event>,
+    workspaces: Workspaces,
 }
 
 #[derive(Clone, Debug)]
 pub enum Event {
     WindowTitle(String),
+    WorkspaceCurrent(u32),
+    WorkspaceDesktops(Vec<(String, u32, u32)>),
+    WorkspaceUrgency(Vec<u32>),
 }
+
+// TODO: visible by doing tracking
+
 
 impl Global {
     pub fn new(ctx: egui::Context) -> Self {
@@ -17,15 +26,17 @@ impl Global {
 
         Self {
             signal,
+            workspaces: Workspaces::new(),
         }
     }
 
-    pub fn signals(&self, lua: &mlua::Lua) {
+    pub fn signals(&mut self, config: &mut ConfigScript) {
         for event in self.signal.read() {
             match event {
                 Event::WindowTitle(title) => {
-                    lua.globals().set("xcake_window_title", title).ok();
+                    config.lua.globals().set("xcake_window_title", title).ok();
                 },
+                _ => {},
             }
         }
     }
