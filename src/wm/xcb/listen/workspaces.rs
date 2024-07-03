@@ -12,7 +12,7 @@ pub struct Workspaces {
     desktops: Vec<(String, u32, u32)>,
     urgency: Vec<u32>,
     monitors: Vec<monitor::Monitor>,
-    monitor_last_current: HashMap<u32, u32>,
+    monitor_current: HashMap<u32, u32>,
 }
 
 pub struct Workspace {
@@ -40,12 +40,12 @@ impl Workspaces {
             desktops: zip_names_origins(names, origins),
             urgency: get_desktop_urgency(&conn, &ewmh_conn),
             monitors: monitor::list(),
-            monitor_last_current: HashMap::new(),
+            monitor_current: HashMap::new(),
         };
 
         let monitor_index = workspaces.get_monitor_index(&workspaces.desktops[workspaces.current as usize]);
 
-        workspaces.monitor_last_current.insert(monitor_index, workspaces.current);
+        workspaces.monitor_current.insert(monitor_index, workspaces.current);
 
         workspaces
     }
@@ -67,7 +67,7 @@ impl Workspaces {
     pub fn update_last_visible(&mut self) {
         if self.desktops.len() > self.current as _ {
             let index = self.get_monitor_index(&self.desktops[self.current as usize]);
-            self.monitor_last_current.insert(index, self.current);
+            self.monitor_current.insert(index, self.current);
         }
     }
 
@@ -75,9 +75,9 @@ impl Workspaces {
         self.desktops.iter().enumerate().map(|(i, desktop)| {
             let focused = self.current == i as _;
             let monitor_index = self.get_monitor_index(&desktop);
-            let monitor_last = self.monitor_last_current.get(&monitor_index);
-            let visible = if let Some(last_current) = monitor_last {
-                *last_current == i as u32
+            let monitor_last = self.monitor_current.get(&monitor_index);
+            let visible = if let Some(mcurrent) = monitor_last {
+                *mcurrent == i as u32
             } else {
                 focused
             };
