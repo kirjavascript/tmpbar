@@ -2,26 +2,26 @@ use xcb::x;
 use xcb_wm::{ewmh, icccm};
 use crate::global::Event;
 use crate::wm::monitor;
+use std::collections::HashMap;
 
-// TODO: visible by using tracking
 // make global global
 // use _monitor_index
 
 pub struct Workspaces {
-    pub current: u32,
-    pub desktops: Vec<(String, u32, u32)>,
-    pub urgency: Vec<u32>,
+    current: u32,
+    desktops: Vec<(String, u32, u32)>,
+    urgency: Vec<u32>,
     monitors: Vec<monitor::Monitor>,
+    monitor_last_current: HashMap<u32, u32>,
 }
 
-#[derive(Debug)]
 pub struct Workspace {
     number: u32,
     name: String,
     focused: bool,
     urgent: bool,
-    // visible
-    monitor: u32,
+    visible: bool,
+    monitor_index: u32,
 }
 
 impl Workspaces {
@@ -35,28 +35,68 @@ impl Workspaces {
         let names = get_desktop_names(&ewmh_conn);
         let origins = get_desktop_origins(&conn, &ewmh_conn, &root);
 
-        Workspaces {
+        let mut workspaces = Workspaces {
             current: get_current_desktop(&ewmh_conn),
             desktops: zip_names_origins(names, origins),
             urgency: get_desktop_urgency(&conn, &ewmh_conn),
             monitors: monitor::list(),
+            monitor_last_current: HashMap::new(),
+        };
+
+        let monitor_index = workspaces.get_monitor_index(&workspaces.desktops[workspaces.current as usize]);
+
+        workspaces.monitor_last_current.insert(monitor_index, workspaces.current);
+
+        workspaces
+    }
+
+    pub fn set_current(&mut self, current: u32) {
+        self.current = current;
+        self.update_last_visible();
+    }
+
+    pub fn set_desktops(&mut self, desktops: Vec<(String, u32, u32)>) {
+        self.desktops = desktops;
+        self.update_last_visible();
+    }
+
+    pub fn set_urgency(&mut self, urgency: Vec<u32>) {
+        self.urgency = urgency;
+    }
+
+    pub fn update_last_visible(&mut self) {
+        if self.desktops.len() > self.current as _ {
+            let index = self.get_monitor_index(&self.desktops[self.current as usize]);
+            self.monitor_last_current.insert(index, self.current);
         }
     }
 
     pub fn list(&self) -> Vec<Workspace> {
         self.desktops.iter().enumerate().map(|(i, desktop)| {
-            let monitor = self.monitors.iter().find(|m| {
-                m.x == desktop.1 as _ && m.y == desktop.2 as _
-            }).map(|m| m.index).unwrap_or(0);
+            let focused = self.current == i as _;
+            let monitor_index = self.get_monitor_index(&desktop);
+            let monitor_last = self.monitor_last_current.get(&monitor_index);
+            let visible = if let Some(last_current) = monitor_last {
+                *last_current == i as u32
+            } else {
+                focused
+            };
 
             Workspace {
                 number: i as u32 + 1,
                 name: desktop.0.to_owned(),
-                focused: self.current == i as _,
+                focused,
+                visible,
                 urgent: self.urgency.contains(&(i as u32)),
-                monitor,
+                monitor_index,
             }
         }).collect()
+    }
+
+    pub fn get_monitor_index(&self, desktop: &(String, u32, u32)) -> u32 {
+        self.monitors.iter().find(|m| {
+            m.x == desktop.1 as _ && m.y == desktop.2 as _
+        }).map(|m| m.index).unwrap_or(0)
     }
 }
 
