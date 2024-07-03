@@ -9,7 +9,7 @@ pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
     if let Some(Property::Function(func)) = comp.props().get("markup") {
         let rect = ui.available_rect_before_wrap();
 
-        ui.add(core::svg_image(func, &rect));
+        ui.add(core::svg_image(&global.lua, func, &rect));
         return;
     }
 

@@ -99,10 +99,10 @@ pub fn parse_bars(lua: &mlua::Lua) -> mlua::Result<Vec<Bar>> {
 
         // default props for every component
 
-        let mut default_props = HashMap::new();
-
-        default_props.insert("_bar_id".to_string(), Property::String(format!("xcake-{}", id)));
-        default_props.insert("_monitor_index".to_string(), Property::Integer(monitor.index as _));
+        let default_props = create_default(
+            format!("xcake-{}", id),
+            monitor.index,
+        );
 
         // get props for top level container
 
@@ -129,7 +129,22 @@ pub fn parse_bars(lua: &mlua::Lua) -> mlua::Result<Vec<Bar>> {
     Ok(bars)
 }
 
-fn to_property(value: Value, default_props: &HashMap<String, Property>) -> Property {
+pub fn copy_default(props: &Props) -> HashMap<String, Property> {
+    let bar_id: String = props.get("_bar_id").unwrap_or_default().into();
+    let monitor_index: i64 = props.get("_monitor_index").unwrap_or_default().into();
+    create_default(bar_id, monitor_index as _)
+}
+
+fn create_default(bar_id: String, monitor_index: u32) -> HashMap<String, Property> {
+    let mut default_props = HashMap::new();
+
+    default_props.insert("_bar_id".to_string(), Property::String(bar_id));
+    default_props.insert("_monitor_index".to_string(), Property::Integer(monitor_index as _));
+
+    default_props
+}
+
+pub fn to_property(value: Value, default_props: &HashMap<String, Property>) -> Property {
     match value {
         Value::Nil => Property::Null,
         Value::Function(f) => Property::Function(f.into_owned()),

@@ -12,16 +12,36 @@ for _, monitor in monitors() do
         -- crossJustify = true,
         -- align = "end",
         -- crossAlign = "end",
-        margin = 5,
+        -- margin = 5,
 
-        background = function(width, height) return string.format([[
-          <rect x="0" y="0" width="%d" height="%d" rx="5" fill="none" stroke="#996699" stroke-width="5"/>
-        ]], width, height) end,
+--         background = function(svg) return string.format([[
+--           <rect x="0" y="0" width="%d" height="%d" rx="5" fill="none" stroke="#996699" stroke-width="5"/>
+--         ]], svg.width, svg.height) end,
 
         items = {
             {
                 "workspaces",
-                showAll = false,
+                render = function (workspace) return {
+                    "label",
+                    text = tostring(workspace.number),
+                    background = function(svg)
+                        local color = 3
+
+                        if workspace.urgent then
+                            color = "red"
+                        elseif workspace.focused then
+                            color = "blue"
+                        elseif workspace.visible then
+                            color = "darkblue"
+                        else
+                            color = "black"
+                        end
+
+                        return string.format([[
+                            <rect x="0" y="0" width="16" height="%d" fill="%s"/>
+                        ]], svg.height, color)
+                    end,
+                } end
             },
             {
                 "button",
@@ -39,9 +59,9 @@ for _, monitor in monitors() do
             {
                 "image",
                 size = 50,
-                markup = function(width, height) return string.format([[
+                markup = function(svg) return string.format([[
                     <rect x="0" y="0" width="%d" height="%d" fill="none" stroke="#FFAA00" stroke-width="5"/>
-                ]], width, height) end,
+                ]], svg.width, svg.height) end,
             },
             {
                 "input",
@@ -67,13 +87,6 @@ for _, monitor in monitors() do
                         "label",
                         text = "foo bar baz",
                     },
-                    {
-                        "battery",
-                        render = function(filled) return {
-                            "svg",
-                            markup = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"30\" height=\"30\"><path d=\"M4.2 10a11.1 11.1 0 0 0 0 10h20c.4-.6.6-1.3.8-2h1.6a12 12 0 0 0 0-6H25c-.2-.7-.4-1.4-.8-2h-20zM19 11h5v8h-5v-8z\" style=\"fill:#".. ({"red", "yellow", "green"})[(filled/44) + 1] ..";fill-opacity:1;stroke:none;stroke-width:.49999997;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1\"/></svg>"
-                        } end
-                    },
                 },
             },
         },
@@ -81,7 +94,6 @@ for _, monitor in monitors() do
 end
 
 -- TODO
--- get i3mode from i3blocks code
--- WebView ?! File Menu (everything from cakey)
+-- i3mode
 -- window collapse
 -- animated SVG for battery monitor, CPU graph

@@ -18,7 +18,7 @@ pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
             ui.with_layout(layout, |ui| {
                 for prop in list {
                     if let Property::Component(comp) = prop {
-                        super::render(comp, ui, global);
+                        crate::components::render(comp, ui, global);
                     }
                 }
             });
@@ -51,7 +51,7 @@ pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
                     strip.cell(|ui| {
 
                         core::render_layout(comp, ui, |comp, ui| {
-                            super::render(comp, ui, global);
+                            crate::components::render(comp, ui, global);
                         });
                     });
                 }

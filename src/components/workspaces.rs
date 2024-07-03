@@ -1,6 +1,6 @@
 use eframe::egui;
 use egui::Ui;
-use crate::config::{Property, Component};
+use crate::config::{Property, Component, to_property, copy_default};
 use crate::global::Global;
 use crate::wm::xcb::workspaces::Workspace;
 
@@ -14,12 +14,35 @@ pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
         show_all || workspace.monitor_index == monitor_index as u32
     }).collect();
 
+
     if let Some(Property::Function(func)) = props.get("render") {
         for workspace in workspaces {
+            let table = table_from_workspace(&global.lua, &workspace).unwrap();
+            let result = func.call::<mlua::Table, mlua::Value>(table);
 
+            if result.is_ok() {
+                let component = result.unwrap();
 
-            // func.call::<mlua::Table, String>((workspace));
-
+                let default_props = copy_default(props);
+                if let Property::Component(mut comp) = to_property(component, &default_props) {
+                    crate::components::render(&mut comp, ui, global);
+                }
+            } else {
+                error!("{}", result.err().unwrap().to_string());
+            }
         }
     }
+}
+
+fn table_from_workspace<'a>(lua: &'a mlua::Lua, workspace: &Workspace) -> mlua::Result<mlua::Table<'a>> {
+    let table = lua.create_table()?;
+
+    table.set("number", workspace.number)?;
+    table.set("name", workspace.name.to_owned())?;
+    table.set("focused", workspace.focused)?;
+    table.set("urgent", workspace.urgent)?;
+    table.set("visible", workspace.visible)?;
+    table.set("monitor_index", workspace.monitor_index)?;
+
+    Ok(table)
 }

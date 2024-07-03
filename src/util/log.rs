@@ -18,29 +18,29 @@ macro_rules! message {
 #[macro_export]
 macro_rules! error {
     ( $x:expr, $( $y:expr ),* $(,)? ) => {
-        message!(Red, "error", format!($x, $($y),*));
+        message!(Red, "error", format!($x, $($y),*))
     };
     ( $x:expr ) => {
-        message!(Red, "error", format!($x));
+        message!(Red, "error", format!($x))
     };
 }
 
 #[macro_export]
 macro_rules! warn {
     ( $x:expr, $( $y:expr ),* $(,)? ) => {
-        message!(Yellow, "warning", format!($x, $($y),*));
+        message!(Yellow, "warning", format!($x, $($y),*))
     };
     ( $x:expr ) => {
-        message!(Yellow, "warning", format!($x));
+        message!(Yellow, "warning", format!($x))
     };
 }
 
 #[macro_export]
 macro_rules! info {
     ( $x:expr, $( $y:expr ),* $(,)? ) => {
-        message!(Cyan, "info", format!($x, $($y),*));
+        message!(Cyan, "info", format!($x, $($y),*))
     };
     ( $x:expr ) => {
-        message!(Cyan, "info", format!($x));
+        message!(Cyan, "info", format!($x))
     };
 }
