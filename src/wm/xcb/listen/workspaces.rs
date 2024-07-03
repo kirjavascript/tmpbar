@@ -4,9 +4,6 @@ use crate::global::Event;
 use crate::wm::monitor;
 use std::collections::HashMap;
 
-// make global global
-// use _monitor_index
-
 pub struct Workspaces {
     current: u32,
     desktops: Vec<(String, u32, u32)>,
@@ -15,13 +12,14 @@ pub struct Workspaces {
     monitor_current: HashMap<u32, u32>,
 }
 
+#[derive(Debug)]
 pub struct Workspace {
-    number: u32,
-    name: String,
-    focused: bool,
-    urgent: bool,
-    visible: bool,
-    monitor_index: u32,
+    pub number: u32,
+    pub name: String,
+    pub focused: bool,
+    pub urgent: bool,
+    pub visible: bool,
+    pub monitor_index: u32,
 }
 
 impl Workspaces {
@@ -109,7 +107,7 @@ pub fn handle_event(
     let atom = event.atom();
 
     if atom == ewmh_conn.atoms._NET_CURRENT_DESKTOP {
-        return Some(Event::WorkspaceCurrent( get_current_desktop(&ewmh_conn)));
+        return Some(Event::WorkspaceCurrent(get_current_desktop(&ewmh_conn)));
     }
 
     if atom == ewmh_conn.atoms._NET_DESKTOP_NAMES {

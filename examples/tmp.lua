@@ -20,6 +20,10 @@ for _, monitor in monitors() do
 
         items = {
             {
+                "workspaces",
+                showAll = false,
+            },
+            {
                 "button",
                 text = "shutdown",
                 justify = true,
@@ -77,7 +81,7 @@ for _, monitor in monitors() do
 end
 
 -- TODO
--- title, get i3mode from i3blocks code
+-- get i3mode from i3blocks code
 -- WebView ?! File Menu (everything from cakey)
 -- window collapse
 -- animated SVG for battery monitor, CPU graph

@@ -4,7 +4,7 @@ use crate::wm::xcb::workspaces::Workspaces;
 
 pub struct Global {
     signal: Signal<Event>,
-    workspaces: Workspaces,
+    pub workspaces: Workspaces,
 }
 
 #[derive(Clone, Debug)]
@@ -44,7 +44,5 @@ impl Global {
                 },
             }
         }
-
-        println!("{:#?}", self.workspaces.list());
     }
 }

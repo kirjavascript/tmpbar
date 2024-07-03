@@ -12,8 +12,6 @@ pub fn render_frame(comp: &mut Component, ui: &mut Ui, func: impl FnOnce(&mut Co
         return;
     }
 
-    // TODO: rounding, etc
-
     let mut frame = egui::Frame::none();
 
     fn get_margin(item: &Property) -> egui::Margin {

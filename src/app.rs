@@ -26,12 +26,8 @@ impl TmpBar {
 impl eframe::App for TmpBar {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         // TODO:
-        // colours
-        // styles?
-        // absolute positioning in stripbuilder
-        // redo structure
+        // colours / styles / layout
         //
-        // workspace data
         // input: pressing enter doesnt unfocus properly
 
         if self.config.reload_signal.has_consume() {
@@ -69,7 +65,7 @@ impl eframe::App for TmpBar {
                     egui::CentralPanel::default()
                         .frame(egui::Frame::none().fill(egui::Color32::TRANSPARENT))
                         .show(ctx, |ui| {
-                            crate::components::render(&mut bar.container, ui);
+                            crate::components::render(&mut bar.container, ui, &mut self.global);
                     });
                 },
             );
