@@ -8,27 +8,24 @@ pub struct ConfigScript {
     pub path: String,
     pub bars: Vec<Bar>,
     pub reload_signal: Signal<()>,
-    pub lua: mlua::Lua,
 }
 
 impl ConfigScript {
-    pub fn reload(&mut self) -> Result<(), String> {
-        load(self)?;
+    pub fn reload(&mut self, lua: &mlua::Lua) -> Result<(), String> {
+        load(self, lua)?;
         Ok(())
     }
 }
 
-pub fn init(path: &str, ctx: egui::Context) -> ConfigScript {
+pub fn init(path: &str, ctx: egui::Context, lua: &mlua::Lua) -> ConfigScript {
     let mut script = ConfigScript {
         path: path.to_owned(),
         bars: Vec::new(),
         reload_signal: Signal::new(ctx),
-        lua: mlua::Lua::new(),
     };
 
-    script.lua.load(include_str!("./prelude.lua")).exec().unwrap();
 
-    let load_result = load(&mut script);
+    let load_result = load(&mut script, lua);
 
     match load_result {
         Ok(_) => {
@@ -43,7 +40,7 @@ pub fn init(path: &str, ctx: egui::Context) -> ConfigScript {
     }
 }
 
-fn load(script: &mut ConfigScript) -> Result<(), String> {
+fn load(script: &mut ConfigScript, lua: &mlua::Lua) -> Result<(), String> {
     let code = {
         let path = std::path::Path::new(&script.path);
 
@@ -59,25 +56,25 @@ fn load(script: &mut ConfigScript) -> Result<(), String> {
         script
     };
 
-    eval(script, code).map_err(|err| err.to_string())
+    eval(script, lua, code).map_err(|err| err.to_string())
 }
 
-fn eval(script: &mut ConfigScript, code: String) -> mlua::Result<()> {
-    let globals = script.lua.globals();
+fn eval(script: &mut ConfigScript, lua: &mlua::Lua, code: String) -> mlua::Result<()> {
+    let globals = lua.globals();
 
     if let Ok(path) = canonicalize(Path::new(&script.path)) {
         let parent = path.parent().map(|p| p.to_path_buf());
         globals.set("xcake_parent_path", parent.unwrap().to_string_lossy() + "/")?;
     }
 
-    set_monitors(&script.lua, &globals)?;
+    set_monitors(lua, &globals)?;
 
-    let set_state: mlua::Function = script.lua.globals().get("xcake_reset_state")?;
+    let set_state: mlua::Function = lua.globals().get("xcake_reset_state")?;
     set_state.call(())?;
 
-    script.lua.load(code).exec()?;
+    lua.load(code).exec()?;
 
-    script.bars = parse_bars(&script.lua)?;
+    script.bars = parse_bars(lua)?;
 
     Ok(())
 }

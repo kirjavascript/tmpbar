@@ -1,10 +1,10 @@
 use crate::util::Signal;
-use crate::config::ConfigScript;
 use crate::wm::xcb::workspaces::Workspaces;
 
 pub struct Global {
-    signal: Signal<Event>,
+    pub lua: mlua::Lua,
     pub workspaces: Workspaces,
+    signal: Signal<Event>,
 }
 
 #[derive(Clone, Debug)]
@@ -21,17 +21,22 @@ impl Global {
 
         crate::wm::xcb::listen(signal.clone());
 
+        let lua = mlua::Lua::new();
+
+        lua.load(include_str!("./prelude.lua")).exec().unwrap();
+
         Self {
-            signal,
             workspaces: Workspaces::new(),
+            lua,
+            signal,
         }
     }
 
-    pub fn signals(&mut self, config: &mut ConfigScript) {
+    pub fn signals(&mut self) {
         for event in self.signal.read() {
             match event {
                 Event::WindowTitle(title) => {
-                    config.lua.globals().set("xcake_window_title", title).ok();
+                    self.lua.globals().set("xcake_window_title", title).ok();
                 },
                 Event::WorkspaceCurrent(current) => {
                     self.workspaces.set_current(current);
