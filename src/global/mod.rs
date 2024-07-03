@@ -15,9 +15,6 @@ pub enum Event {
     WorkspaceUrgency(Vec<u32>),
 }
 
-// TODO: visible by doing tracking
-
-
 impl Global {
     pub fn new(ctx: egui::Context) -> Self {
         let signal: Signal<Event> = Signal::new(ctx);
@@ -47,7 +44,5 @@ impl Global {
                 },
             }
         }
-
-        println!("{:?}", self.workspaces);
     }
 }

@@ -15,13 +15,13 @@ eframe = { version = "0.27.2", default-features = false, features = [
     "glow",
 ] }
 log = "0.4"
-egui-winit = { version = "0.27.2", features=["x11", "wayland"] }
+egui-winit = { version = "0.27.2", features = ["x11", "wayland"] }
 
 xcb = "1.4.0"
 xcb-wm = { version = "0.4.0", features = ["ewmh", "icccm"] }
+mlua = { version = "0.9.8", features = ["luajit52", "unstable"] }
 gumdrop = "0.8.1"
 display-info = "0.5.1"
-mlua = { version = "0.9.8", features = ["luajit52", "unstable"] }
 ansi_term = "0.12.1"
 inotify = "0.10.2"
 

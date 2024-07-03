@@ -1,12 +1,26 @@
 use xcb::x;
 use xcb_wm::{ewmh, icccm};
 use crate::global::Event;
+use crate::wm::monitor;
 
-#[derive(Debug)]
+// TODO: visible by using tracking
+// make global global
+// add monitor name to workspace
+
 pub struct Workspaces {
     pub current: u32,
     pub desktops: Vec<(String, u32, u32)>,
     pub urgency: Vec<u32>,
+    monitors: Vec<monitor::Monitor>,
+}
+
+pub struct Workspace {
+    number: u32,
+    name: String,
+    focused: bool,
+    urgent: bool,
+    // visible
+    // monitor
 }
 
 impl Workspaces {
@@ -24,7 +38,19 @@ impl Workspaces {
             current: get_current_desktop(&ewmh_conn),
             desktops: zip_names_origins(names, origins),
             urgency: get_desktop_urgency(&conn, &ewmh_conn),
+            monitors: monitor::list(),
         }
+    }
+
+    pub fn list(&self) -> Vec<Workspace> {
+        self.desktops.iter().enumerate().map(|(i, desktop)| {
+            Workspace {
+                number: i as u32 + 1,
+                name: desktop.0.to_owned(),
+                focused: self.current == i as _,
+                urgent: self.urgency.contains(&(i as u32)),
+            }
+        }).collect()
     }
 }
 
