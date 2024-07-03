@@ -103,7 +103,7 @@ pub fn parse_bars(lua: &mlua::Lua) -> mlua::Result<Vec<Bar>> {
         let mut default_props = HashMap::new();
 
         default_props.insert("_bar_id".to_string(), Property::String(format!("xcake-{}", id)));
-
+        default_props.insert("_monitor_index".to_string(), Property::Integer(monitor.index as _));
         default_props.insert("_parent_path".to_string(), Property::String(xcake_parent_path.to_string()?));
 
         // get props for top level container

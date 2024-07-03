@@ -2,6 +2,7 @@ use display_info::DisplayInfo;
 
 #[derive(Clone, Debug)]
 pub struct Monitor {
+    pub index: u32,
     pub name: String,
     pub width: u32,
     pub height: u32,
@@ -23,8 +24,9 @@ pub fn list() -> Vec<Monitor> {
         Vec::new()
     });
 
-    list.iter().map(|m| {
+    list.iter().enumerate().map(|(i, m)| {
         Monitor {
+            index: i as u32,
             name: m.name.to_string(),
             x: m.x,
             y: m.y,

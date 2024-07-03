@@ -44,5 +44,7 @@ impl Global {
                 },
             }
         }
+
+        println!("{:?}", self.workspaces.list());
     }
 }

@@ -5,7 +5,7 @@ use crate::wm::monitor;
 
 // TODO: visible by using tracking
 // make global global
-// add monitor name to workspace
+// use _monitor_index
 
 pub struct Workspaces {
     pub current: u32,
@@ -14,13 +14,14 @@ pub struct Workspaces {
     monitors: Vec<monitor::Monitor>,
 }
 
+#[derive(Debug)]
 pub struct Workspace {
     number: u32,
     name: String,
     focused: bool,
     urgent: bool,
     // visible
-    // monitor
+    monitor: u32,
 }
 
 impl Workspaces {
@@ -44,11 +45,16 @@ impl Workspaces {
 
     pub fn list(&self) -> Vec<Workspace> {
         self.desktops.iter().enumerate().map(|(i, desktop)| {
+            let monitor = self.monitors.iter().find(|m| {
+                m.x == desktop.1 as _ && m.y == desktop.2 as _
+            }).map(|m| m.index).unwrap_or(0);
+
             Workspace {
                 number: i as u32 + 1,
                 name: desktop.0.to_owned(),
                 focused: self.current == i as _,
                 urgent: self.urgency.contains(&(i as u32)),
+                monitor,
             }
         }).collect()
     }
