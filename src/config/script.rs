@@ -1,5 +1,4 @@
-use std::fs::{File, canonicalize};
-use std::path::Path;
+use std::fs::File;
 use std::io::prelude::*;
 use super::parse::{Bar, parse_bars};
 use crate::util::Signal;
@@ -62,14 +61,9 @@ fn load(script: &mut ConfigScript, lua: &mlua::Lua) -> Result<(), String> {
 fn eval(script: &mut ConfigScript, lua: &mlua::Lua, code: String) -> mlua::Result<()> {
     let globals = lua.globals();
 
-    if let Ok(path) = canonicalize(Path::new(&script.path)) {
-        let parent = path.parent().map(|p| p.to_path_buf());
-        globals.set("xcake_parent_path", parent.unwrap().to_string_lossy() + "/")?;
-    }
-
     set_monitors(lua, &globals)?;
 
-    let set_state: mlua::Function = lua.globals().get("xcake_reset_state")?;
+    let set_state: mlua::Function = globals.get("xcake_reset_state")?;
     set_state.call(())?;
 
     lua.load(code).exec()?;

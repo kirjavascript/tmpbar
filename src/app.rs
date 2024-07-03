@@ -8,7 +8,10 @@ pub struct TmpBar {
 
 impl TmpBar {
     pub fn new(cc: &eframe::CreationContext<'_>, path: String) -> Self {
-        let global = global::Global::new(cc.egui_ctx.clone());
+        let global = global::Global::new(
+            &path,
+            cc.egui_ctx.clone(),
+        );
         let config = config::script::init(
             &path,
             cc.egui_ctx.clone(),

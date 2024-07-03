@@ -66,7 +66,6 @@ pub fn parse_bars(lua: &mlua::Lua) -> mlua::Result<Vec<Bar>> {
     let globals = lua.globals();
 
     let xcake_bars: Table = globals.get("xcake_bars")?;
-    let xcake_parent_path: Value = globals.get("xcake_parent_path")?;
     let mut bars = Vec::new();
 
     for pair in xcake_bars.pairs::<i32, Table>() {
@@ -104,7 +103,6 @@ pub fn parse_bars(lua: &mlua::Lua) -> mlua::Result<Vec<Bar>> {
 
         default_props.insert("_bar_id".to_string(), Property::String(format!("xcake-{}", id)));
         default_props.insert("_monitor_index".to_string(), Property::Integer(monitor.index as _));
-        default_props.insert("_parent_path".to_string(), Property::String(xcake_parent_path.to_string()?));
 
         // get props for top level container
 
