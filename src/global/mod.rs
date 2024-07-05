@@ -21,6 +21,7 @@ impl Global {
         let signal: Signal<Event> = Signal::new(ctx);
 
         crate::wm::xcb::listen(signal.clone());
+        crate::wm::xcb::tmp_tray();
 
         let lua = load_lua(path);
 

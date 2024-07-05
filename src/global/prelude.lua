@@ -4,11 +4,11 @@ end
 
 xcake_window_title = ""
 
-function windowTitle()
+function window_title()
     return xcake_window_title
 end
 
-function readFile(filePath)
+function read_file(filePath)
     if rawget(_G, "xcake_parent_path") ~= nil then
         if filePath:sub(1, 1) ~= '/' then
             filePath = xcake_parent_path .. filePath

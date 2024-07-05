@@ -4,7 +4,7 @@ pub fn handle_event(
     event: &x::PropertyNotifyEvent,
     root: &x::Window,
     conn: &xcb::Connection,
-    atoms: &crate::wm::xcb::Atoms,
+    atoms: &crate::wm::xcb::listen::Atoms,
     active_window: &mut x::Window
 ) -> Option<String> {
     let atom = event.atom();

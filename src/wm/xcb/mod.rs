@@ -1,12 +1,12 @@
-mod atoms;
 mod window;
 mod focus;
 mod listen;
+mod tray;
 
-use atoms::Atoms;
 pub use focus::*;
 pub use window::*;
 pub use listen::*;
+pub use tray::*;
 
 
 #[allow(dead_code)]

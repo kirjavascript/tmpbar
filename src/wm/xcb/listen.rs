@@ -7,13 +7,21 @@ use xcb_wm::ewmh;
 use crate::global::Event;
 use crate::util::Signal;
 
+xcb::atoms_struct! {
+    #[derive(Copy, Clone, Debug)]
+    pub(crate) struct Atoms {
+        pub active_window => b"_NET_ACTIVE_WINDOW",
+        pub utf8_string => b"ATOM_UTF8_STRING",
+    }
+}
+
 pub fn listen(signal: Signal<Event>) {
     std::thread::spawn(move || {
         let (conn, screen_num) = xcb::Connection::connect(None).unwrap();
         let setup = conn.get_setup();
         let screen = setup.roots().nth(screen_num as usize).unwrap();
         let root = screen.root();
-        let atoms = super::Atoms::intern_all(&conn).unwrap();
+        let atoms = Atoms::intern_all(&conn).unwrap();
 
         subscribe_windows(&conn, &root);
 
@@ -51,9 +59,9 @@ pub fn listen(signal: Signal<Event>) {
                         },
                     };
                 }
-                Err(error) => {
-                    #[cfg(debug_assertions)]
-                    error!("{:?}", error);
+                Err(_error) => {
+                    // #[cfg(debug_assertions)]
+                    // error!("{:?}", _error);
                 },
             }
         }
@@ -76,9 +84,10 @@ fn subscribe_windows(conn: &xcb::Connection, window: &x::Window) {
     let cookie = conn.send_request(&xcb::x::QueryTree {
         window: *window,
     });
-    let tree = conn.wait_for_reply(cookie).unwrap();
 
-    for child in tree.children() {
-        subscribe_windows(conn, child);
+    if let Ok(tree) = conn.wait_for_reply(cookie) {
+        for child in tree.children() {
+            subscribe_windows(conn, child);
+        }
     }
 }

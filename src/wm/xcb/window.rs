@@ -2,6 +2,15 @@ use std::collections::HashMap;
 use crate::config::ConfigScript;
 use crate::wm::monitor::Monitor;
 
+xcb::atoms_struct! {
+    #[derive(Copy, Clone, Debug)]
+    pub(crate) struct Atoms {
+        pub shadow => b"_COMPTON_SHADOW",
+        // pub strut_partial => b"_NET_WM_STRUT_PARTIAL",
+        // pub strut => b"_NET_WM_STRUT",
+    }
+}
+
 struct SendBar {
     id: String,
     y: i32,
@@ -26,7 +35,7 @@ pub fn window_patch(config: &ConfigScript) {
         let setup = conn.get_setup();
         let screen = setup.roots().nth(screen_num as usize).unwrap();
         let root = screen.root();
-        let atoms = super::Atoms::intern_all(&conn).unwrap();
+        let atoms = Atoms::intern_all(&conn).unwrap();
 
         let mut windows = get_windows(&conn, root);
 

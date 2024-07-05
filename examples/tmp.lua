@@ -11,7 +11,7 @@ function workspaces()
                         or workspace.visible and "#0022CC"
                         or "black"
 
-                    return ([[ <rect x="0" y="0" width="16" height="%d" fill="%s" rx="2" /> ]]):format(svg.height, color)
+                    return ([[ <rect x="0" y="0" width="12" height="%d" fill="%s" rx="2"/> ]]):format(svg.height, color)
                 end,
         } end
     }
@@ -21,7 +21,7 @@ for _, monitor in monitors() do
     bar({
         monitor = monitor,
         position = "top",
-        height = 55,
+        height = 20,
         flex = true,
         -- orientation = "v",
 
@@ -40,7 +40,7 @@ for _, monitor in monitors() do
         items = {
             {
                 "image",
-                size = 90,
+                size = 40,
                 path = "./archlinux.svg",
             },
             workspaces(),
@@ -59,7 +59,7 @@ for _, monitor in monitors() do
             {
                 "label",
                 justify = true,
-                text = function() return "« "..windowTitle().." »" end,
+                text = function() return "« "..window_title().." »" end,
             },
             {
                 "container",
