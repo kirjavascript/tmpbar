@@ -112,25 +112,28 @@ pub fn _tmp_tray() {
                         &mut icons,
                     );
                 },
+                xcb::Event::X(x::Event::Expose(_)) => {
+                    let cookie = conn.send_request(&x::GetImage {
+                        format: x::ImageFormat::ZPixmap,
+                        drawable: x::Drawable::Window(tray_window),
+                        x: 0,
+                        y: 0,
+                        width: icon_size as _,
+                        height: icon_size as _,
+                        plane_mask: !0,
+                    });
+                    let reply = conn.wait_for_reply(cookie).unwrap();
+
+                    for c in reply.data().chunks(icon_size as _) {
+                        for c in c.chunks(4) {
+                            print!("{:0>2X}{:0>2X}{:0>2X}",c[0],c[1],c[2]);
+                        }
+                        println!("");
+                    }
+                    println!("{}", reply.data().len());
+                },
                 xcb::Event::X(x::Event::ButtonPress(event)) => {
                     // TODO: remote press from event mask
-                    // let cookie = conn.send_request(&x::GetImage {
-                    //     format: x::ImageFormat::ZPixmap,
-                    //     drawable: x::Drawable::Window(tray_window),
-                    //     x: 0,
-                    //     y: 0,
-                    //     width: 40,
-                    //     height:40,
-                    //     plane_mask: !0,
-                    // });
-                    // let reply = conn.wait_for_reply(cookie).unwrap();
-
-                    // for c in reply.data().chunks(40) {
-                    //     for c in c.chunks(4) {
-                    //         print!("{:0>2X}{:0>2X}{:0>2X}",c[0],c[1],c[2]);
-                    //     }
-                    //     println!("");
-                    // }
 
                     let window = icons[0];
                     conn.send_request_checked(&x::SendEvent {
@@ -144,8 +147,8 @@ pub fn _tmp_tray() {
                             root,
                             icons[0],
                             x::Window::none(),
-                            2000,
-                            100,
+                            0,
+                            0,
                             0,
                             0,
                             x::KeyButMask::all(),
@@ -183,7 +186,7 @@ fn add_icon(
             conn.send_request(&x::ChangeWindowAttributes{
                 window,
                 value_list: &[
-                    x::Cw::EventMask(x::EventMask::STRUCTURE_NOTIFY),
+                    x::Cw::EventMask(x::EventMask::STRUCTURE_NOTIFY | x::EventMask::EXPOSURE),
                 ],
             });
             conn.send_request(&x::ReparentWindow{
