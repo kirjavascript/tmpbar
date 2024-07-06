@@ -92,42 +92,8 @@ pub fn _tmp_tray() {
                             icon_size,
                             &mut icons,
                         );
-
-                        // conn.send_request(&x::SendEvent {
-                        //     propagate: false,
-                        //     destination: x::SendEventDest::Window(root),
-                        //     event_mask: x::EventMask::STRUCTURE_NOTIFY,
-                        //     event: &x::ClientMessageEvent::new(
-                        //         root,
-                        //         atoms.manager,
-                        //         x::ClientMessageData::Data32([
-                        //             event.time(),
-                        //             atoms.net_system_tray_s0.resource_id(),
-                        //             window.resource_id(),
-                        //             0,
-                        //             0,
-                        //         ]),
-                        //     ),
-                        // });
-                        // conn.flush().unwrap();
                     }
                 },
-                // xcb::Event::X(x::Event::ConfigureNotify(_event)) => {
-                //     // TODO add unmap
-                //     let cookie = conn.send_request(&x::GetImage {
-                //         format: x::ImageFormat::ZPixmap,
-                //         drawable: x::Drawable::Window(tray_window),
-                //         x: 0,
-                //         y: 0,
-                //         width: 40,
-                //         height:40,
-                //         plane_mask: !0,
-                //     });
-
-                //     let reply = conn.wait_for_reply(cookie).unwrap();
-                //     println!("{:?}", reply.data());
-
-                // },
                 xcb::Event::X(x::Event::ReparentNotify(event)) => {
                     if event.parent() != tray_window {
                         remove_icon(
@@ -146,10 +112,55 @@ pub fn _tmp_tray() {
                         &mut icons,
                     );
                 },
+                xcb::Event::X(x::Event::ButtonPress(event)) => {
+                    // TODO: remote press from event mask
+                    // let cookie = conn.send_request(&x::GetImage {
+                    //     format: x::ImageFormat::ZPixmap,
+                    //     drawable: x::Drawable::Window(tray_window),
+                    //     x: 0,
+                    //     y: 0,
+                    //     width: 40,
+                    //     height:40,
+                    //     plane_mask: !0,
+                    // });
+                    // let reply = conn.wait_for_reply(cookie).unwrap();
+
+                    // for c in reply.data().chunks(40) {
+                    //     for c in c.chunks(4) {
+                    //         print!("{:0>2X}{:0>2X}{:0>2X}",c[0],c[1],c[2]);
+                    //     }
+                    //     println!("");
+                    // }
+
+                    let window = icons[0];
+                    conn.send_request_checked(&x::SendEvent {
+                        propagate: false,
+                        destination: x::SendEventDest::Window(window),
+                        event_mask: x::EventMask::NO_EVENT,
+
+                        event: &x::ButtonPressEvent::new(
+                            event.detail(),
+                            x::CURRENT_TIME,
+                            root,
+                            icons[0],
+                            x::Window::none(),
+                            2000,
+                            100,
+                            0,
+                            0,
+                            x::KeyButMask::all(),
+                            true,
+                        ),
+                    });
+
+                    conn.flush().unwrap();
+                },
                 _ => {
                     println!("event {:?}", event);
+
                 },
             };
+
         }
     }
 }
@@ -293,7 +304,7 @@ fn setup_window(
         value_list: &[
                x::Cw::BackPixel(screen.black_pixel()),
                x::Cw::OverrideRedirect(true),
-               x::Cw::EventMask(x::EventMask::PROPERTY_CHANGE),
+               x::Cw::EventMask(x::EventMask::PROPERTY_CHANGE | x::EventMask::BUTTON_PRESS),
         ],
     });
 
