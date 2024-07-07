@@ -1,4 +1,5 @@
 mod manager;
+mod signal_hook;
 
 use manager::{Manager, TrayEvent, ProxyAction};
 
@@ -12,12 +13,11 @@ pub struct Tray {
     tx_proxy: Sender<ProxyAction>,
 }
 
-// TODO SIGINT destroy_tray
-
 impl Tray {
     pub fn new(ctx: egui::Context) -> Self {
         let (tx_tray, rx_tray) = unbounded();
         let (tx_proxy, rx_proxy) = unbounded();
+        let tx_proxy_clone = tx_proxy.clone();
 
         std::thread::spawn(move || {
             let (tx_event, rx_event) = unbounded();
@@ -36,8 +36,10 @@ impl Tray {
                 }
             });
 
+            let rx_signal = signal_hook::hook();
+
             loop {
-                // TODO: use docs to fix lint issue
+                // TODO: use Select to fix lint issue
                 select! {
                     recv(rx_event) -> event => {
                         if let Ok(event) = event {
@@ -48,7 +50,10 @@ impl Tray {
                         if let Ok(action) = action {
                             manager.handle_action(action);
                         }
-                    }
+                    },
+                    recv(rx_signal) -> _ => {
+                        tx_proxy_clone.send(ProxyAction::Destroy).ok();
+                    },
                 }
             }
         });

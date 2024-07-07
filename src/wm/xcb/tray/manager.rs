@@ -32,11 +32,12 @@ pub struct Manager {
 }
 
 pub enum TrayEvent {
-    Framebuffer(Vec<u8>)
+    Framebuffer(Vec<u8>),
 }
 
 pub enum ProxyAction {
-    Click(u8, usize)
+    Click(u8, usize),
+    Destroy,
 }
 
 impl Manager {
@@ -154,6 +155,15 @@ impl Manager {
                     self.root,
                     button,
                 );
+            },
+            ProxyAction::Destroy => {
+                destroy_tray(
+                    &self.conn,
+                    self.tray_window,
+                    self.root,
+                    &mut self.icons,
+                );
+                std::process::exit(0);
             },
         }
     }
