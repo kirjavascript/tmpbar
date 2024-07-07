@@ -4,8 +4,6 @@ use crate::config::{Property, Component, get_text};
 use crate::global::Global;
 
 pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
-    let props = comp.props();
-
     let (x, y) = global.tray.dimensions();
 
 
@@ -28,5 +26,15 @@ pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
     let img = egui::Image::new(texture)
         .sense(egui::Sense::click());
 
-    ui.add(img);
+    let response = ui.add(img);
+
+    if response.clicked() {
+        global.tray.click(1, 0);
+    }
+    if response.secondary_clicked() {
+        global.tray.click(3, 0);
+    }
+    if response.middle_clicked() {
+        global.tray.click(2, 0);
+    }
 }
