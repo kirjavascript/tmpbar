@@ -3,12 +3,12 @@ mod signal_hook;
 
 use manager::{Manager, TrayEvent, ProxyAction};
 
-use crossbeam_channel::{unbounded, select, Receiver, Sender};
+use crossbeam_channel::{unbounded, select, Receiver, Sender, tick};
 
 pub struct Tray {
     pub framebuffer: Vec<u8>,
-    icon_size: u32,
-    // icon_quantity: u32,
+    pub icon_size: u32,
+    pub icon_quantity: u32,
     rx_tray: Receiver<TrayEvent>,
     tx_proxy: Sender<ProxyAction>,
 }
@@ -17,7 +17,6 @@ impl Tray {
     pub fn new(ctx: egui::Context) -> Self {
         let (tx_tray, rx_tray) = unbounded();
         let (tx_proxy, rx_proxy) = unbounded();
-        let tx_proxy_clone = tx_proxy.clone();
 
         std::thread::spawn(move || {
             let (tx_event, rx_event) = unbounded();
@@ -38,6 +37,8 @@ impl Tray {
 
             let rx_signal = signal_hook::hook();
 
+            let fb_tick = tick(std::time::Duration::from_secs(1));
+
             loop {
                 // TODO: use Select to fix lint issue
                 select! {
@@ -52,7 +53,10 @@ impl Tray {
                         }
                     },
                     recv(rx_signal) -> _ => {
-                        tx_proxy_clone.send(ProxyAction::Destroy).ok();
+                        manager.handle_action(ProxyAction::Destroy);
+                    },
+                    recv(fb_tick) -> _ => {
+                        manager.handle_action(ProxyAction::PollFB);
                     },
                 }
             }
@@ -61,7 +65,7 @@ impl Tray {
         Tray {
             framebuffer: vec![],
             icon_size: 40,
-            // icon_quantity: 0,
+            icon_quantity: 0,
             rx_tray,
             tx_proxy,
         }
@@ -79,13 +83,9 @@ impl Tray {
             match event {
                 TrayEvent::Framebuffer(fb) => {
                     self.framebuffer = fb;
-
-                    for c in self.framebuffer.chunks(self.icon_size as _) {
-                        for c in c.chunks(4) {
-                            print!("{:0>2X}{:0>2X}{:0>2X}",c[0],c[1],c[2]);
-                        }
-                        println!("");
-                    }
+                },
+                TrayEvent::IconQuantity(qty) => {
+                    self.icon_quantity = qty;
                 },
             }
         }

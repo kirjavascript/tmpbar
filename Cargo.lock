@@ -2253,7 +2253,6 @@ dependencies = [
  "gumdrop",
  "image",
  "inotify",
- "log",
  "mlua",
  "serde",
  "signal-hook",

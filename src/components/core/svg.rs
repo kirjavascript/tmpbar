@@ -36,21 +36,8 @@ pub fn svg_image<'a>(lua: &mlua::Lua, func: &mlua::OwnedFunction, rect: &egui::R
         </svg>
     "#);
 
-    let filename = format!("bytes://{}.svg", fnv1a_hash(&svg));
+    let filename = format!("bytes://{}.svg", crate::util::fnv1a_hash(&svg));
     let bytes = svg.into_bytes();
 
     egui::Image::from_bytes(filename, bytes)
-}
-
-fn fnv1a_hash(input: &str) -> u64 {
-    const FNV_OFFSET_BASIS: u64 = 0xcbf29ce484222325;
-    const FNV_PRIME: u64 = 0x100000001b3;
-
-    let mut hash = FNV_OFFSET_BASIS;
-    for byte in input.bytes() {
-        hash ^= byte as u64;
-        hash = hash.wrapping_mul(FNV_PRIME);
-    }
-
-    hash
 }

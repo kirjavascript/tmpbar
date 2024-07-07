@@ -29,14 +29,17 @@ pub struct Manager {
     booted: bool,
     ctx: egui::Context,
     tx_tray: Sender<TrayEvent>,
+    fb_hash: u64,
 }
 
 pub enum TrayEvent {
     Framebuffer(Vec<u8>),
+    IconQuantity(u32),
 }
 
 pub enum ProxyAction {
     Click(u8, usize),
+    PollFB,
     Destroy,
 }
 
@@ -81,6 +84,7 @@ impl Manager {
             booted,
             ctx,
             tx_tray,
+            fb_hash: 0,
         }
     }
 
@@ -108,6 +112,7 @@ impl Manager {
                         self.icon_size,
                         &mut self.icons,
                     );
+                    self.send_message(TrayEvent::IconQuantity(self.icons.len() as _));
                 }
             },
             xcb::Event::X(x::Event::ReparentNotify(event)) => {
@@ -118,6 +123,7 @@ impl Manager {
                         self.icon_size,
                         &mut self.icons,
                     );
+                    self.send_message(TrayEvent::IconQuantity(self.icons.len() as _));
                 }
             },
             xcb::Event::X(x::Event::DestroyNotify(event)) => {
@@ -127,21 +133,9 @@ impl Manager {
                     self.icon_size,
                     &mut self.icons,
                 );
+                self.send_message(TrayEvent::IconQuantity(self.icons.len() as _));
             },
-            xcb::Event::X(x::Event::Expose(_)) => {
-                let fb = get_fb(
-                    &self.conn,
-                    self.tray_window,
-                    self.icon_size as _,
-                    self.icons.len() as _,
-                );
-
-                self.tx_tray.send(TrayEvent::Framebuffer(fb)).ok();
-                self.ctx.request_repaint();
-            },
-            _ => {
-                println!("tray event {:?}", event);
-            },
+            _ => { },
         };
 
     }
@@ -165,7 +159,27 @@ impl Manager {
                 );
                 std::process::exit(0);
             },
+            ProxyAction::PollFB => {
+                let fb = get_fb(
+                    &self.conn,
+                    self.tray_window,
+                    self.icon_size as _,
+                    self.icons.len() as _,
+                );
+
+                let hash = crate::util::fnv1a_hash(&fb);
+
+                if hash != self.fb_hash {
+                    self.send_message(TrayEvent::Framebuffer(fb));
+                    self.fb_hash = hash;
+                }
+            },
         }
+    }
+
+    fn send_message(&self, message: TrayEvent) {
+        self.tx_tray.send(message).ok();
+        self.ctx.request_repaint();
     }
 }
 
@@ -295,6 +309,7 @@ fn remove_icon(
             ],
         });
     }
+    set_tray_size(conn, window, icon_size, icons);
     conn.flush().unwrap();
 }
 
