@@ -1,9 +1,11 @@
 use crate::util::Signal;
 use crate::wm::xcb::workspaces::Workspaces;
+use crate::wm::xcb::Tray;
 
 pub struct Global {
     pub lua: mlua::Lua,
     pub workspaces: Workspaces,
+    pub tray: Tray,
     pub parent_path: String,
     signal: Signal<Event>,
 }
@@ -21,7 +23,7 @@ impl Global {
         let signal: Signal<Event> = Signal::new(ctx.clone());
 
         crate::wm::xcb::listen(signal.clone());
-        crate::wm::xcb::Tray::new(ctx);
+        let tray = Tray::new(ctx);
 
         let lua = load_lua(path);
 
@@ -29,6 +31,7 @@ impl Global {
 
         Self {
             workspaces: Workspaces::new(),
+            tray,
             parent_path,
             lua,
             signal,
@@ -53,7 +56,7 @@ impl Global {
             }
         }
 
-        // self.tray.signals();
+        self.tray.signals();
     }
 }
 

@@ -1,5 +1,6 @@
 use xcb::{x, Xid, XidNew};
 use std::sync::Arc;
+use crossbeam_channel::Sender;
 
 xcb::atoms_struct! {
     #[derive(Copy, Clone, Debug)]
@@ -15,8 +16,6 @@ xcb::atoms_struct! {
         pub net_system_tray_s0 => b"_NET_SYSTEM_TRAY_S0",
         pub net_system_tray_opcode => b"_NET_SYSTEM_TRAY_OPCODE",
         pub manager => b"MANAGER",
-        // pub net_wm_window_type => b"_NET_WM_WINDOW_TYPE",
-        // pub net_wm_window_type_dock => b"_NET_WM_WINDOW_TYPE_DOCK",
     }
 }
 
@@ -37,10 +36,8 @@ pub enum Event {
 }
 
 pub enum Action {
-    Click
+    Click(u8, usize)
 }
-
-use crossbeam_channel::Sender;
 
 impl Manager {
     pub fn new(
@@ -138,14 +135,6 @@ impl Manager {
                     self.icons.len() as _,
                 );
 
-                // for c in reply.data().chunks(icon_size as _) {
-                //     for c in c.chunks(4) {
-                //         print!("{:0>2X}{:0>2X}{:0>2X}",c[0],c[1],c[2]);
-                //     }
-                //     println!("");
-                // }
-                // println!("{}", reply.data().len());
-
                 self.tx_tray.send(Event::Framebuffer(fb)).ok();
                 self.ctx.request_repaint();
             },
@@ -156,29 +145,46 @@ impl Manager {
 
     }
 
-    pub fn click(&self) {
-        let window = self.icons[0];
-        self.conn.send_request_checked(&x::SendEvent {
-            propagate: false,
-            destination: x::SendEventDest::Window(window),
-            event_mask: x::EventMask::NO_EVENT,
-            event: &x::ButtonPressEvent::new(
-                1, // button
-                x::CURRENT_TIME,
-                self.root,
-                window,
-                x::Window::none(),
-                0,
-                0,
-                0,
-                0,
-                x::KeyButMask::all(),
-                true,
-            ),
-        });
-
-        self.conn.flush().unwrap();
+    pub fn handle_action(&mut self, action: Action) {
+        match action {
+            Action::Click(button, icon_index) => {
+                click(
+                    &self.conn,
+                    self.icons[icon_index],
+                    self.root,
+                    button,
+                );
+            },
+        }
     }
+}
+
+pub fn click(
+    conn: &xcb::Connection,
+    window: x::Window,
+    root: x::Window,
+    button: u8,
+) {
+    conn.send_request_checked(&x::SendEvent {
+        propagate: false,
+        destination: x::SendEventDest::Window(window),
+        event_mask: x::EventMask::NO_EVENT,
+        event: &x::ButtonPressEvent::new(
+            button,
+            x::CURRENT_TIME,
+            root,
+            window,
+            x::Window::none(),
+            0,
+            0,
+            0,
+            0,
+            x::KeyButMask::all(),
+            true,
+        ),
+    });
+
+    conn.flush().unwrap();
 }
 
 fn get_fb(
@@ -200,7 +206,6 @@ fn get_fb(
 
     reply.data().to_vec()
 }
-
 
 fn add_icon(
     conn: &xcb::Connection,
