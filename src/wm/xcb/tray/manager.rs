@@ -28,21 +28,21 @@ pub struct Manager {
     icons: Vec<x::Window>,
     booted: bool,
     ctx: egui::Context,
-    tx_tray: Sender<Event>,
+    tx_tray: Sender<TrayEvent>,
 }
 
-pub enum Event {
+pub enum TrayEvent {
     Framebuffer(Vec<u8>)
 }
 
-pub enum Action {
+pub enum ProxyAction {
     Click(u8, usize)
 }
 
 impl Manager {
     pub fn new(
         ctx: egui::Context,
-        tx_tray: Sender<Event>,
+        tx_tray: Sender<TrayEvent>,
     ) -> Self {
         let (conn, screen_num) = xcb::Connection::connect(None).unwrap();
         let conn = Arc::new(conn);
@@ -135,7 +135,7 @@ impl Manager {
                     self.icons.len() as _,
                 );
 
-                self.tx_tray.send(Event::Framebuffer(fb)).ok();
+                self.tx_tray.send(TrayEvent::Framebuffer(fb)).ok();
                 self.ctx.request_repaint();
             },
             _ => {
@@ -145,9 +145,9 @@ impl Manager {
 
     }
 
-    pub fn handle_action(&mut self, action: Action) {
+    pub fn handle_action(&mut self, action: ProxyAction) {
         match action {
-            Action::Click(button, icon_index) => {
+            ProxyAction::Click(button, icon_index) => {
                 click(
                     &self.conn,
                     self.icons[icon_index],

@@ -1,15 +1,15 @@
 mod manager;
 
-use manager::{Manager, Event, Action};
+use manager::{Manager, TrayEvent, ProxyAction};
 
 use crossbeam_channel::{unbounded, select, Receiver, Sender};
 
 pub struct Tray {
-    framebuffer: Vec<u8>,
+    pub framebuffer: Vec<u8>,
     icon_size: u32,
     // icon_quantity: u32,
-    rx_tray: Receiver<Event>,
-    tx_proxy: Sender<Action>,
+    rx_tray: Receiver<TrayEvent>,
+    tx_proxy: Sender<ProxyAction>,
 }
 
 // TODO SIGINT destroy_tray
@@ -37,6 +37,7 @@ impl Tray {
             });
 
             loop {
+                // TODO: use docs to fix lint issue
                 select! {
                     recv(rx_event) -> event => {
                         if let Ok(event) = event {
@@ -62,7 +63,7 @@ impl Tray {
     }
 
     pub fn click(&self, button: u8, icon_index: usize) {
-        self.tx_proxy.send(manager::Action::Click(
+        self.tx_proxy.send(manager::ProxyAction::Click(
             button,
             icon_index
         )).ok();
@@ -71,7 +72,7 @@ impl Tray {
     pub fn signals(&mut self) {
         if let Ok(event) = self.rx_tray.try_recv() {
             match event {
-                Event::Framebuffer(fb) => {
+                TrayEvent::Framebuffer(fb) => {
                     self.framebuffer = fb;
 
                     for c in self.framebuffer.chunks(self.icon_size as _) {
