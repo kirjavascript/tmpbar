@@ -33,8 +33,7 @@ pub struct Manager {
 }
 
 pub enum TrayEvent {
-    Framebuffer(Vec<u8>),
-    IconQuantity(u32),
+    Framebuffer(Vec<u8>, u32),
 }
 
 pub enum ProxyAction {
@@ -112,7 +111,6 @@ impl Manager {
                         self.icon_size,
                         &mut self.icons,
                     );
-                    self.send_message(TrayEvent::IconQuantity(self.icons.len() as _));
                 }
             },
             xcb::Event::X(x::Event::ReparentNotify(event)) => {
@@ -123,7 +121,6 @@ impl Manager {
                         self.icon_size,
                         &mut self.icons,
                     );
-                    self.send_message(TrayEvent::IconQuantity(self.icons.len() as _));
                 }
             },
             xcb::Event::X(x::Event::DestroyNotify(event)) => {
@@ -133,7 +130,6 @@ impl Manager {
                     self.icon_size,
                     &mut self.icons,
                 );
-                self.send_message(TrayEvent::IconQuantity(self.icons.len() as _));
             },
             _ => { },
         };
@@ -170,7 +166,8 @@ impl Manager {
                 let hash = crate::util::fnv1a_hash(&fb);
 
                 if hash != self.fb_hash {
-                    self.send_message(TrayEvent::Framebuffer(fb));
+                    self.send_message(TrayEvent::Framebuffer(fb, self.icons.len() as _));
+
                     self.fb_hash = hash;
                 }
             },

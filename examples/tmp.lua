@@ -21,7 +21,7 @@ for _, monitor in monitors() do
     bar({
         monitor = monitor,
         position = "top",
-        height = 20,
+        height = 40,
         flex = true,
         -- orientation = "v",
 
@@ -85,6 +85,10 @@ for _, monitor in monitors() do
                         crossJustify = true,
                         size = 100,
                         click = function() return exec("activate-linux") end
+                    },
+                    {
+                        "tray",
+                        foo = "bar",
                     },
                 },
             },

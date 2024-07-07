@@ -9,6 +9,7 @@ mod container;
 mod label;
 mod image;
 mod input;
+mod tray;
 mod workspaces;
 
 pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
@@ -26,6 +27,7 @@ fn render_impl(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
         "image" => image::render(comp, ui, global),
         "label" => label::render(comp, ui),
         "workspaces" => workspaces::render(comp, ui, global),
+        "tray" => tray::render(comp, ui, global),
         _ => { ui.label(format!("[unknown {:?}]", comp.name())); },
     }
 }

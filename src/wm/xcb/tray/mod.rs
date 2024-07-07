@@ -37,7 +37,7 @@ impl Tray {
 
             let rx_signal = signal_hook::hook();
 
-            let fb_tick = tick(std::time::Duration::from_secs(1));
+            let fb_tick = tick(std::time::Duration::from_millis(800));
 
             loop {
                 // TODO: use Select to fix lint issue
@@ -71,6 +71,10 @@ impl Tray {
         }
     }
 
+    pub fn dimensions(&self) -> (u32, u32) {
+        (self.icon_size * self.icon_quantity, self.icon_size)
+    }
+
     pub fn click(&self, button: u8, icon_index: usize) {
         self.tx_proxy.send(manager::ProxyAction::Click(
             button,
@@ -81,10 +85,8 @@ impl Tray {
     pub fn signals(&mut self) {
         if let Ok(event) = self.rx_tray.try_recv() {
             match event {
-                TrayEvent::Framebuffer(fb) => {
+                TrayEvent::Framebuffer(fb, qty) => {
                     self.framebuffer = fb;
-                },
-                TrayEvent::IconQuantity(qty) => {
                     self.icon_quantity = qty;
                 },
             }
