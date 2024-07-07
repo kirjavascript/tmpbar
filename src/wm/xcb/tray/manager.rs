@@ -13,6 +13,7 @@ xcb::atoms_struct! {
         pub wm_take_focus => b"WM_TAKE_FOCUS",
         pub net_wm_state_sticky => b"_NET_WM_STATE_STICKY",
         pub net_wm_state_above => b"_NET_WM_STATE_ABOVE",
+        pub net_wm_state_hidden => b"_NET_WM_STATE_HIDDEN",
         pub net_system_tray_s0 => b"_NET_SYSTEM_TRAY_S0",
         pub net_system_tray_opcode => b"_NET_SYSTEM_TRAY_OPCODE",
         pub manager => b"MANAGER",
@@ -407,14 +408,6 @@ fn setup_window(
         r#type: x::ATOM_CARDINAL,
         data: &[0 as u32],
     });
-
-    // conn.send_request(&x::ChangeProperty {
-    //     mode: x::PropMode::Replace,
-    //     window,
-    //     property: atoms.net_wm_window_type,
-    //     r#type: x::ATOM_ATOM,
-    //     data: &[atoms.net_wm_window_type_dock],
-    // });
 
     // skip showing in taskbar
     conn.send_request(&x::ChangeProperty {
