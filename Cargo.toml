@@ -24,6 +24,8 @@ gumdrop = "0.8.1"
 display-info = "0.5.1"
 ansi_term = "0.12.1"
 inotify = "0.10.2"
+signal-hook = "0.3.17"
+crossbeam-channel = "0.5.13"
 
 # egui features
 serde = { version = "1", features = ["derive"] }

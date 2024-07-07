@@ -18,10 +18,10 @@ pub enum Event {
 
 impl Global {
     pub fn new(path: &str, ctx: egui::Context) -> Self {
-        let signal: Signal<Event> = Signal::new(ctx);
+        let signal: Signal<Event> = Signal::new(ctx.clone());
 
         crate::wm::xcb::listen(signal.clone());
-        crate::wm::xcb::tmp_tray();
+        crate::wm::xcb::Tray::new(ctx);
 
         let lua = load_lua(path);
 
@@ -52,6 +52,8 @@ impl Global {
                 },
             }
         }
+
+        // self.tray.signals();
     }
 }
 
