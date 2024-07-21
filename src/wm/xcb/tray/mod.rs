@@ -13,6 +13,10 @@ pub struct Tray {
     tx_proxy: Sender<ProxyAction>,
 }
 
+// TODO: try copying framebuffer from a bar for transparent background
+// TODO: only secondary trays should be proxies?
+// TODO: for X/Y just set some state
+
 impl Tray {
     pub fn new(ctx: egui::Context) -> Self {
         let (tx_tray, rx_tray) = unbounded();

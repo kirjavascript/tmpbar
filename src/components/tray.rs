@@ -1,14 +1,19 @@
 use eframe::egui;
 use egui::Ui;
-use crate::config::{Property, Component, get_text};
+use crate::config::Component;
 use crate::global::Global;
 
-pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
+pub fn render(_comp: &mut Component, ui: &mut Ui, global: &mut Global) {
     let (x, y) = global.tray.dimensions();
 
-
     let pixels: Vec<egui::Color32> = global.tray.framebuffer.chunks_exact(4)
-        .map(|p| egui::Color32::from_rgb(p[2], p[1], p[0]))
+        // .map(|p| egui::Color32::from_rgba_premultiplied(p[2], p[1], p[0], p[3]))
+        .map(|p|
+            if p[0] == 0 && p[1] == 0 && p[2] == 0 {
+                egui::Color32::TRANSPARENT
+            } else {
+                egui::Color32::from_rgba_premultiplied(p[2], p[1], p[0], p[3])
+        })
         .collect();
 
     if (x * y) != pixels.len() as _ {
@@ -27,6 +32,8 @@ pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
         .sense(egui::Sense::click());
 
     let response = ui.add(img);
+
+    // ctx.input().pointer.interact_pos()
 
     if response.clicked() {
         global.tray.click(1, 0);

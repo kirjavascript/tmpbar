@@ -16,6 +16,7 @@ xcb::atoms_struct! {
         pub net_wm_state_hidden => b"_NET_WM_STATE_HIDDEN",
         pub net_system_tray_s0 => b"_NET_SYSTEM_TRAY_S0",
         pub net_system_tray_opcode => b"_NET_SYSTEM_TRAY_OPCODE",
+        pub shadow => b"_COMPTON_SHADOW",
         pub manager => b"MANAGER",
     }
 }
@@ -205,6 +206,27 @@ pub fn click(
             true,
         ),
     });
+
+    conn.flush().unwrap();
+
+    // conn.send_request_checked(&x::SendEvent {
+    //     propagate: true,
+    //     destination: x::SendEventDest::Window(window),
+    //     event_mask: x::EventMask::NO_EVENT,
+    //     event: &x::ButtonReleaseEvent::new(
+    //         button,
+    //         x::CURRENT_TIME,
+    //         root,
+    //         window,
+    //         x::Window::none(),
+    //         20,
+    //         20,
+    //         20,
+    //         20,
+    //         x::KeyButMask::all(),
+    //         true,
+    //     ),
+    // });
 
     conn.flush().unwrap();
 }
@@ -446,6 +468,15 @@ fn setup_window(
             atoms.net_wm_state_sticky,
             atoms.net_wm_state_above,
         ],
+    });
+
+    // picom.conf shadow-exclude "_COMPTON_SHADOW@:32c = 0"
+    conn.send_request(&xcb::x::ChangeProperty {
+        mode: xcb::x::PropMode::Replace,
+        window,
+        property: atoms.shadow,
+        r#type: xcb::x::ATOM_CARDINAL,
+        data: &[0u32],
     });
 
     // map

@@ -11,7 +11,9 @@ function workspaces()
                         or workspace.visible and "#0022CC"
                         or "black"
 
-                    return ([[ <rect x="0" y="0" width="12" height="%d" fill="%s" rx="2"/> ]]):format(svg.height, color)
+                    return ([[
+                        <rect x="0" y="0" width="12" height="%d" fill="%s" rx="2"/>
+                    ]]):format(svg.height, color)
                 end,
         } end
     }
@@ -33,9 +35,9 @@ for _, monitor in monitors() do
         -- crossAlign = "end",
         -- margin = { bottom = 5 },
 
---         background = function(svg) return string.format([[
---           <rect x="0" y="0" width="%d" height="%d" rx="5" fill="none" stroke="#996699" stroke-width="5"/>
---         ]], svg.width, svg.height) end,
+        background = function(svg) return string.format([[
+            <rect x="0" y="0" width="%d" height="%d" rx="5" fill="none" stroke="black" stroke-width="5"/>
+        ]], svg.width, svg.height) end,
 
         items = {
             {
