@@ -208,27 +208,6 @@ pub fn click(
     });
 
     conn.flush().unwrap();
-
-    // conn.send_request_checked(&x::SendEvent {
-    //     propagate: true,
-    //     destination: x::SendEventDest::Window(window),
-    //     event_mask: x::EventMask::NO_EVENT,
-    //     event: &x::ButtonReleaseEvent::new(
-    //         button,
-    //         x::CURRENT_TIME,
-    //         root,
-    //         window,
-    //         x::Window::none(),
-    //         20,
-    //         20,
-    //         20,
-    //         20,
-    //         x::KeyButMask::all(),
-    //         true,
-    //     ),
-    // });
-
-    conn.flush().unwrap();
 }
 
 fn get_fb(
@@ -387,6 +366,35 @@ fn owner(conn: &xcb::Connection, atoms: &Atoms) -> x::Window {
     reply.owner()
 }
 
+fn destroy_tray(
+    conn: &xcb::Connection,
+    tray_window: x::Window,
+    root: x::Window,
+    icons: &mut Vec<x::Window>,
+) {
+    for icon in icons.drain(..) {
+        conn.send_request(&x::ChangeWindowAttributes{
+            window: icon,
+            value_list: &[
+                x::Cw::EventMask(x::EventMask::NO_EVENT),
+            ],
+        });
+        conn.send_request(&x::UnmapWindow{
+            window: icon,
+        });
+        conn.send_request(&x::ReparentWindow{
+            window: icon,
+            parent: root,
+            x: 0,
+            y: 0,
+        });
+    }
+    conn.send_request(&x::DestroyWindow {
+        window: tray_window,
+    });
+    conn.flush().unwrap();
+}
+
 fn setup_window(
     conn: &xcb::Connection,
     window: x::Window,
@@ -485,33 +493,126 @@ fn setup_window(
     });
 
     conn.flush().unwrap();
+
+    // return;
+
+    // let (depth, visual) = if let Some(visual_type) = find_rgba_visual(screen) {
+    //     (32, visual_type.visual_id())
+    // } else {
+    //     (x::COPY_FROM_PARENT as u8, screen.root_visual())
+    // };
+
+    // // transparency
+    // if let Some(visual_type) = find_rgba_visual(screen) {
+    //     println!("1");
+    //     let colormap = conn.generate_id();
+    //     conn.send_request(&x::CreateColormap {
+    //         alloc: x::ColormapAlloc::None,
+    //         mid: colormap,
+    //         window: root,
+    //         visual: visual_type.visual_id(),
+    //     });
+
+    //     let visual_depth = 32;
+
+    //     let window = conn.generate_id();
+    //     conn.send_request(&x::CreateWindow {
+    //         depth: visual_depth,
+    //         wid: window,
+    //         parent: root,
+    //         x: 2200,
+    //         y: 40,
+    //         width: icon_size as _,
+    //         height: icon_size as _,
+    //         border_width: 0,
+    //         class: x::WindowClass::InputOutput,
+    //         visual: visual_type.visual_id(),
+    //         value_list: &[
+    //            x::Cw::BackPixel(0),
+    //            x::Cw::BorderPixel(0),
+    //            // x::Cw::OverrideRedirect(true),
+    //            x::Cw::EventMask(x::EventMask::EXPOSURE),
+    //            x::Cw::Colormap(colormap),
+    //         ],
+    //     });
+
+    //     use image::{RgbaImage, Rgba};
+
+    //     let width = 40;
+    //     let height = 40;
+
+    //     let mut img: RgbaImage = RgbaImage::new(width, height);
+    //     for (_, _, pixel) in img.enumerate_pixels_mut() {
+    //         *pixel = Rgba([255, 0, 0, 128]); // Semi-transparent red
+    //     }
+
+    //     let pixmap = conn.generate_id();
+    //     conn.send_request(&x::CreatePixmap {
+    //         depth: visual_depth,
+    //         pid: pixmap,
+    //         drawable: x::Drawable::Window(window),
+    //         width: width as u16,
+    //         height: height as u16,
+    //     });
+
+    //     let gc = conn.generate_id();
+    //     conn.send_request(&x::CreateGc {
+    //         cid: gc,
+    //         drawable: x::Drawable::Window(window),
+    //         value_list: &[
+    //             x::Gc::Foreground(0),
+    //             x::Gc::Background(0),
+    //         ],
+    //     });
+
+    //     conn.send_request(&x::PutImage {
+    //         format: x::ImageFormat::ZPixmap,
+    //         drawable: x::Drawable::Window(window),
+    //         gc,
+    //         width: width as u16,
+    //         height: width as u16,
+    //         dst_x: 0,
+    //         dst_y: 0,
+    //         left_pad: 0,
+    //         depth: visual_depth,
+    //         data: &img,
+    //     });
+
+    //     conn.send_request(&x::CopyArea {
+    //         src_drawable: x::Drawable::Pixmap(pixmap),
+    //         dst_drawable: x::Drawable::Window(window),
+    //         gc,
+    //         src_x: 0,
+    //         src_y: 0,
+    //         dst_x: 0,
+    //         dst_y: 0,
+    //         width: width as u16,
+    //         height: width as u16,
+    //     });
+    //     conn.flush().unwrap();
+
+    //     conn.send_request(&x::FreePixmap { pixmap });
+    //     conn.send_request(&x::FreeGc { gc });
+
+    //     conn.flush().unwrap();
+    //     conn.send_request(&x::MapWindow {
+    //         window,
+    //     });
+
+    //     conn.flush().unwrap();
+
+    // }
+
+
 }
 
-fn destroy_tray(
-    conn: &xcb::Connection,
-    tray_window: x::Window,
-    root: x::Window,
-    icons: &mut Vec<x::Window>,
-) {
-    for icon in icons.drain(..) {
-        conn.send_request(&x::ChangeWindowAttributes{
-            window: icon,
-            value_list: &[
-                x::Cw::EventMask(x::EventMask::NO_EVENT),
-            ],
-        });
-        conn.send_request(&x::UnmapWindow{
-            window: icon,
-        });
-        conn.send_request(&x::ReparentWindow{
-            window: icon,
-            parent: root,
-            x: 0,
-            y: 0,
-        });
-    }
-    conn.send_request(&x::DestroyWindow {
-        window: tray_window,
-    });
-    conn.flush().unwrap();
-}
+// pub fn find_rgba_visual(screen: &x::Screen) -> Option<&x::Visualtype> {
+//     for depth in screen.allowed_depths() {
+//         for visual in depth.visuals() {
+//             if depth.depth() == 32 {
+//                 return Some(visual)
+//             }
+//         }
+//     }
+//     None
+// }

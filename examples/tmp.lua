@@ -3,7 +3,7 @@ function workspaces()
         "workspaces",
         render = function (workspace) return {
                 "label",
-                text = tostring(workspace.number),
+                text = tostring(workspace.name):sub(1, 1),
                 size = 100, -- TODO
                 background = function(svg)
                     local color = workspace.urgent and "red"
@@ -34,6 +34,10 @@ for _, monitor in monitors() do
         -- align = "end",
         -- crossAlign = "end",
         -- margin = { bottom = 5 },
+
+        scroll = function(delta)
+            print(string.format("d: %f", delta))
+        end,
 
         background = function(svg) return string.format([[
             <rect x="0" y="0" width="%d" height="%d" rx="5" fill="none" stroke="black" stroke-width="5"/>
