@@ -1,31 +1,26 @@
+mod lua;
+
 use crate::util::Signal;
 use crate::wm::xcb::workspaces::Workspaces;
-use crate::wm::xcb::Tray;
+use crate::wm::xcb::{Tray, Event};
+use lua::LuaCallback;
 
 pub struct Global {
     pub lua: mlua::Lua,
     pub workspaces: Workspaces,
     pub tray: Tray,
     pub parent_path: String,
-    signal: Signal<Event>,
-}
-
-#[derive(Clone, Debug)]
-pub enum Event {
-    WindowTitle(String),
-    WorkspaceCurrent(u32),
-    WorkspaceDesktops(Vec<(String, u32, u32)>),
-    WorkspaceUrgency(Vec<u32>),
+    xcb_signal: Signal<Event>,
+    lua_signal: Signal<LuaCallback>,
 }
 
 impl Global {
     pub fn new(path: &str, ctx: egui::Context) -> Self {
-        let signal: Signal<Event> = Signal::new(ctx.clone());
+        let xcb_signal: Signal<Event> = Signal::new(ctx.clone());
+        crate::wm::xcb::listen(xcb_signal.clone());
 
-        crate::wm::xcb::listen(signal.clone());
-        let tray = Tray::new(ctx);
-
-        let lua = load_lua(path);
+        let tray = Tray::new(ctx.clone());
+        let (lua, lua_signal) = lua::load_lua(path, ctx);
 
         let parent_path = lua.globals().get("xcake_parent_path").unwrap_or_default();
 
@@ -34,12 +29,13 @@ impl Global {
             tray,
             parent_path,
             lua,
-            signal,
+            xcb_signal,
+            lua_signal,
         }
     }
 
     pub fn signals(&mut self) {
-        for event in self.signal.read() {
+        for event in self.xcb_signal.read() {
             match event {
                 Event::WindowTitle(title) => {
                     self.lua.globals().set("xcake_window_title", title).ok();
@@ -56,19 +52,13 @@ impl Global {
             }
         }
 
+        for event in self.lua_signal.read() {
+            match event {
+                LuaCallback::CycleWorkspace(direction, monitor) => {
+                }
+            }
+        }
+
         self.tray.signals();
     }
-}
-
-fn load_lua(path: &str) -> mlua::Lua {
-    let lua = mlua::Lua::new();
-    lua.load(include_str!("./prelude.lua")).exec().unwrap();
-
-    // save parent path
-    if let Ok(path) = std::fs::canonicalize(std::path::Path::new(path)) {
-        let parent = path.parent().map(|p| p.to_path_buf());
-        lua.globals().set("xcake_parent_path", parent.unwrap().to_string_lossy() + "/").ok();
-    }
-
-    lua
 }

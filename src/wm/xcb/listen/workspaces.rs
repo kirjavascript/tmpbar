@@ -1,6 +1,6 @@
 use xcb::x;
 use xcb_wm::{ewmh, icccm};
-use crate::global::Event;
+use crate::wm::xcb::Event;
 use crate::wm::monitor;
 use std::collections::HashMap;
 

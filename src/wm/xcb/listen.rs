@@ -4,7 +4,6 @@ pub mod workspaces;
 use xcb::{x, Xid};
 use xcb_wm::ewmh;
 
-use crate::global::Event;
 use crate::util::Signal;
 
 xcb::atoms_struct! {
@@ -13,6 +12,14 @@ xcb::atoms_struct! {
         pub active_window => b"_NET_ACTIVE_WINDOW",
         pub utf8_string => b"ATOM_UTF8_STRING",
     }
+}
+
+#[derive(Clone, Debug)]
+pub enum Event {
+    WindowTitle(String),
+    WorkspaceCurrent(u32),
+    WorkspaceDesktops(Vec<(String, u32, u32)>),
+    WorkspaceUrgency(Vec<u32>),
 }
 
 pub fn listen(signal: Signal<Event>) {

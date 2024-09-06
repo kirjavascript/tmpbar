@@ -14,6 +14,7 @@ mod workspaces;
 
 pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
     core::render_background(comp, ui, global);
+    core::apply_scroll(comp, ui);
     core::render_frame(comp, ui, |comp, ui| {
         render_impl(comp, ui, global);
     });

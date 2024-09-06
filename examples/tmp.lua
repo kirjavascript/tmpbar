@@ -37,6 +37,10 @@ for _, monitor in monitors() do
 
         scroll = function(delta)
             print(string.format("d: %f", delta))
+            cycleWorkspace({
+                monitor = monitor,
+                direction = delta < 0 and "next" or "prev",
+            })
         end,
 
         background = function(svg) return string.format([[
@@ -74,7 +78,7 @@ for _, monitor in monitors() do
                     {
                         "label", -- clock
                         interval = 1000,
-                        text = function() return os.date("%Y-%m-%d %X") end,
+                        text = function() return os.date("%a %Y-%m-%d %X") end,
                     },
                     {
                         "button",

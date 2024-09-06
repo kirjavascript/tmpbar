@@ -3,14 +3,14 @@ use egui::Ui;
 use crate::config::{Component, Property};
 
 pub fn render_frame(comp: &mut Component, ui: &mut Ui, callback: impl FnOnce(&mut Component, &mut Ui)) {
-    // let props = comp.props();
-    // let keys = ["margin", "padding"];
-    // let has_key = keys.iter().any(|&key| props.contains_key(key));
+    let props = comp.props();
+    let keys = ["margin", "padding"];
+    let has_key = keys.iter().any(|&key| props.contains_key(key));
 
-    // if !has_key {
-    //     callback(comp, ui);
-    //     return;
-    // }
+    if !has_key {
+        callback(comp, ui);
+        return;
+    }
 
     let mut frame = egui::Frame::none();
 
@@ -22,20 +22,6 @@ pub fn render_frame(comp: &mut Component, ui: &mut Ui, callback: impl FnOnce(&mu
     }
 
     frame.show(ui, |ui| {
-        // mouse scroll
-        if let Some(Property::Function(func)) = comp.props().get("scroll") {
-            let frame_rect = ui.max_rect();
-            let is_hovered = ui.rect_contains_pointer(frame_rect);
-
-            if is_hovered {
-                let scroll_delta = ui.input(|i| i.raw_scroll_delta.y);
-
-                if scroll_delta != 0. {
-                    func.call::<f32, ()>(scroll_delta).ok();
-                }
-            }
-        }
-
         callback(comp, ui);
     });
 }

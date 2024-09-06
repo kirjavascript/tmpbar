@@ -77,19 +77,8 @@ pub fn parse_bars(lua: &mlua::Lua) -> mlua::Result<Vec<Bar>> {
 
         let empty_table = lua.create_table()?;
         let monitor: Table = value.get("monitor").unwrap_or_else(|_| empty_table);
-        let monitor_name: Result<String, mlua::prelude::LuaError> = monitor.get("name");
-        let monitor_index = monitor.get("index").unwrap_or(1);
-        let monitor = if let Ok(name) = monitor_name {
-            monitors.iter().find(|monitor| { monitor.name == name })
-        } else {
-            None
-        };
-        let monitor = monitor.unwrap_or_else(|| {
-            monitors.get(monitor_index - 1).unwrap_or_else(|| {
-                warn!("cannot find monitor, defaulting to {}", monitors[0].name);
-                &monitors[0]
-            })
-        });
+
+        let monitor = get_monitor(&monitor, &monitors);
 
         value.set("monitor", Value::Nil)?;
         value.set("height", Value::Nil)?;
@@ -142,6 +131,23 @@ fn create_default(bar_id: String, monitor_index: u32) -> HashMap<String, Propert
     default_props.insert("_monitor_index".to_string(), Property::Integer(monitor_index as _));
 
     default_props
+}
+
+pub fn get_monitor<'a>(monitor: &Table, monitors: &'a Vec<monitor::Monitor>) -> &'a monitor::Monitor {
+    let monitor_name: Result<String, mlua::prelude::LuaError> = monitor.get("name");
+    let monitor_index = monitor.get("index").unwrap_or(1);
+    let monitor = if let Ok(name) = monitor_name {
+        monitors.iter().find(|monitor| { monitor.name == name })
+    } else {
+        None
+    };
+
+    monitor.unwrap_or_else(|| {
+        monitors.get(monitor_index - 1).unwrap_or_else(|| {
+            warn!("cannot find monitor, defaulting to {}", monitors[0].name);
+            &monitors[0]
+        })
+    })
 }
 
 pub fn to_property(value: Value, default_props: &HashMap<String, Property>) -> Property {
