@@ -56,7 +56,10 @@ impl Global {
             match event {
                 LuaCallback::CycleWorkspace(direction) => {
                     self.workspaces.cycle_workspace(direction);
-                }
+                },
+                LuaCallback::FocusWorkspace(desktop) => {
+                    self.workspaces.focus_workspace(desktop);
+                },
             }
         }
 

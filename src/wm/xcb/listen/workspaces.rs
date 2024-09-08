@@ -87,7 +87,7 @@ impl Workspaces {
             };
 
             Workspace {
-                number: i as u32 + 1,
+                number: i as u32,
                 name: desktop.0.to_owned(),
                 focused,
                 visible,
@@ -123,33 +123,23 @@ impl Workspaces {
             WorkspaceDirection::Next => {
                 if current_index + 1 < workspaces.len() {
                     let workspace = &workspaces[current_index + 1].number;
-                    self.focus_workspace(workspace - 1);
+                    self.focus_workspace(*workspace);
                 }
             },
             WorkspaceDirection::Prev => {
                 if current_index > 0 {
                     let workspace = &workspaces[current_index - 1].number;
-                    self.focus_workspace(workspace - 1);
+                    self.focus_workspace(*workspace);
                 }
             },
         }
     }
 
     pub fn focus_workspace(&self, workspace: u32) {
-
-        let (conn, screen_num) = xcb::Connection::connect(None).unwrap();
-        let setup = conn.get_setup();
-        let screen = setup.roots().nth(screen_num as usize).unwrap();
-        let root = screen.root();
+        let (conn, _) = xcb::Connection::connect(None).unwrap();
         let ewmh_conn = ewmh::Connection::connect(&conn);
-
-    // let request = ewmh::proto::SendCurrentDesktop::new(&ewmh_conn, workspace);
-    // let cookie = ewmh_conn.send_request(&request);
-
-    // ewmh_conn.wait_for_reply(cookie).unwrap();
-
-
-        println!("{workspace}");
+        let request = ewmh::proto::SendCurrentDesktop::new(&ewmh_conn, workspace);
+        ewmh_conn.send_and_check_request(&request).ok();
     }
 }
 

@@ -3,7 +3,8 @@ use crate::wm::xcb::workspaces::WorkspaceDirection;
 
 #[derive(Clone)]
 pub enum LuaCallback {
-    CycleWorkspace(WorkspaceDirection)
+    CycleWorkspace(WorkspaceDirection),
+    FocusWorkspace(u32),
 }
 
 pub fn load_lua(path: &str, ctx: egui::Context) -> (mlua::Lua, Signal<LuaCallback>) {
@@ -30,7 +31,15 @@ pub fn load_lua(path: &str, ctx: egui::Context) -> (mlua::Lua, Signal<LuaCallbac
         Ok(())
     }).unwrap();
 
-    globals.set("cycleWorkspace", cycle_workspace).unwrap();
+    globals.set("xcake_cycle_workspace", cycle_workspace).unwrap();
+
+    let fn_signal = signal.clone();
+    let focus_workspace = lua.create_function(move |_, desktop: u32| {
+        fn_signal.send(LuaCallback::FocusWorkspace(desktop));
+        Ok(())
+    }).unwrap();
+
+    globals.set("xcake_focus_workspace", focus_workspace).unwrap();
 
     drop(globals);
 

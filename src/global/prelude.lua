@@ -8,6 +8,14 @@ function window_title()
     return xcake_window_title
 end
 
+function set_workspace(value)
+    if type(value) == "string" then
+        xcake_cycle_workspace(value)
+    elseif type(value) == "number" then
+        xcake_focus_workspace(value)
+    end
+end
+
 function read_file(filePath)
     if rawget(_G, "xcake_parent_path") ~= nil then
         if filePath:sub(1, 1) ~= '/' then

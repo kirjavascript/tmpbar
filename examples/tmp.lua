@@ -36,8 +36,7 @@ for _, monitor in monitors() do
         -- margin = { bottom = 5 },
 
         scroll = function(delta)
-            print(string.format("d: %f", delta))
-            cycleWorkspace(delta > 0 and "next" or "prev")
+            set_workspace(delta > 0 and "next" or "prev")
         end,
 
         background = function(svg) return string.format([[
