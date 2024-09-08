@@ -41,6 +41,14 @@ pub fn load_lua(path: &str, ctx: egui::Context) -> (mlua::Lua, Signal<LuaCallbac
 
     globals.set("xcake_focus_workspace", focus_workspace).unwrap();
 
+    let focus_workspace = lua.create_function(move |_, command: String| {
+        std::process::Command::new("/bin/sh").arg("-c").arg(command)
+            .spawn().ok();
+        Ok(())
+    }).unwrap();
+
+    globals.set("spawn", focus_workspace).unwrap();
+
     drop(globals);
 
     (lua, signal)

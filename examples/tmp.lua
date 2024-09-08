@@ -15,6 +15,9 @@ function workspaces()
                         <rect x="0" y="0" width="12" height="%d" fill="%s" rx="2"/>
                     ]]):format(svg.height, color)
                 end,
+                click = function()
+                    set_workspace(workspace.number)
+                end,
         } end
     }
 end
@@ -65,7 +68,7 @@ for _, monitor in monitors() do
             {
                 "label",
                 justify = true,
-                text = function() return "« "..window_title().." »" end,
+                text = function() return "« " .. window_title() .. " »" end,
             },
             {
                 "container",
@@ -82,7 +85,7 @@ for _, monitor in monitors() do
                         justify = true,
                         crossJustify = true,
                         size = 100,
-                        click = function() return exec("~/.config/i3/scripts/powermenu") end
+                        click = function() return spawn("~/.config/i3/scripts/powermenu") end
                     },
                     {
                         "button",
@@ -90,7 +93,7 @@ for _, monitor in monitors() do
                         justify = true,
                         crossJustify = true,
                         size = 100,
-                        click = function() return exec("activate-linux") end
+                        click = function() return spawn("activate-linux") end
                     },
                     {
                         "tray",
@@ -104,7 +107,7 @@ end
 
 
 -- TODO
--- fix activate linux being sync
+-- fix activate linux being sync ( do on rust side)
+-- click on everything
 -- i3mode
--- window collapse
 -- animated SVG for battery monitor, CPU graph

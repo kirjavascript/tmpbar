@@ -1,14 +1,14 @@
-use eframe::egui;
-use egui::Ui;
 use crate::config::Component;
 use crate::global::Global;
+use eframe::egui;
+use egui::Ui;
 
-mod core;
 mod button;
 mod container;
-mod label;
+mod core;
 mod image;
 mod input;
+mod label;
 mod tray;
 mod workspaces;
 
@@ -29,6 +29,8 @@ fn render_impl(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
         "label" => label::render(comp, ui),
         "workspaces" => workspaces::render(comp, ui, global),
         "tray" => tray::render(comp, ui, global),
-        _ => { ui.label(format!("[unknown {:?}]", comp.name())); },
+        _ => {
+            ui.label(format!("[unknown {:?}]", comp.name()));
+        }
     }
 }
