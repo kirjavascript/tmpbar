@@ -1,27 +1,3 @@
-function workspaces()
-    return {
-        "workspaces",
-        render = function (workspace) return {
-                "label",
-                text = tostring(workspace.name):sub(1, 1),
-                size = 100, -- TODO
-                background = function(svg)
-                    local color = workspace.urgent and "red"
-                        or workspace.focused and "#0A83FD"
-                        or workspace.visible and "#0022CC"
-                        or "black"
-
-                    return ([[
-                        <rect x="0" y="0" width="12" height="%d" fill="%s" rx="2"/>
-                    ]]):format(svg.height, color)
-                end,
-                click = function()
-                    set_workspace(workspace.number)
-                end,
-        } end
-    }
-end
-
 for _, monitor in monitors() do
     bar({
         monitor = monitor,
@@ -47,60 +23,69 @@ for _, monitor in monitors() do
         ]], svg.width, svg.height) end,
 
         items = {
-            {
-                "image",
+            component("image", {
                 size = 40,
                 path = "./archlinux.svg",
-            },
-            workspaces(),
-            -- {
-            --     "image",
-            --     size = 50,
-            --     markup = function(svg) return ([[
-            --         <rect x="0" y="0" width="%d" height="%d" fill="none" stroke="#FFAA00" stroke-width="5"/>
-            --     ]]):format(svg.width, svg.height) end,
-            -- },
-            -- {
-            --     "input",
-            --     size = 150,
-            --     submit = print,
-            -- },
-            {
-                "label",
+            }),
+            component("workspaces", {
+                render = function (workspace) return component("label", {
+                        text = tostring(workspace.name):sub(1, 1),
+                        size = 100, -- TODO
+                        background = function(svg)
+                            local color = workspace.urgent and "red"
+                                or workspace.focused and "#0A83FD"
+                                or workspace.visible and "#0022CC"
+                                or "black"
+
+                            return ([[
+                                <rect x="0" y="0" width="12" height="%d" fill="%s" rx="2"/>
+                            ]]):format(svg.height, color)
+                        end,
+                        click = function()
+                            set_workspace(workspace.number)
+                        end,
+                }) end
+            }),
+                -- {
+                --     "image",
+                --     size = 50,
+                --     markup = function(svg) return ([[
+                --         <rect x="0" y="0" width="%d" height="%d" fill="none" stroke="#FFAA00" stroke-width="5"/>
+                --     ]]):format(svg.width, svg.height) end,
+                -- },
+                -- {
+                --     "input",
+                --     size = 150,
+                --     submit = print,
+                -- },
+            component("label", {
                 justify = true,
                 text = function() return "« " .. window_title() .. " »" end,
-            },
-            {
-                "container",
+            }),
+            component("container", {
                 direction = "<",
                 items = {
-                    {
-                        "label", -- clock
+                    component("label", { -- clock
                         interval = 1000,
                         text = function() return os.date("%a %Y-%m-%d %X") end,
-                    },
-                    {
-                        "button",
+                    }),
+                    component("button", {
                         text = "shutdown",
                         justify = true,
                         crossJustify = true,
                         size = 100,
                         click = function() return spawn("~/.config/i3/scripts/powermenu") end
-                    },
-                    {
-                        "button",
+                    }),
+                    component("button", {
                         text = "activate",
                         justify = true,
                         crossJustify = true,
                         size = 100,
                         click = function() return spawn("activate-linux") end
-                    },
-                    {
-                        "tray",
-                        foo = "bar",
-                    },
+                    }),
+                    component("tray"),
                 },
-            },
+            }),
         },
     })
 end

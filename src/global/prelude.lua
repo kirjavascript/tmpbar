@@ -57,3 +57,9 @@ end
 function bar(config)
     table.insert(xcake_bars, config)
 end
+
+function component(name, config)
+    config = config or {}
+    config['xcake_component'] = name
+    return config
+end

@@ -162,7 +162,6 @@ pub fn to_property(value: Value, default_props: &HashMap<String, Property>) -> P
             let mut map = HashMap::new();
             let mut array = Vec::new();
             let mut is_array = true;
-            let mut component_name = None;
             for pair in t.pairs::<Value, Value>() {
                 match pair {
                     Ok((key, val)) => {
@@ -172,11 +171,6 @@ pub fn to_property(value: Value, default_props: &HashMap<String, Property>) -> P
                                 if idx < 1 {
                                     is_array = false;
                                 } else {
-                                    if idx == 1 {
-                                        if let Property::String(ref name) = prop {
-                                            component_name = Some(name.clone())
-                                        }
-                                    }
                                     array.push((idx as usize, prop));
                                 }
                             },
@@ -190,6 +184,8 @@ pub fn to_property(value: Value, default_props: &HashMap<String, Property>) -> P
                     Err(_) => is_array = false,
                 }
             }
+            let component_name: Option<String> = map.get("xcake_component").map(|c| c.into());
+
             if is_array {
                 array.sort_by_key(|&(idx, _)| idx);
                 Property::Array(array.into_iter().map(|(_, prop)| prop).collect())
