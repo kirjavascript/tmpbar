@@ -10,7 +10,7 @@ pub fn apply_scroll(comp: &mut Component, ui: &mut Ui) {
             let scroll_delta = ui.input(|i| i.raw_scroll_delta.y);
 
             if scroll_delta != 0. {
-                func.call::<f32, ()>(scroll_delta).ok();
+                func.call::<f32, ()>(-scroll_delta).ok(); // negate it to match browser behaviour
             }
         }
     }

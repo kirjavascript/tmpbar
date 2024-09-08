@@ -1,14 +1,9 @@
 use crate::util::Signal;
-
-#[derive(Clone)]
-pub enum WorkspaceDirection {
-    Next,
-    Prev,
-}
+use crate::wm::xcb::workspaces::WorkspaceDirection;
 
 #[derive(Clone)]
 pub enum LuaCallback {
-    CycleWorkspace(WorkspaceDirection, mlua::OwnedTable)
+    CycleWorkspace(WorkspaceDirection)
 }
 
 pub fn load_lua(path: &str, ctx: egui::Context) -> (mlua::Lua, Signal<LuaCallback>) {
@@ -27,12 +22,10 @@ pub fn load_lua(path: &str, ctx: egui::Context) -> (mlua::Lua, Signal<LuaCallbac
     let signal: Signal<LuaCallback> = Signal::new(ctx);
 
     let fn_signal = signal.clone();
-    let cycle_workspace = lua.create_function(move |_, table: mlua::Table| {
-        let monitor: mlua::Table = table.get("monitor").unwrap();
-        let direction: String = table.get("direction").unwrap_or("next".to_string()).into();
+    let cycle_workspace = lua.create_function(move |_, direction: String| {
         let direction = if direction == "next".to_string() { WorkspaceDirection::Next } else { WorkspaceDirection::Prev };
 
-        fn_signal.send(LuaCallback::CycleWorkspace(direction, monitor.into_owned()));
+        fn_signal.send(LuaCallback::CycleWorkspace(direction));
 
         Ok(())
     }).unwrap();

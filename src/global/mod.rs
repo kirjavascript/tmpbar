@@ -2,7 +2,7 @@ mod lua;
 
 use crate::util::Signal;
 use crate::wm::xcb::workspaces::Workspaces;
-use crate::wm::xcb::{Tray, Event};
+use crate::wm::xcb::{Event, Tray};
 use lua::LuaCallback;
 
 pub struct Global {
@@ -39,22 +39,23 @@ impl Global {
             match event {
                 Event::WindowTitle(title) => {
                     self.lua.globals().set("xcake_window_title", title).ok();
-                },
+                }
                 Event::WorkspaceCurrent(current) => {
                     self.workspaces.set_current(current);
-                },
+                }
                 Event::WorkspaceDesktops(desktops) => {
                     self.workspaces.set_desktops(desktops);
-                },
+                }
                 Event::WorkspaceUrgency(urgency) => {
                     self.workspaces.set_urgency(urgency);
-                },
+                }
             }
         }
 
         for event in self.lua_signal.read() {
             match event {
-                LuaCallback::CycleWorkspace(direction, monitor) => {
+                LuaCallback::CycleWorkspace(direction) => {
+                    self.workspaces.cycle_workspace(direction);
                 }
             }
         }

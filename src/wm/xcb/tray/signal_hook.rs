@@ -1,4 +1,3 @@
-
 use crossbeam_channel::{Receiver, bounded};
 use signal_hook::consts::signal::*;
 use signal_hook::iterator::Signals;

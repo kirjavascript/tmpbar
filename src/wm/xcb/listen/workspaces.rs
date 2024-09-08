@@ -22,6 +22,12 @@ pub struct Workspace {
     pub monitor_index: u32,
 }
 
+#[derive(Clone)]
+pub enum WorkspaceDirection {
+    Next,
+    Prev,
+}
+
 impl Workspaces {
     pub fn new() -> Self {
         let (conn, screen_num) = xcb::Connection::connect(None).unwrap();
@@ -95,6 +101,55 @@ impl Workspaces {
         self.monitors.iter().find(|m| {
             m.x == desktop.1 as _ && m.y == desktop.2 as _
         }).map(|m| m.index).unwrap_or(0)
+    }
+
+    pub fn cycle_workspace(&self, direction: WorkspaceDirection) {
+        let workspaces = self.list();
+
+        let current = &workspaces[self.current as usize];
+
+        let monitor_index = current.monitor_index;
+        let current_number = current.number;
+
+        let workspaces: Vec<Workspace> = workspaces
+            .into_iter()
+            .filter(|workspace| workspace.monitor_index == monitor_index)
+            .collect();
+
+        let current_index = workspaces.iter().position(|workspace| workspace.number == current_number).unwrap_or(0);
+
+
+        match direction {
+            WorkspaceDirection::Next => {
+                if current_index + 1 < workspaces.len() {
+                    let workspace = &workspaces[current_index + 1].number;
+                    self.focus_workspace(workspace - 1);
+                }
+            },
+            WorkspaceDirection::Prev => {
+                if current_index > 0 {
+                    let workspace = &workspaces[current_index - 1].number;
+                    self.focus_workspace(workspace - 1);
+                }
+            },
+        }
+    }
+
+    pub fn focus_workspace(&self, workspace: u32) {
+
+        let (conn, screen_num) = xcb::Connection::connect(None).unwrap();
+        let setup = conn.get_setup();
+        let screen = setup.roots().nth(screen_num as usize).unwrap();
+        let root = screen.root();
+        let ewmh_conn = ewmh::Connection::connect(&conn);
+
+    // let request = ewmh::proto::SendCurrentDesktop::new(&ewmh_conn, workspace);
+    // let cookie = ewmh_conn.send_request(&request);
+
+    // ewmh_conn.wait_for_reply(cookie).unwrap();
+
+
+        println!("{workspace}");
     }
 }
 
