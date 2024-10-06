@@ -82,23 +82,31 @@ pub fn load_lua(path: &str, ctx: egui::Context) -> (mlua::Lua, Signal<LuaCallbac
                     interfaces.insert(name.to_string(), (down, up));
                 }
 
-                return Some(interfaces)
+                return interfaces
             },
             Err(err) => {
                 error!("{}", err);
-                return None
+                return HashMap::new()
             },
         }
-
     }, std::time::Duration::from_secs(1));
 
 
-    let network = lua.create_function(move |_, ()| {
-        network_read.borrow_mut()();
-        Ok(1)
+    let network = lua.create_function(move |lua, ()| {
+        let interfaces = network_read.borrow_mut()();
+        let table = lua.create_table().unwrap();
+
+        for (name, (down, up)) in interfaces.iter() {
+            let interface = lua.create_table().unwrap();
+            interface.set("down", *down).unwrap();
+            interface.set("up", *up).unwrap();
+            table.set(name.to_string(), interface).unwrap();
+        }
+
+        Ok(table)
     }).unwrap();
 
-    globals.set("network", network).unwrap();
+    globals.set("bandwidth", network).unwrap();
 
     drop(globals);
 
