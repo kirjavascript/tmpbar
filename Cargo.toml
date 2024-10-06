@@ -27,10 +27,11 @@ ansi_term = "0.12.1"
 inotify = "0.10.2"
 signal-hook = "0.3.17"
 
+probes = "0.7.1"
+
 # egui features
 serde = { version = "1", features = ["derive"] }
 env_logger = "0.10"
-
 
 [profile.release]
 opt-level = 2

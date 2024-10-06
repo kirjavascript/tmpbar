@@ -1,3 +1,5 @@
+-- interfaces = ["enp3s0", "eno1", "eth0"]
+
 for _, monitor in monitors() do
     bar({
         monitor = monitor,

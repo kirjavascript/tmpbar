@@ -41,13 +41,64 @@ pub fn load_lua(path: &str, ctx: egui::Context) -> (mlua::Lua, Signal<LuaCallbac
 
     globals.set("xcake_focus_workspace", focus_workspace).unwrap();
 
-    let focus_workspace = lua.create_function(move |_, command: String| {
+    // API
+
+    let spawn = lua.create_function(move |_, command: String| {
         std::process::Command::new("/bin/sh").arg("-c").arg(command)
             .spawn().ok();
         Ok(())
     }).unwrap();
 
-    globals.set("spawn", focus_workspace).unwrap();
+    globals.set("spawn", spawn).unwrap();
+
+    use std::collections::HashMap;
+
+    let mut last_result: HashMap<String, (u64, u64)> = HashMap::new();
+    let mut last_time = std::time::Instant::now();
+
+    let network_read = crate::util::throttle_cell(move|| {
+        let bw = probes::network::read();
+        match bw {
+            Ok(info) => {
+                let mut interfaces: HashMap<String, (f64, f64)> = HashMap::new();
+
+                for (name, interface) in info.interfaces.iter() {
+                    let (rx_last, tx_last) = *last_result.get(&name.to_string()).unwrap_or(&(0, 0));
+
+                    let (rx, tx) = (
+                        interface.received,
+                        interface.transmitted,
+                    );
+
+                    last_result.insert(name.to_string(), (rx, tx));
+
+                    let now = std::time::Instant::now();
+                    let interval = (now-last_time).as_secs_f64();
+                    last_time = now;
+
+                    let down = (rx.max(rx_last) - rx_last) as f64 / interval;
+                    let up = (tx.max(tx_last) - tx_last) as f64 / interval;
+
+                    interfaces.insert(name.to_string(), (down, up));
+                }
+
+                return Some(interfaces)
+            },
+            Err(err) => {
+                error!("{}", err);
+                return None
+            },
+        }
+
+    }, std::time::Duration::from_secs(1));
+
+
+    let network = lua.create_function(move |_, ()| {
+        network_read.borrow_mut()();
+        Ok(1)
+    }).unwrap();
+
+    globals.set("network", network).unwrap();
 
     drop(globals);
 

@@ -1675,6 +1675,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "probes"
+version = "0.7.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "221a63ace7fa83306611acb79dd41c3d3645d4957e3a79d8d6e90c69e3e97d8f"
+dependencies = [
+ "libc",
+]
+
+[[package]]
 name = "proc-macro-crate"
 version = "3.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2254,6 +2263,7 @@ dependencies = [
  "image",
  "inotify",
  "mlua",
+ "probes",
  "serde",
  "signal-hook",
  "xcb",
