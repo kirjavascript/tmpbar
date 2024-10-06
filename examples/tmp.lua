@@ -71,6 +71,10 @@ for _, monitor in monitors() do
                         interval = 1000,
                         text = function() return os.date("%a %Y-%m-%d %X") end,
                     }),
+                    component("label", { -- network
+                        interval = 1000,
+                        text = function() return bandwidth()['enp3s0'].down end,
+                    }),
                     component("button", {
                         text = "shutdown",
                         justify = true,
