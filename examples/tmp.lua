@@ -1,5 +1,3 @@
--- interfaces = ["enp3s0", "eno1", "eth0"]
-
 for _, monitor in monitors() do
     bar({
         monitor = monitor,
@@ -72,8 +70,12 @@ for _, monitor in monitors() do
                         text = function() return os.date("%a %Y-%m-%d %X") end,
                     }),
                     component("label", { -- network
-                        interval = 1000,
-                        text = function() return bandwidth()['enp3s0'].down end,
+                        text = function()
+                            local bw = bandwidth();
+                            return bw.enp3s0 and bw.enp3s0.down
+                                or bw.eth0 and bw.eth0.down
+                                or '[no interface]'
+                        end,
                     }),
                     component("button", {
                         text = "shutdown",
@@ -98,7 +100,7 @@ end
 
 
 -- TODO
--- fix activate linux being sync ( do on rust side)
+-- export functions as a lua module
 -- click on everything
 -- i3mode
 -- animated SVG for battery monitor, CPU graph
