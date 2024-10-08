@@ -2,6 +2,7 @@ use crate::util::Signal;
 use crate::wm::xcb::workspaces::WorkspaceDirection;
 
 mod bandwidth;
+mod memory;
 
 #[derive(Clone)]
 pub enum LuaCallback {
@@ -54,6 +55,7 @@ pub fn load_lua(path: &str, ctx: egui::Context) -> (mlua::Lua, Signal<LuaCallbac
     globals.set("spawn", spawn).unwrap();
 
     bandwidth::bind(&lua, &globals);
+    memory::bind(&lua, &globals);
 
     drop(globals);
 

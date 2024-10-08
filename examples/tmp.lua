@@ -77,6 +77,11 @@ for _, monitor in monitors() do
                                 or '[no interface]'
                         end,
                     }),
+                    component("label", { -- network
+                        text = function()
+                            return 'MEM ' .. memory().used_percent
+                        end,
+                    }),
                     component("button", {
                         text = "shutdown",
                         justify = true,
@@ -100,7 +105,6 @@ end
 
 
 -- TODO
--- export functions as a lua module
 -- click on everything
 -- i3mode
 -- animated SVG for battery monitor, CPU graph
