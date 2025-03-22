@@ -1,4 +1,4 @@
-for _, monitor in monitors() do
+for monitor_index, monitor in monitors() do
     bar({
         monitor = monitor,
         position = "top",
@@ -96,7 +96,7 @@ for _, monitor in monitors() do
                         size = 100,
                         click = function() return spawn("activate-linux") end
                     }),
-                    component("tray"),
+                    monitor_index == 1 and component("tray"),
                 },
             }),
         },

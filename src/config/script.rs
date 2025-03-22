@@ -64,7 +64,7 @@ fn eval(script: &mut ConfigScript, lua: &mlua::Lua, code: String) -> mlua::Resul
     set_monitors(lua, &globals)?;
 
     let set_state: mlua::Function = globals.get("xcake_reset_state")?;
-    set_state.call(())?;
+    set_state.call::<_, ()>(())?;
 
     lua.load(code).exec()?;
 
