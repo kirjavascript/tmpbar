@@ -70,7 +70,7 @@ impl eframe::App for TmpBar {
                     );
 
                     egui::CentralPanel::default()
-                        .frame(egui::Frame::none().fill(egui::Color32::TRANSPARENT))
+                        .frame(egui::Frame::new().fill(egui::Color32::TRANSPARENT))
                         .show(ctx, |ui| {
                             crate::components::render(
                                 &mut bar.container,

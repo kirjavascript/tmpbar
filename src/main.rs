@@ -38,9 +38,9 @@ fn main() -> eframe::Result<()> {
     eframe::run_native(
         "🍰",
         native_options,
-        Box::new(|cc| Box::new(app::TmpBar::new(
+        Box::new(|cc| Ok(Box::new(app::TmpBar::new(
             cc,
             path,
-        ))),
+        )))),
     )
 }

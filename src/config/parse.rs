@@ -251,6 +251,16 @@ impl Into<i64> for &Property {
     }
 }
 
+impl Into<i8> for &Property {
+    fn into(self) -> i8 {
+        match self {
+            Property::Integer(i) => *i as _,
+            Property::Float(f) => *f as _,
+            _ => i8::default(),
+        }
+    }
+}
+
 impl Into<f64> for &Property {
     fn into(self) -> f64 {
         match self {

@@ -12,7 +12,7 @@ pub fn render_frame(comp: &mut Component, ui: &mut Ui, callback: impl FnOnce(&mu
         return;
     }
 
-    let mut frame = egui::Frame::none();
+    let mut frame = egui::Frame::new();
 
     if let Some(margin) = comp.props().get("margin") {
         frame.outer_margin = get_margin(margin);
