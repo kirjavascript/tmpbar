@@ -59,7 +59,7 @@ impl Manager {
         if !is_available(&conn, &atoms) {
             // we are in a thread
             std::panic::set_hook(Box::new(|info| {
-                warn!("{}", info.payload().downcast_ref::<&str>().expect("expected &str"));
+                warn!("{}", info);
             }));
             panic!("system tray is already in use!");
         }

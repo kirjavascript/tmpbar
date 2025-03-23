@@ -241,6 +241,16 @@ impl Into<String> for &Property {
     }
 }
 
+impl Into<usize> for &Property {
+    fn into(self) -> usize {
+        match self {
+            Property::Integer(i) => *i as _,
+            Property::Float(f) => *f as _,
+            _ => usize::default(),
+        }
+    }
+}
+
 impl Into<i64> for &Property {
     fn into(self) -> i64 {
         match self {

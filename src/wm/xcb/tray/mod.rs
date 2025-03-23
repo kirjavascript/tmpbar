@@ -13,9 +13,8 @@ pub struct Tray {
     tx_proxy: Sender<ProxyAction>,
 }
 
-// TODO: try copying framebuffer from a bar for transparent background
-// TODO: only secondary trays should be proxies?
-// TODO: for X/Y just set some state
+// TODO: handle fullscreen
+// TODO: handle reloading config while tray is already in use
 
 impl Tray {
     pub fn new(ctx: egui::Context) -> Self {
