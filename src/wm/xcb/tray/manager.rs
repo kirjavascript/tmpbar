@@ -31,16 +31,14 @@ pub struct Manager {
     booted: bool,
     ctx: egui::Context,
     tx_tray: Sender<TrayEvent>,
-    fb_hash: u64,
 }
 
 pub enum TrayEvent {
-    Framebuffer(Vec<u8>, u32),
+    Dimensions(u32, u32),
 }
 
 pub enum ProxyAction {
-    Click(u8, usize),
-    PollFB,
+    Position(i32, i32),
     Destroy,
 }
 
@@ -88,7 +86,6 @@ impl Manager {
             booted,
             ctx,
             tx_tray,
-            fb_hash: 0,
         }
     }
 
@@ -105,6 +102,7 @@ impl Manager {
                     );
 
                     self.booted = true;
+                    self.send_dimensions();
                 }
             },
             xcb::Event::X(x::Event::ClientMessage(event)) => {
@@ -116,25 +114,33 @@ impl Manager {
                         self.icon_size,
                         &mut self.icons,
                     );
+
+                    self.send_dimensions();
                 }
             },
             xcb::Event::X(x::Event::ReparentNotify(event)) => {
                 if event.parent() != self.tray_window {
                     remove_icon(
                         &self.conn,
+                        self.tray_window,
                         event.window(),
                         self.icon_size,
                         &mut self.icons,
                     );
+
+                    self.send_dimensions();
                 }
             },
             xcb::Event::X(x::Event::DestroyNotify(event)) => {
                 remove_icon(
                     &self.conn,
+                    self.tray_window,
                     event.window(),
                     self.icon_size,
                     &mut self.icons,
                 );
+
+                self.send_dimensions();
             },
             _ => { },
         };
@@ -143,12 +149,12 @@ impl Manager {
 
     pub fn handle_action(&mut self, action: ProxyAction) {
         match action {
-            ProxyAction::Click(button, icon_index) => {
-                click(
+            ProxyAction::Position(x, y) => {
+                set_pos(
                     &self.conn,
-                    self.icons[icon_index],
-                    self.root,
-                    button,
+                    self.tray_window,
+                    x,
+                    y
                 );
             },
             ProxyAction::Destroy => {
@@ -160,22 +166,6 @@ impl Manager {
                 );
                 std::process::exit(0);
             },
-            ProxyAction::PollFB => {
-                let fb = get_fb(
-                    &self.conn,
-                    self.tray_window,
-                    self.icon_size as _,
-                    self.icons.len() as _,
-                );
-
-                let hash = crate::util::fnv1a_hash(&fb);
-
-                if hash != self.fb_hash {
-                    self.send_message(TrayEvent::Framebuffer(fb, self.icons.len() as _));
-
-                    self.fb_hash = hash;
-                }
-            },
         }
     }
 
@@ -183,54 +173,29 @@ impl Manager {
         self.tx_tray.send(message).ok();
         self.ctx.request_repaint();
     }
+
+    fn send_dimensions(&self) {
+        let x = self.icon_size * self.icons.len() as u32;
+        let y = self.icon_size;
+
+        self.send_message(TrayEvent::Dimensions(x, y));
+    }
 }
 
-pub fn click(
+fn set_pos(
     conn: &xcb::Connection,
     window: x::Window,
-    root: x::Window,
-    button: u8,
+    x: i32,
+    y: i32,
 ) {
-    conn.send_request_checked(&x::SendEvent {
-        propagate: false,
-        destination: x::SendEventDest::Window(window),
-        event_mask: x::EventMask::NO_EVENT,
-        event: &x::ButtonPressEvent::new(
-            button,
-            x::CURRENT_TIME,
-            root,
-            window,
-            x::Window::none(),
-            0,
-            0,
-            0,
-            0,
-            x::KeyButMask::all(),
-            true,
-        ),
+    conn.send_request(&x::ConfigureWindow {
+        window,
+        value_list: &[
+            x::ConfigWindow::X(x),
+            x::ConfigWindow::Y(y),
+        ],
     });
-
     conn.flush().unwrap();
-}
-
-fn get_fb(
-    conn: &xcb::Connection,
-    window: x::Window,
-    icon_size: u16,
-    icon_quantity: u16,
-) -> Vec<u8> {
-    let cookie = conn.send_request(&x::GetImage {
-        format: x::ImageFormat::ZPixmap,
-        drawable: x::Drawable::Window(window),
-        x: 0,
-        y: 0,
-        width: icon_quantity * icon_size,
-        height: icon_size,
-        plane_mask: !0,
-    });
-    let reply = conn.wait_for_reply(cookie).unwrap();
-
-    reply.data().to_vec()
 }
 
 fn add_icon(
@@ -295,6 +260,7 @@ fn set_tray_size(
 
 fn remove_icon(
     conn: &xcb::Connection,
+    tray_window: x::Window,
     window: x::Window,
     icon_size: u32,
     icons: &mut Vec<x::Window>,
@@ -311,7 +277,7 @@ fn remove_icon(
             ],
         });
     }
-    set_tray_size(conn, window, icon_size, icons);
+    set_tray_size(conn, tray_window, icon_size, icons);
     conn.flush().unwrap();
 }
 
@@ -410,7 +376,7 @@ fn setup_window(
         depth: x::COPY_FROM_PARENT as _,
         wid: window,
         parent: root,
-        x: 2200,
+        x: 0,
         y: 0,
         width: icon_size as _,
         height: icon_size as _,

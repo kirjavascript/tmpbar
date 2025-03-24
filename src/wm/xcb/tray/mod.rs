@@ -3,18 +3,17 @@ mod signal_hook;
 
 use manager::{Manager, TrayEvent, ProxyAction};
 
-use crossbeam_channel::{unbounded, select, Receiver, Sender, tick};
+use crossbeam_channel::{unbounded, select, Receiver, Sender};
 
 pub struct Tray {
-    pub framebuffer: Vec<u8>,
-    pub icon_size: u32,
-    pub icon_quantity: u32,
+    pub dimensions: (u32, u32),
+    pub old_pos: (i32, i32),
     rx_tray: Receiver<TrayEvent>,
     tx_proxy: Sender<ProxyAction>,
 }
 
 // TODO: handle fullscreen
-// TODO: handle reloading config while tray is already in use
+// TODO: update size based on bar
 
 impl Tray {
     pub fn new(ctx: egui::Context) -> Self {
@@ -40,8 +39,6 @@ impl Tray {
 
             let rx_signal = signal_hook::hook();
 
-            let fb_tick = tick(std::time::Duration::from_millis(800));
-
             loop {
                 // TODO: use Select to fix lint issue
                 select! {
@@ -58,39 +55,36 @@ impl Tray {
                     recv(rx_signal) -> _ => {
                         manager.handle_action(ProxyAction::Destroy);
                     },
-                    recv(fb_tick) -> _ => {
-                        manager.handle_action(ProxyAction::PollFB);
-                    },
                 }
             }
         });
 
         Tray {
-            framebuffer: vec![],
-            icon_size: 40,
-            icon_quantity: 0,
+            dimensions: (0, 0),
+            old_pos: (0, 0),
             rx_tray,
             tx_proxy,
         }
     }
 
-    pub fn dimensions(&self) -> (u32, u32) {
-        (self.icon_size * self.icon_quantity, self.icon_size)
-    }
+    pub fn set_pos(&mut self, x: i32, y: i32) {
+        let (x1, y1) = self.old_pos;
 
-    pub fn click(&self, button: u8, icon_index: usize) {
-        self.tx_proxy.send(manager::ProxyAction::Click(
-            button,
-            icon_index
-        )).ok();
+        if x1 != x || y1 != y {
+            self.tx_proxy.send(manager::ProxyAction::Position(
+                    x,
+                    y,
+            )).ok();
+
+            self.old_pos = (x, y);
+        }
     }
 
     pub fn signals(&mut self) {
         if let Ok(event) = self.rx_tray.try_recv() {
             match event {
-                TrayEvent::Framebuffer(fb, qty) => {
-                    self.framebuffer = fb;
-                    self.icon_quantity = qty;
+                TrayEvent::Dimensions(x, y) => {
+                    self.dimensions = (x, y);
                 },
             }
         }
