@@ -46,18 +46,6 @@ for monitor_index, monitor in monitors() do
                         end,
                 }) end
             }),
-                -- {
-                --     "image",
-                --     size = 50,
-                --     markup = function(svg) return ([[
-                --         <rect x="0" y="0" width="%d" height="%d" fill="none" stroke="#FFAA00" stroke-width="5"/>
-                --     ]]):format(svg.width, svg.height) end,
-                -- },
-                -- {
-                --     "input",
-                --     size = 150,
-                --     submit = print,
-                -- },
             component("label", {
                 justify = true,
                 text = function() return "« " .. window_title() .. " »" end,
@@ -77,7 +65,7 @@ for monitor_index, monitor in monitors() do
                                 or '[no interface]'
                         end,
                     }),
-                    component("label", { -- network
+                    component("label", {
                         text = function()
                             return 'MEM ' .. memory().used_percent
                         end,

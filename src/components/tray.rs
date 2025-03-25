@@ -5,28 +5,30 @@ use egui::{Ui, Vec2, Color32};
 
 pub fn render(_comp: &mut Component, ui: &mut Ui, global: &mut Global) {
     let (w, h) = global.tray.dimensions;
+    let scale = ui.ctx().pixels_per_point();
 
-    let local_pos = ui.min_rect().min;
-    let mut x_pos = local_pos.x as f32;
-    let mut y_pos = local_pos.y as f32;
+    let size = Vec2::new((w as f32 / scale) as _, (h as f32 / scale) as _);
+
+    // allocate size
+    let (rect, _response) = ui.allocate_exact_size(size, egui::Sense::empty());
+
+    if ui.is_rect_visible(rect) {
+        ui.painter().rect_filled(rect, 0.0, Color32::from_rgb(0, 128, 0));
+    }
+
+    // set position of tray
+    let local_pos = rect.min;
+    let mut x_pos = scale * local_pos.x as f32;
+    let mut y_pos = scale * local_pos.y as f32;
 
     let rect = ui.ctx().input(|i| {
-        i.viewport().outer_rect
+        i.viewport().inner_rect
     });
 
     if let Some(rect) = rect {
-        x_pos += rect.min.x;
-        y_pos += rect.min.y;
+        x_pos += scale * rect.min.x;
+        y_pos += scale * rect.min.y;
     }
-
-    y_pos += 20.;
 
     global.tray.set_pos(x_pos as _, y_pos as _);
-
-    let size = Vec2::new(w as _, h as _);
-    let (rect, _response) = ui.allocate_exact_size(size, egui::Sense::hover());
-
-    if ui.is_rect_visible(rect) {
-        ui.painter().rect_filled(rect, 0.0, Color32::from_rgb(255, 0, 0));
-    }
 }
