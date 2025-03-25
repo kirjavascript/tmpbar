@@ -17,6 +17,7 @@ pub struct Tray {
 // TODO: background colour
 // TODO: handle zero trays
 // TODO: update size based on bar
+// TODO: truncate window title
 
 impl Tray {
     pub fn new(ctx: egui::Context) -> Self {

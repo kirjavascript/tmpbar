@@ -3,7 +3,7 @@ use crate::config::Component;
 use crate::global::Global;
 use egui::{Ui, Vec2, Color32};
 
-pub fn render(_comp: &mut Component, ui: &mut Ui, global: &mut Global) {
+pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
     let (w, h) = global.tray.dimensions;
     let scale = ui.ctx().pixels_per_point();
 
@@ -12,7 +12,7 @@ pub fn render(_comp: &mut Component, ui: &mut Ui, global: &mut Global) {
     // allocate size
     let (rect, _response) = ui.allocate_exact_size(size, egui::Sense::empty());
 
-    if ui.is_rect_visible(rect) {
+    if comp.props().get("showDebug").unwrap_or_default().into() {
         ui.painter().rect_filled(rect, 0.0, Color32::from_rgb(0, 128, 0));
     }
 
