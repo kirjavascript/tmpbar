@@ -23,16 +23,16 @@ pub fn listen(tray_window: x::Window) {
         match event {
             Ok(Event::X(x::Event::ConfigureNotify(event))) => {
                 if is_window_overlapping(&conn, event.window(), tray_window) {
-                    println!("Overlap detected!");
+                    println!("Overlap1");
                 } else {
-                    println!("no overlap");
+                    println!("no overlap1");
                 }
             }
             Ok(Event::X(x::Event::MapNotify(event))) => {
                 if is_window_overlapping(&conn, event.window(), tray_window) {
-                    println!("Overlap detected!");
+                    println!("Overlap2");
                 } else {
-                    println!("no overlap");
+                    println!("no overlap2");
                 }
             }
             Ok(Event::X(x::Event::UnmapNotify(event))) => {
@@ -66,7 +66,24 @@ fn subscribe_events(conn: &Connection, window: x::Window) {
     conn.flush().ok();
 }
 
+fn is_override_redirect(conn: &Connection, window: x::Window) -> bool {
+    let attrs_cookie = conn.send_request(&x::GetWindowAttributes { window });
+    let attrs_reply = conn.wait_for_reply(attrs_cookie);
+
+    if let Ok(attrs) = attrs_reply {
+        return attrs.override_redirect();
+    }
+
+    false
+}
+
 fn is_window_overlapping(conn: &Connection, window: x::Window, tray: x::Window) -> bool {
+    // if is_override_redirect(conn, window) {
+    //     return false
+    // }
+
+    // TODO: handle the bar
+
     let target_geom_cookie = conn.send_request(&x::GetGeometry { drawable: x::Drawable::Window(window) });
     let target_geometry_result = conn.wait_for_reply(target_geom_cookie);
 
@@ -95,6 +112,10 @@ fn rectangles_overlap(
     x1: i16, y1: i16, w1: u16, h1: u16,
     x2: i16, y2: i16, w2: u16, h2: u16
 ) -> bool {
+    if w1 == 0 || h1 == 0 || w2 == 0 || h2 == 0 {
+        return false;
+    }
+
     x1 < x2 + w2 as i16 &&
     x1 + w1 as i16 > x2 &&
     y1 < y2 + h2 as i16 &&
