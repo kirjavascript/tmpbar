@@ -1,3 +1,4 @@
+// mod overlap;
 mod manager;
 mod signal_hook;
 
@@ -32,6 +33,8 @@ impl Tray {
                 tx_tray,
             );
 
+            // overlap::listen(manager.tray_window);
+
             let clonn = manager.conn.clone();
             std::thread::spawn(move || {
                 loop {
@@ -44,7 +47,6 @@ impl Tray {
             let rx_signal = signal_hook::hook();
 
             loop {
-                // TODO: use Select to fix lint issue
                 select! {
                     recv(rx_event) -> event => {
                         if let Ok(event) = event {

@@ -23,7 +23,7 @@ xcb::atoms_struct! {
 
 pub struct Manager {
     pub conn: Arc<xcb::Connection>,
-    tray_window: x::Window,
+    pub tray_window: x::Window,
     root: x::Window,
     atoms: Atoms,
     icon_size: u32,

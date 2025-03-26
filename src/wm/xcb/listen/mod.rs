@@ -37,39 +37,30 @@ pub fn listen(signal: Signal<Event>) {
 
         loop {
             match conn.wait_for_event() {
-                Ok(event) => {
-                    match event {
-                        xcb::Event::X(x::Event::CreateNotify(event)) => {
-                            subscribe_events(&conn, &event.window());
-                        },
-                        xcb::Event::X(x::Event::PropertyNotify(event)) => {
-                            if let Some(event) = workspaces::handle_event(
-                                &event,
-                                &root,
-                                &conn,
-                                &ewmh_conn,
-                            ) {
-                                signal.send(event);
-                            }
-
-                            if let Some(title) = window_title::handle_event(
-                                &event,
-                                &root,
-                                &conn,
-                                &atoms,
-                                &mut active_window,
-                            ) {
-                                signal.send(Event::WindowTitle(title));
-                            }
-                        }
-                        _ => {
-                        },
-                    };
-                }
-                Err(_error) => {
-                    // #[cfg(debug_assertions)]
-                    // error!("{:?}", _error);
+                Ok(xcb::Event::X(x::Event::CreateNotify(event))) => {
+                    subscribe_events(&conn, &event.window());
                 },
+                Ok(xcb::Event::X(x::Event::PropertyNotify(event))) => {
+                    if let Some(event) = workspaces::handle_event(
+                        &event,
+                        &root,
+                        &conn,
+                        &ewmh_conn,
+                    ) {
+                        signal.send(event);
+                    }
+
+                    if let Some(title) = window_title::handle_event(
+                        &event,
+                        &root,
+                        &conn,
+                        &atoms,
+                        &mut active_window,
+                    ) {
+                        signal.send(Event::WindowTitle(title));
+                    }
+                },
+                _ => {},
             }
         }
     });
