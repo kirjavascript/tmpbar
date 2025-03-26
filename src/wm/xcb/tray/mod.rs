@@ -14,10 +14,10 @@ pub struct Tray {
 }
 
 // TODO: handle fullscreen
+// TODO: HEIGHT update size based on bar
 // TODO: handle zero icons
 // TODO: background colour
 // TODO: handle zero trays
-// TODO: update size based on bar
 // TODO: truncate window title
 
 impl Tray {

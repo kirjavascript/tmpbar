@@ -2,7 +2,7 @@ for monitor_index, monitor in monitors() do
     bar({
         monitor = monitor,
         position = "top",
-        height = 40,
+        height = 30,
         flex = true,
         -- orientation = "v",
 
@@ -13,10 +13,6 @@ for monitor_index, monitor in monitors() do
         -- align = "end",
         -- crossAlign = "end",
         -- margin = { bottom = 5 },
-
-        scroll = function(delta)
-            set_workspace(delta > 0 and "next" or "prev")
-        end,
 
         background = function(svg) return string.format([[
             <rect x="0" y="0" width="%d" height="%d" rx="5" fill="none" stroke="black" stroke-width="5"/>
@@ -90,6 +86,21 @@ for monitor_index, monitor in monitors() do
         },
     })
 end
+
+-- tiny workspace switcher at the bottom
+for _, monitor in monitors() do
+    bar({
+        monitor = monitor,
+        position = "bottom",
+        height = 1,
+        -- TODO: black background
+
+        scroll = function(delta)
+            set_workspace(delta > 0 and "next" or "prev")
+        end,
+    })
+end
+
 
 
 -- TODO
