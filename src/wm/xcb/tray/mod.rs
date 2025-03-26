@@ -1,4 +1,4 @@
-// mod overlap;
+mod overlap;
 mod manager;
 mod signal_hook;
 
@@ -33,7 +33,9 @@ impl Tray {
                 tx_tray,
             );
 
-            // overlap::listen(manager.tray_window);
+            std::thread::spawn(move || {
+                overlap::listen(manager.tray_window);
+            });
 
             let clonn = manager.conn.clone();
             std::thread::spawn(move || {

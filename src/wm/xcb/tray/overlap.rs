@@ -1,31 +1,38 @@
-use xcb::{x, Connection, xproto};
+use xcb::{x, Event, Connection};
 
-fn listen(tray_window: x::Window) {
+pub fn listen(tray_window: x::Window) {
     let (conn, screen_num) = Connection::connect(None).unwrap();
     let setup = conn.get_setup();
     let screen = setup.roots().nth(screen_num as usize).unwrap();
 
-    let values = [(xproto::CW_EVENT_MASK,
-        xproto::EVENT_MASK_SUBSTRUCTURE_NOTIFY |
-        xproto::EVENT_MASK_STRUCTURE_NOTIFY)
-    ];
+    let change_attrs = x::ChangeWindowAttributes {
+        window: screen.root(),
+        value_list: &[
+            x::Cw::EventMask(
+                x::EventMask::STRUCTURE_NOTIFY
+                | x::EventMask::SUBSTRUCTURE_NOTIFY
+            ),
+        ],
+    };
 
-    xproto::change_window_attributes(&conn, screen.root(), &values);
-    conn.flush();
+    conn.send_request_checked(&change_attrs);
+    conn.flush().ok();
 
     loop {
         let event = conn.wait_for_event();
         match event {
             Ok(Event::X(x::Event::ConfigureNotify(event))) => {
-                println!("ConfigureNotify: window = {:?}", event.window());
-                if is_window_overlapping(&conn, event.window()) {
+                if is_window_overlapping(&conn, event.window(), tray_window) {
                     println!("Overlap detected!");
+                } else {
+                    println!("no overlap");
                 }
             }
             Ok(Event::X(x::Event::MapNotify(event))) => {
-                println!("MapNotify: window = {:?}", event.window());
-                if is_window_overlapping(&conn, event.window()) {
+                if is_window_overlapping(&conn, event.window(), tray_window) {
                     println!("Overlap detected!");
+                } else {
+                    println!("no overlap");
                 }
             }
             Ok(Event::X(x::Event::UnmapNotify(event))) => {
@@ -36,40 +43,46 @@ fn listen(tray_window: x::Window) {
             }
             Ok(Event::X(x::Event::CreateNotify(event))) => {
                 println!("CreateNotify: window = {:?}", event.window());
-                subscribe_events(&conn, &event.window());
+                subscribe_events(&conn, event.window());
             }
             _ => {}
         }
     }
 }
 
-fn is_window_overlapping(conn: &Connection, window: u32) -> bool {
-    let setup = conn.get_setup();
-    let root = setup.roots().next().unwrap().root;
+fn subscribe_events(conn: &Connection, window: x::Window) {
+    let change_attrs = x::ChangeWindowAttributes {
+        window,
+        value_list: &[
+            x::Cw::EventMask(
+                x::EventMask::STRUCTURE_NOTIFY
+                | x::EventMask::SUBSTRUCTURE_NOTIFY
+                | x::EventMask::EXPOSURE
+            ),
+        ],
+    };
 
-    // Query the window tree
-    let tree = xproto::query_tree(&conn, root).get_reply().unwrap();
-    let stack = tree.children();
+    conn.send_request_checked(&change_attrs);
+    conn.flush().ok();
+}
 
-    // Get the target window's geometry
-    let target_geometry = xproto::get_geometry(&conn, window).get_reply().unwrap();
+fn is_window_overlapping(conn: &Connection, window: x::Window, tray: x::Window) -> bool {
+    let target_geom_cookie = conn.send_request(&x::GetGeometry { drawable: x::Drawable::Window(window) });
+    let target_geometry_result = conn.wait_for_reply(target_geom_cookie);
 
-    for &child in stack {
-        if child == window {
-            continue;
-        }
-
-        let child_geometry = xproto::get_geometry(&conn, child).get_reply().unwrap();
-
-        if rectangles_overlap(
-            target_geometry.x(), target_geometry.y(), target_geometry.width(), target_geometry.height(),
-            child_geometry.x(), child_geometry.y(), child_geometry.width(), child_geometry.height(),
-        ) {
-            return true;
-        }
+    if target_geometry_result.is_err() {
+        return false
     }
 
-    false
+    let target_geometry = target_geometry_result.unwrap();
+
+    let child_geom_cookie = conn.send_request(&x::GetGeometry { drawable: x::Drawable::Window(tray) });
+    let child_geometry = conn.wait_for_reply(child_geom_cookie).unwrap();
+
+    return rectangles_overlap(
+        target_geometry.x(), target_geometry.y(), target_geometry.width(), target_geometry.height(),
+        child_geometry.x(), child_geometry.y(), child_geometry.width(), child_geometry.height(),
+    );
 }
 
 fn rectangles_overlap(
@@ -77,7 +90,7 @@ fn rectangles_overlap(
     x2: i16, y2: i16, w2: u16, h2: u16
 ) -> bool {
     x1 < x2 + w2 as i16 &&
-        x1 + w1 as i16 > x2 &&
-        y1 < y2 + h2 as i16 &&
-        y1 + h1 as i16 > y2
+    x1 + w1 as i16 > x2 &&
+    y1 < y2 + h2 as i16 &&
+    y1 + h1 as i16 > y2
 }
