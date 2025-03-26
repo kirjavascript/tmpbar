@@ -77,7 +77,13 @@ fn is_window_overlapping(conn: &Connection, window: x::Window, tray: x::Window) 
     let target_geometry = target_geometry_result.unwrap();
 
     let child_geom_cookie = conn.send_request(&x::GetGeometry { drawable: x::Drawable::Window(tray) });
-    let child_geometry = conn.wait_for_reply(child_geom_cookie).unwrap();
+    let child_geometry_result = conn.wait_for_reply(child_geom_cookie);
+
+    if child_geometry_result.is_err() {
+        return false
+    }
+
+    let child_geometry = child_geometry_result.unwrap();
 
     return rectangles_overlap(
         target_geometry.x(), target_geometry.y(), target_geometry.width(), target_geometry.height(),
