@@ -31,4 +31,10 @@ pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
     }
 
     global.tray.set_pos(x_pos as _, y_pos as _);
+
+    let available_height = scale * ui.available_height().min(
+        ui.ctx().screen_rect().height()
+    ).round();
+
+    global.tray.set_size(available_height as _);
 }

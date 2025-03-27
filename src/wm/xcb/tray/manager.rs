@@ -39,6 +39,7 @@ pub enum TrayEvent {
 
 pub enum ProxyAction {
     Position(i32, i32),
+    Size(u32),
     Overlap(bool),
     Destroy,
 }
@@ -65,7 +66,7 @@ impl Manager {
 
         let booted = false;
         let icons = vec![];
-        let icon_size = 40;
+        let icon_size = 20;
         let tray_window = conn.generate_id();
 
         setup_window(
@@ -173,7 +174,19 @@ impl Manager {
                     self.tray_window,
                     !is_overlapping,
                 );
-            }
+            },
+            ProxyAction::Size(size) => {
+                self.icon_size = size;
+                set_tray_size(
+                    &self.conn,
+                    self.tray_window,
+                    size,
+                    &mut self.icons
+                );
+
+                self.conn.flush().unwrap();
+                self.send_dimensions();
+            },
         }
     }
 

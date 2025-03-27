@@ -1,8 +1,13 @@
+-- TODO
+-- i3mode
+-- click on everything
+-- animated SVG for battery monitor, CPU graph
+
 for monitor_index, monitor in monitors() do
     bar({
         monitor = monitor,
         position = "top",
-        height = 40,
+        height = 100,
         flex = true,
         -- orientation = "v",
 
@@ -15,7 +20,16 @@ for monitor_index, monitor in monitors() do
         -- margin = { bottom = 5 },
 
         background = function(svg) return string.format([[
-            <rect x="0" y="0" width="%d" height="%d" rx="5" fill="none" stroke="black" stroke-width="5"/>
+            <rect
+                x="0"
+                y="0"
+                width="%d"
+                height="%d"
+                rx="5"
+                fill="none"
+                stroke="black"
+                stroke-width="5"
+            />
         ]], svg.width, svg.height) end,
 
         items = {
@@ -100,10 +114,3 @@ for _, monitor in monitors() do
         end,
     })
 end
-
-
-
--- TODO
--- click on everything
--- i3mode
--- animated SVG for battery monitor, CPU graph

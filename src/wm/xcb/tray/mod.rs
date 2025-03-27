@@ -9,11 +9,12 @@ use crossbeam_channel::{unbounded, select, Receiver, Sender};
 pub struct Tray {
     pub dimensions: (u32, u32),
     old_pos: (i32, i32),
+    old_size: u32,
     rx_tray: Receiver<TrayEvent>,
     tx_proxy: Sender<ProxyAction>,
 }
 
-// TODO: HEIGHT update size based on bar
+// TODO: HEIGHT update size based on bar available_height
 // TODO: handle zero icons
 // TODO: handle zero trays
 // TODO: background colour
@@ -76,6 +77,7 @@ impl Tray {
         Tray {
             dimensions: (0, 0),
             old_pos: (0, 0),
+            old_size: 20,
             rx_tray,
             tx_proxy,
         }
@@ -85,13 +87,16 @@ impl Tray {
         let (x1, y1) = self.old_pos;
 
         if x1 != x || y1 != y {
-            self.tx_proxy.send(manager::ProxyAction::Position(
-                    x,
-                    y,
-            )).ok();
-
+            self.tx_proxy.send(ProxyAction::Position(x, y)).ok();
             self.old_pos = (x, y);
         }
+    }
+
+    pub fn set_size(&mut self, size: u32) {
+        // if size != self.old_size {
+        //     self.tx_proxy.send(ProxyAction::Size(size)).ok();
+        //     self.old_size = size;
+        // }
     }
 
     pub fn signals(&mut self) {
