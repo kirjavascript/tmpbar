@@ -184,6 +184,12 @@ impl Manager {
                     &mut self.icons
                 );
 
+                set_icon_sizes(
+                    &self.conn,
+                    size,
+                    &mut self.icons
+                );
+
                 self.conn.flush().unwrap();
                 self.send_dimensions();
             },
@@ -292,8 +298,27 @@ fn set_tray_size(
         window: tray_window,
         value_list: &[
             xcb::x::ConfigWindow::Width(icon_size * icons.len() as u32),
+            xcb::x::ConfigWindow::Height(icon_size),
         ],
     });
+}
+
+fn set_icon_sizes(
+    conn: &xcb::Connection,
+    icon_size: u32,
+    icons: &mut Vec<x::Window>,
+) {
+    for (index, icon) in icons.iter().enumerate() {
+        conn.send_request(&x::ConfigureWindow {
+            window: *icon,
+            value_list: &[
+                xcb::x::ConfigWindow::X(index as i32 * icon_size as i32),
+                xcb::x::ConfigWindow::Y(0),
+                xcb::x::ConfigWindow::Width(icon_size),
+                xcb::x::ConfigWindow::Height(icon_size),
+            ],
+        });
+    }
 }
 
 fn remove_icon(
