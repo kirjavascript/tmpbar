@@ -1,5 +1,6 @@
 use xcb::{x, Event, Connection};
 use std::collections::HashSet;
+use crossbeam_channel::Sender;
 
 xcb::atoms_struct! {
     #[derive(Copy, Clone, Debug)]
@@ -10,7 +11,7 @@ xcb::atoms_struct! {
     }
 }
 
-pub fn listen(tray_window: x::Window) {
+pub fn listen(tray_window: x::Window, tx: Sender<bool>) {
     let (conn, screen_num) = Connection::connect(None).unwrap();
     let setup = conn.get_setup();
     let screen = setup.roots().nth(screen_num as usize).unwrap();
@@ -71,12 +72,12 @@ pub fn listen(tray_window: x::Window) {
         if overlaps.is_empty() {
             if is_overlapping == true {
                 is_overlapping = false;
-                println!("no overlap");
+                tx.send(false).ok();
             }
         } else {
             if is_overlapping == false {
                 is_overlapping = true;
-                println!("overlap");
+                tx.send(true).ok();
             }
         }
     }
@@ -124,7 +125,6 @@ fn is_window_mapped(conn: &Connection, window: x::Window) -> bool {
 }
 
 fn ignore_wm_type(conn: &Connection, atoms: &Atoms, window: x::Window) -> bool {
-    // ignore docks
     let prop_cookie = conn.send_request(&x::GetProperty {
         delete: false,
         window,
@@ -144,6 +144,7 @@ fn ignore_wm_type(conn: &Connection, atoms: &Atoms, window: x::Window) -> bool {
             return true
         }
 
+        // ignore docks
         for atom in win_atoms {
             if *atom == atoms.dock {
                 return true

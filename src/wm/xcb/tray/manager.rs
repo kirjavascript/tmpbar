@@ -39,6 +39,7 @@ pub enum TrayEvent {
 
 pub enum ProxyAction {
     Position(i32, i32),
+    Overlap(bool),
     Destroy,
 }
 
@@ -166,6 +167,13 @@ impl Manager {
                 );
                 std::process::exit(0);
             },
+            ProxyAction::Overlap(is_overlapping) => {
+                set_mapped(
+                    &self.conn,
+                    self.tray_window,
+                    !is_overlapping,
+                );
+            }
         }
     }
 
@@ -180,6 +188,23 @@ impl Manager {
 
         self.send_message(TrayEvent::Dimensions(x, y));
     }
+}
+
+fn set_mapped(
+    conn: &xcb::Connection,
+    window: x::Window,
+    mapped: bool,
+) {
+    if mapped {
+        conn.send_request(&x::MapWindow {
+            window,
+        });
+    } else {
+        conn.send_request(&x::UnmapWindow {
+            window,
+        });
+    }
+    conn.flush().unwrap();
 }
 
 fn set_pos(

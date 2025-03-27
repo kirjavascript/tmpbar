@@ -13,11 +13,10 @@ pub struct Tray {
     tx_proxy: Sender<ProxyAction>,
 }
 
-// TODO: handle fullscreen
 // TODO: HEIGHT update size based on bar
 // TODO: handle zero icons
-// TODO: background colour
 // TODO: handle zero trays
+// TODO: background colour
 // TODO: truncate window title
 
 impl Tray {
@@ -33,8 +32,10 @@ impl Tray {
                 tx_tray,
             );
 
+            let (tx_overlap, rx_overlap) = unbounded();
+
             std::thread::spawn(move || {
-                overlap::listen(manager.tray_window);
+                overlap::listen(manager.tray_window, tx_overlap);
             });
 
             let clonn = manager.conn.clone();
@@ -62,6 +63,11 @@ impl Tray {
                     },
                     recv(rx_signal) -> _ => {
                         manager.handle_action(ProxyAction::Destroy);
+                    },
+                    recv(rx_overlap) -> is_overlapping => {
+                        if let Ok(is_overlapping) = is_overlapping {
+                            manager.handle_action(ProxyAction::Overlap(is_overlapping));
+                        }
                     },
                 }
             }
