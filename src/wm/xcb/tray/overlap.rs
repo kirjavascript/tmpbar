@@ -194,17 +194,6 @@ fn subscribe_windows(conn: &xcb::Connection, window: x::Window) {
     }
 }
 
-fn is_override_redirect(conn: &Connection, window: x::Window) -> bool {
-    let attrs_cookie = conn.send_request(&x::GetWindowAttributes { window });
-    let attrs_reply = conn.wait_for_reply(attrs_cookie);
-
-    if let Ok(attrs) = attrs_reply {
-        return attrs.override_redirect();
-    }
-
-    false
-}
-
 fn is_window_mapped(conn: &Connection, window: x::Window) -> bool {
     let attrs_cookie = conn.send_request(&x::GetWindowAttributes { window });
     let attrs_reply = conn.wait_for_reply(attrs_cookie);
@@ -217,8 +206,7 @@ fn is_window_mapped(conn: &Connection, window: x::Window) -> bool {
 }
 
 fn ignore_wm_type(conn: &Connection, atoms: &Atoms, window: x::Window) -> bool {
-    // ignore if docks or missing wm type
-
+    // ignore docks
     let prop_cookie = conn.send_request(&x::GetProperty {
         delete: false,
         window,
@@ -231,11 +219,7 @@ fn ignore_wm_type(conn: &Connection, atoms: &Atoms, window: x::Window) -> bool {
     let prop_reply = conn.wait_for_reply(prop_cookie);
 
     if let Ok(prop) = prop_reply {
-        // Check if the property exists but is empty (no window type)
         let win_atoms = prop.value::<x::Atom>();
-        // if atoms.is_empty() {
-        //     return true
-        // }
 
         for atom in win_atoms {
             if *atom == atoms.dock {
@@ -243,9 +227,9 @@ fn ignore_wm_type(conn: &Connection, atoms: &Atoms, window: x::Window) -> bool {
             }
         }
 
-        return false
+        false
     } else {
-        return true
+        true
     }
 }
 
@@ -256,9 +240,6 @@ fn is_window_overlapping(conn: &Connection, atoms: &Atoms, window: x::Window, tr
     if !is_window_mapped(conn, window) {
         return false
     }
-    // if is_override_redirect(conn, window) {
-    //     return false
-    // }
     if ignore_wm_type(conn, atoms, window) {
         return false
     }
