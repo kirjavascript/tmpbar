@@ -1,4 +1,5 @@
 use xcb::{x, Event, Connection};
+use std::collections::HashSet;
 
 xcb::atoms_struct! {
     #[derive(Copy, Clone, Debug)]
@@ -31,7 +32,7 @@ pub fn listen(tray_window: x::Window) {
 
     subscribe_windows(&conn, root);
 
-    let mut overlaps = std::collections::HashMap::new();
+    let mut overlaps = HashSet::new();
     let mut is_overlapping = false;
 
     loop {
@@ -40,26 +41,8 @@ pub fn listen(tray_window: x::Window) {
             Ok(Event::X(x::Event::ConfigureNotify(event))) => {
                 let window = event.window();
 
-                let cookie = conn.send_request(&xcb::x::GetProperty {
-                    delete: false,
-                    window,
-                    property: xcb::x::ATOM_WM_NAME,
-                    r#type: atoms.utf8_string,
-                    long_offset: 0,
-                    long_length: 256,
-                });
-
-                let title = if let Ok(reply) = conn.wait_for_reply(cookie) {
-                    let value = reply.value();
-                    let title = String::from_utf8_lossy(value).into_owned();
-
-                    title
-                } else {
-                    "...".to_string()
-                };
-
                 if is_window_overlapping(&conn, &atoms, root, window, tray_window) {
-                    overlaps.insert(window, title);
+                    overlaps.insert(window);
                 } else {
                     overlaps.remove(&window);
                 }
@@ -67,26 +50,8 @@ pub fn listen(tray_window: x::Window) {
             Ok(Event::X(x::Event::MapNotify(event))) => {
                 let window = event.window();
 
-                let cookie = conn.send_request(&xcb::x::GetProperty {
-                    delete: false,
-                    window,
-                    property: xcb::x::ATOM_WM_NAME,
-                    r#type: atoms.utf8_string,
-                    long_offset: 0,
-                    long_length: 256,
-                });
-
-                let title = if let Ok(reply) = conn.wait_for_reply(cookie) {
-                    let value = reply.value();
-                    let title = String::from_utf8_lossy(value).into_owned();
-
-                    title
-                } else {
-                    "...".to_string()
-                };
-
                 if is_window_overlapping(&conn, &atoms, root, window, tray_window) {
-                    overlaps.insert(window, title);
+                    overlaps.insert(window);
                 } else {
                     overlaps.remove(&window);
                 }
