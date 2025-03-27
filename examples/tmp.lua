@@ -2,7 +2,7 @@ for monitor_index, monitor in monitors() do
     bar({
         monitor = monitor,
         position = "top",
-        height = 50,
+        height = 40,
         flex = true,
         -- orientation = "v",
 

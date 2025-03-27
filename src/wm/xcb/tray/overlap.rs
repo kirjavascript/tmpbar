@@ -34,8 +34,6 @@ pub fn listen(tray_window: x::Window) {
     let mut overlaps = std::collections::HashMap::new();
     let mut is_overlapping = false;
 
-    // TODO: cleanup
-
     loop {
         let event = conn.wait_for_event();
         match event {
@@ -105,44 +103,15 @@ pub fn listen(tray_window: x::Window) {
             _ => {}
         }
 
-        println!("\n...");
-        for (k, v) in overlaps.iter() {
-            use xcb::Xid;
-            println!("{} @ {:x} ({:.17})", k.resource_id(), k.resource_id(), v);
-
-            let child_geom_cookie = conn.send_request(&x::GetGeometry { drawable: x::Drawable::Window(*k) });
-            let child_geometry_result = conn.wait_for_reply(child_geom_cookie);
-
-            if !child_geometry_result.is_err() {
-                let child_geometry = child_geometry_result.unwrap();
-
-                // Get the absolute coordinates by translating to root window coordinates
-                let translate_cookie = conn.send_request(&x::TranslateCoordinates {
-                    src_window: *k,
-                    dst_window: conn.get_setup().roots().nth(0).unwrap().root(),
-                    src_x: 0,
-                    src_y: 0,
-                });
-
-                let translate_result = conn.wait_for_reply(translate_cookie);
-
-                if let Ok(translate) = translate_result {
-                    println!("--> abs({},{}) rel({},{}) {} {}",
-                        translate.dst_x(),
-                        translate.dst_y(),
-                        child_geometry.x(),
-                        child_geometry.y(),
-                        child_geometry.width(),
-                        child_geometry.height(),
-                    );
-                } else {
-                    println!("--> rel({},{}) {} {}",
-                        child_geometry.x(),
-                        child_geometry.y(),
-                        child_geometry.width(),
-                        child_geometry.height(),
-                    );
-                }
+        if overlaps.is_empty() {
+            if is_overlapping == true {
+                is_overlapping = false;
+                println!("no overlap");
+            }
+        } else {
+            if is_overlapping == false {
+                is_overlapping = true;
+                println!("overlap");
             }
         }
     }
@@ -204,6 +173,11 @@ fn ignore_wm_type(conn: &Connection, atoms: &Atoms, window: x::Window) -> bool {
 
     if let Ok(prop) = prop_reply {
         let win_atoms = prop.value::<x::Atom>();
+
+        // ignore windows without a WM_TYPE
+        if win_atoms.is_empty() {
+            return true
+        }
 
         for atom in win_atoms {
             if *atom == atoms.dock {
