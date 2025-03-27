@@ -41,6 +41,8 @@ pub fn window_patch(config: &ConfigScript) {
 
         // it is completely ridiculous to use window titles to find windows,
         // but to get a direct X window reference we have to fork eframe
+        //
+        // ... at least we only have to do this once
         while windows.get(&bars.last().unwrap().id).is_none() {
             windows = get_windows(&conn, root);
 

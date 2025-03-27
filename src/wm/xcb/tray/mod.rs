@@ -8,7 +8,7 @@ use crossbeam_channel::{unbounded, select, Receiver, Sender};
 
 pub struct Tray {
     pub dimensions: (u32, u32),
-    pub old_pos: (i32, i32),
+    old_pos: (i32, i32),
     rx_tray: Receiver<TrayEvent>,
     tx_proxy: Sender<ProxyAction>,
 }
