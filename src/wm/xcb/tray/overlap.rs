@@ -1,9 +1,19 @@
 use xcb::{x, Event, Connection};
 
+xcb::atoms_struct! {
+    #[derive(Copy, Clone, Debug)]
+    pub(crate) struct Atoms {
+        pub wm_type => b"_NET_WM_WINDOW_TYPE",
+        pub dock => b"_NET_WM_WINDOW_TYPE_DOCK",
+        pub utf8_string => b"ATOM_UTF8_STRING",
+    }
+}
+
 pub fn listen(tray_window: x::Window) {
     let (conn, screen_num) = Connection::connect(None).unwrap();
     let setup = conn.get_setup();
     let screen = setup.roots().nth(screen_num as usize).unwrap();
+    let atoms = Atoms::intern_all(&conn).unwrap();
 
     let change_attrs = x::ChangeWindowAttributes {
         window: screen.root(),
@@ -23,14 +33,8 @@ pub fn listen(tray_window: x::Window) {
     let mut overlaps = std::collections::HashMap::new();
     let mut is_overlapping = false;
 
-    let wm_type_cookie = conn.send_request(&x::InternAtom {
-        only_if_exists: true,
-        name: b"ATOM_UTF8_STRING",
-    });
-
-    let utf8_string = conn.wait_for_reply(wm_type_cookie).unwrap();
-
     // TODO: cleanup
+    // TODO: take into account screen coords
 
     loop {
         let event = conn.wait_for_event();
@@ -42,7 +46,7 @@ pub fn listen(tray_window: x::Window) {
                     delete: false,
                     window,
                     property: xcb::x::ATOM_WM_NAME,
-                    r#type: utf8_string.atom(),
+                    r#type: atoms.utf8_string,
                     long_offset: 0,
                     long_length: 256,
                 });
@@ -56,7 +60,7 @@ pub fn listen(tray_window: x::Window) {
                     "...".to_string()
                 };
 
-                if is_window_overlapping(&conn, window, tray_window) {
+                if is_window_overlapping(&conn, &atoms, window, tray_window) {
                     overlaps.insert(window, title);
                 } else {
                     overlaps.remove(&window);
@@ -69,7 +73,7 @@ pub fn listen(tray_window: x::Window) {
                     delete: false,
                     window,
                     property: xcb::x::ATOM_WM_NAME,
-                    r#type: utf8_string.atom(),
+                    r#type: atoms.utf8_string,
                     long_offset: 0,
                     long_length: 256,
                 });
@@ -83,7 +87,7 @@ pub fn listen(tray_window: x::Window) {
                     "...".to_string()
                 };
 
-                if is_window_overlapping(&conn, window, tray_window) {
+                if is_window_overlapping(&conn, &atoms, window, tray_window) {
                     overlaps.insert(window, title);
                 } else {
                     overlaps.remove(&window);
@@ -100,7 +104,63 @@ pub fn listen(tray_window: x::Window) {
             }
             _ => {}
         }
-        println!("{:#?}", overlaps);
+
+        println!("\n...");
+        for (k, v) in overlaps.iter() {
+            use xcb::Xid;
+            println!("{} @ {:x} ({:.17})", k.resource_id(), k.resource_id(), v);
+            let translate_cookie = conn.send_request(&x::TranslateCoordinates {
+                src_window: *k,
+                dst_window: screen.root(),
+                src_x: 0,
+                src_y: 0,
+            });
+
+            let translate_result = conn.wait_for_reply(translate_cookie);
+
+            if let Ok(reply) = translate_result {
+                let abs_x = reply.dst_x();
+                let abs_y = reply.dst_y();
+                println!("Absolute position: ({}, {})", abs_x, abs_y);
+            } else {
+                eprintln!("Failed to get window position");
+            }
+
+            let child_geom_cookie = conn.send_request(&x::GetGeometry { drawable: x::Drawable::Window(*k) });
+            let child_geometry_result = conn.wait_for_reply(child_geom_cookie);
+
+            if !child_geometry_result.is_err() {
+                let child_geometry = child_geometry_result.unwrap();
+
+                // Get the absolute coordinates by translating to root window coordinates
+                let translate_cookie = conn.send_request(&x::TranslateCoordinates {
+                    src_window: *k,
+                    dst_window: conn.get_setup().roots().nth(0).unwrap().root(),
+                    src_x: 0,
+                    src_y: 0,
+                });
+
+                let translate_result = conn.wait_for_reply(translate_cookie);
+
+                if let Ok(translate) = translate_result {
+                    println!("--> abs({},{}) rel({},{}) {} {}",
+                        translate.dst_x(),
+                        translate.dst_y(),
+                        child_geometry.x(),
+                        child_geometry.y(),
+                        child_geometry.width(),
+                        child_geometry.height(),
+                    );
+                } else {
+                    println!("--> rel({},{}) {} {}",
+                        child_geometry.x(),
+                        child_geometry.y(),
+                        child_geometry.width(),
+                        child_geometry.height(),
+                    );
+                }
+            }
+        }
     }
 }
 
@@ -156,32 +216,13 @@ fn is_window_mapped(conn: &Connection, window: x::Window) -> bool {
     false
 }
 
-fn ignore_wm_type(conn: &Connection, window: x::Window) -> bool {
+fn ignore_wm_type(conn: &Connection, atoms: &Atoms, window: x::Window) -> bool {
     // ignore if docks or missing wm type
-
-    let wm_type_cookie = conn.send_request(&x::InternAtom {
-        only_if_exists: true,
-        name: b"_NET_WM_WINDOW_TYPE",
-    });
-    let dock_type_cookie = conn.send_request(&x::InternAtom {
-        only_if_exists: true,
-        name: b"_NET_WM_WINDOW_TYPE_DOCK",
-    });
-
-    let wm_type_reply = conn.wait_for_reply(wm_type_cookie);
-    let dock_type_reply = conn.wait_for_reply(dock_type_cookie);
-
-    if wm_type_reply.is_err() || dock_type_reply.is_err() {
-        return false;
-    }
-
-    let wm_type_atom = wm_type_reply.unwrap().atom();
-    let dock_type_atom = dock_type_reply.unwrap().atom();
 
     let prop_cookie = conn.send_request(&x::GetProperty {
         delete: false,
         window,
-        property: wm_type_atom,
+        property: atoms.wm_type,
         r#type: x::ATOM_ATOM,
         long_offset: 0,
         long_length: 32,
@@ -191,13 +232,13 @@ fn ignore_wm_type(conn: &Connection, window: x::Window) -> bool {
 
     if let Ok(prop) = prop_reply {
         // Check if the property exists but is empty (no window type)
-        let atoms = prop.value::<x::Atom>();
+        let win_atoms = prop.value::<x::Atom>();
         // if atoms.is_empty() {
         //     return true
         // }
 
-        for atom in atoms {
-            if *atom == dock_type_atom {
+        for atom in win_atoms {
+            if *atom == atoms.dock {
                 return true
             }
         }
@@ -208,7 +249,7 @@ fn ignore_wm_type(conn: &Connection, window: x::Window) -> bool {
     }
 }
 
-fn is_window_overlapping(conn: &Connection, window: x::Window, tray: x::Window) -> bool {
+fn is_window_overlapping(conn: &Connection, atoms: &Atoms, window: x::Window, tray: x::Window) -> bool {
     if window == tray {
         return false
     }
@@ -218,7 +259,7 @@ fn is_window_overlapping(conn: &Connection, window: x::Window, tray: x::Window) 
     // if is_override_redirect(conn, window) {
     //     return false
     // }
-    if ignore_wm_type(conn, window) {
+    if ignore_wm_type(conn, atoms, window) {
         return false
     }
 
