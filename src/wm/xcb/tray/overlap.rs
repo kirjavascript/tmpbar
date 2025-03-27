@@ -14,6 +14,7 @@ pub fn listen(tray_window: x::Window) {
     let setup = conn.get_setup();
     let screen = setup.roots().nth(screen_num as usize).unwrap();
     let atoms = Atoms::intern_all(&conn).unwrap();
+    let root = screen.root();
 
     let change_attrs = x::ChangeWindowAttributes {
         window: screen.root(),
@@ -28,13 +29,12 @@ pub fn listen(tray_window: x::Window) {
     conn.send_request_checked(&change_attrs);
     conn.flush().ok();
 
-    subscribe_windows(&conn, screen.root());
+    subscribe_windows(&conn, root);
 
     let mut overlaps = std::collections::HashMap::new();
     let mut is_overlapping = false;
 
     // TODO: cleanup
-    // TODO: take into account screen coords
 
     loop {
         let event = conn.wait_for_event();
@@ -60,7 +60,7 @@ pub fn listen(tray_window: x::Window) {
                     "...".to_string()
                 };
 
-                if is_window_overlapping(&conn, &atoms, window, tray_window) {
+                if is_window_overlapping(&conn, &atoms, root, window, tray_window) {
                     overlaps.insert(window, title);
                 } else {
                     overlaps.remove(&window);
@@ -87,7 +87,7 @@ pub fn listen(tray_window: x::Window) {
                     "...".to_string()
                 };
 
-                if is_window_overlapping(&conn, &atoms, window, tray_window) {
+                if is_window_overlapping(&conn, &atoms, root, window, tray_window) {
                     overlaps.insert(window, title);
                 } else {
                     overlaps.remove(&window);
@@ -109,22 +109,6 @@ pub fn listen(tray_window: x::Window) {
         for (k, v) in overlaps.iter() {
             use xcb::Xid;
             println!("{} @ {:x} ({:.17})", k.resource_id(), k.resource_id(), v);
-            let translate_cookie = conn.send_request(&x::TranslateCoordinates {
-                src_window: *k,
-                dst_window: screen.root(),
-                src_x: 0,
-                src_y: 0,
-            });
-
-            let translate_result = conn.wait_for_reply(translate_cookie);
-
-            if let Ok(reply) = translate_result {
-                let abs_x = reply.dst_x();
-                let abs_y = reply.dst_y();
-                println!("Absolute position: ({}, {})", abs_x, abs_y);
-            } else {
-                eprintln!("Failed to get window position");
-            }
 
             let child_geom_cookie = conn.send_request(&x::GetGeometry { drawable: x::Drawable::Window(*k) });
             let child_geometry_result = conn.wait_for_reply(child_geom_cookie);
@@ -233,7 +217,13 @@ fn ignore_wm_type(conn: &Connection, atoms: &Atoms, window: x::Window) -> bool {
     }
 }
 
-fn is_window_overlapping(conn: &Connection, atoms: &Atoms, window: x::Window, tray: x::Window) -> bool {
+fn is_window_overlapping(
+    conn: &Connection,
+    atoms: &Atoms,
+    root: x::Window,
+    window: x::Window,
+    tray: x::Window,
+) -> bool {
     if window == tray {
         return false
     }
@@ -253,18 +243,50 @@ fn is_window_overlapping(conn: &Connection, atoms: &Atoms, window: x::Window, tr
 
     let target_geometry = target_geometry_result.unwrap();
 
-    let child_geom_cookie = conn.send_request(&x::GetGeometry { drawable: x::Drawable::Window(tray) });
-    let child_geometry_result = conn.wait_for_reply(child_geom_cookie);
+    let tray_geom_cookie = conn.send_request(&x::GetGeometry { drawable: x::Drawable::Window(tray) });
+    let tray_geometry_result = conn.wait_for_reply(tray_geom_cookie);
 
-    if child_geometry_result.is_err() {
+    if tray_geometry_result.is_err() {
         return false
     }
 
-    let child_geometry = child_geometry_result.unwrap();
+    let tray_geometry = tray_geometry_result.unwrap();
+
+    // get absolute coordinates
+
+    let target_translate_cookie = conn.send_request(&x::TranslateCoordinates {
+        src_window: window,
+        dst_window: root,
+        src_x: 0,
+        src_y: 0,
+    });
+
+    let translate_result = conn.wait_for_reply(target_translate_cookie);
+
+    let (target_x, target_y) = if let Ok(ref translate) = translate_result {
+        (translate.dst_x(), translate.dst_y())
+    } else {
+        (target_geometry.x(), target_geometry.y())
+    };
+
+    let tray_translate_cookie = conn.send_request(&x::TranslateCoordinates {
+        src_window: tray,
+        dst_window: root,
+        src_x: 0,
+        src_y: 0,
+    });
+
+    let translate_result = conn.wait_for_reply(tray_translate_cookie);
+
+    let (tray_x, tray_y) = if let Ok(ref translate) = translate_result {
+        (translate.dst_x(), translate.dst_y())
+    } else {
+        (tray_geometry.x(), tray_geometry.y())
+    };
 
     return rectangles_overlap(
-        target_geometry.x(), target_geometry.y(), target_geometry.width(), target_geometry.height(),
-        child_geometry.x(), child_geometry.y(), child_geometry.width(), child_geometry.height(),
+        target_x, target_y, target_geometry.width(), target_geometry.height(),
+        tray_x, tray_y, tray_geometry.width(), tray_geometry.height(),
     );
 }
 
