@@ -657,13 +657,13 @@ fn setup_window(
 
 }
 
-// pub fn find_rgba_visual(screen: &x::Screen) -> Option<&x::Visualtype> {
-//     for depth in screen.allowed_depths() {
-//         for visual in depth.visuals() {
-//             if depth.depth() == 32 {
-//                 return Some(visual)
-//             }
-//         }
-//     }
-//     None
-// }
+    // fn find_rgba_visual(screen: &x::Screen) -> Option<&x::Visualtype> {
+    //     for depth in screen.allowed_depths() {
+    //         for visual in depth.visuals() {
+    //             if visual.class() == x::VisualClass::TrueColor && depth.depth() == 32 {
+    //                 return Some(visual)
+    //             }
+    //         }
+    //     }
+    //     None
+    // }
