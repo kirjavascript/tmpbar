@@ -174,6 +174,7 @@ impl Manager {
                     self.tray_window,
                     !is_overlapping,
                 );
+                self.conn.flush().unwrap();
             },
             ProxyAction::Size(size) => {
                 self.icon_size = size;
@@ -223,7 +224,6 @@ fn set_mapped(
             window,
         });
     }
-    conn.flush().unwrap();
 }
 
 fn set_pos(

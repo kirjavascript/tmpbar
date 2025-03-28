@@ -7,7 +7,7 @@ for monitor_index, monitor in monitors() do
     bar({
         monitor = monitor,
         position = "top",
-        height = 20,
+        height = 40,
         flex = true,
         -- orientation = "v",
 
@@ -58,7 +58,7 @@ for monitor_index, monitor in monitors() do
             }),
             component("label", {
                 justify = true,
-                text = function() return "« " .. window_title() .. " »" end,
+                text = function() return "« " .. truncate(window_title(), 80) .. " »" end,
             }),
             component("container", {
                 direction = "<",

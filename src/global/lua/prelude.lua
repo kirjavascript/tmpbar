@@ -50,6 +50,15 @@ function trim(s)
     return (s:gsub("^%s*(.-)%s*$", "%1"))
 end
 
+function truncate(s, length, ellipse)
+    ellipse = ellipse or "..."
+    if #s > length then
+        return string.sub(s, 1, length) .. ellipse
+    else
+        return s
+    end
+end
+
 function monitors()
     return ipairs(xcake_monitors)
 end

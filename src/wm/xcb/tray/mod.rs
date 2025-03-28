@@ -14,11 +14,10 @@ pub struct Tray {
     tx_proxy: Sender<ProxyAction>,
 }
 
-// TODO: HEIGHT update size based on bar available_height
+// TODO: height when reloading makes icons disappear (overlap flag to debug)
 // TODO: handle zero icons
 // TODO: handle zero trays
 // TODO: background colour
-// TODO: truncate window title
 
 impl Tray {
     pub fn new(ctx: egui::Context) -> Self {
@@ -93,10 +92,12 @@ impl Tray {
     }
 
     pub fn set_size(&mut self, size: u32) {
-        // if size != self.old_size {
-        //     self.tx_proxy.send(ProxyAction::Size(size)).ok();
-        //     self.old_size = size;
-        // }
+        if size != self.old_size {
+            self.tx_proxy.send(ProxyAction::Size(size)).ok();
+            // TODO: overlap check doesnt take into account bar size changes
+            // self.tx_proxy.send(ProxyAction::Overlap(true)).ok();
+            self.old_size = size;
+        }
     }
 
     pub fn signals(&mut self) {

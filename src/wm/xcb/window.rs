@@ -46,7 +46,7 @@ pub fn window_patch(config: &ConfigScript) {
         while windows.get(&bars.last().unwrap().id).is_none() {
             windows = get_windows(&conn, root);
 
-            std::thread::sleep(std::time::Duration::from_millis(50));
+            std::thread::sleep(std::time::Duration::from_millis(250));
         }
 
 
@@ -85,7 +85,6 @@ pub fn window_patch(config: &ConfigScript) {
             conn.flush().unwrap();
 
         }
-
 
         // TODO: finish STRUT
         // let width = 1920;
@@ -127,18 +126,19 @@ pub fn get_windows(conn: &xcb::Connection, root: xcb::x::Window) -> HashMap<Stri
         let cookie = conn.send_request(&xcb::x::QueryTree {
             window,
         });
-        let reply = conn.wait_for_reply(cookie).unwrap();
 
-        reply
-            .children().iter().for_each(|window| {
-                if let Some(name) = get_wm_name(&conn, &window) {
-                    let title = name.trim_end();
+        if let Ok(reply) = conn.wait_for_reply(cookie) {
+            reply
+                .children().iter().for_each(|window| {
+                    if let Some(name) = get_wm_name(&conn, &window) {
+                        let title = name.trim_end();
 
-                    windows.insert(title.to_string(), *window);
-                }
+                        windows.insert(title.to_string(), *window);
+                    }
 
-                query(&conn, *window, windows);
-            });
+                    query(&conn, *window, windows);
+                });
+        }
     }
 
     query(conn, root, &mut windows);

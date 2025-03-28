@@ -7,6 +7,7 @@ xcb::atoms_struct! {
     pub(crate) struct Atoms {
         pub wm_type => b"_NET_WM_WINDOW_TYPE",
         pub dock => b"_NET_WM_WINDOW_TYPE_DOCK",
+        pub popup_menu => b"_NET_WM_WINDOW_TYPE_POPUP_MENU",
         pub utf8_string => b"ATOM_UTF8_STRING",
     }
 }
@@ -144,9 +145,9 @@ fn ignore_wm_type(conn: &Connection, atoms: &Atoms, window: x::Window) -> bool {
             return true
         }
 
-        // ignore docks
+        // ignore docks and popup menus
         for atom in win_atoms {
-            if *atom == atoms.dock {
+            if *atom == atoms.dock || *atom == atoms.popup_menu {
                 return true
             }
         }
