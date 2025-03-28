@@ -28,6 +28,7 @@ pub struct Manager {
     atoms: Atoms,
     icon_size: u32,
     icons: Vec<x::Window>,
+    is_overlapping: bool,
     booted: bool,
     ctx: egui::Context,
     tx_tray: Sender<TrayEvent>,
@@ -65,6 +66,7 @@ impl Manager {
         }
 
         let booted = false;
+        let is_overlapping = false;
         let icons = vec![];
         let icon_size = 20;
         let tray_window = conn.generate_id();
@@ -85,6 +87,7 @@ impl Manager {
             atoms,
             icon_size,
             icons,
+            is_overlapping,
             booted,
             ctx,
             tx_tray,
@@ -115,6 +118,7 @@ impl Manager {
                         self.tray_window,
                         self.icon_size,
                         &mut self.icons,
+                        self.is_overlapping,
                     );
 
                     self.send_dimensions();
@@ -169,11 +173,14 @@ impl Manager {
                 std::process::exit(0);
             },
             ProxyAction::Overlap(is_overlapping) => {
-                set_mapped(
-                    &self.conn,
-                    self.tray_window,
-                    !is_overlapping,
-                );
+                if !self.icons.is_empty() {
+                    set_mapped(
+                        &self.conn,
+                        self.tray_window,
+                        !is_overlapping,
+                    );
+                }
+                self.is_overlapping = is_overlapping;
                 self.conn.flush().unwrap();
             },
             ProxyAction::Size(size) => {
@@ -248,6 +255,7 @@ fn add_icon(
     tray_window: x::Window,
     icon_size: u32,
     icons: &mut Vec<x::Window>,
+    is_overlapping: bool,
 ) {
     if let x::ClientMessageData::Data32(data) = event.data() {
         let opcode = data[1];
@@ -280,6 +288,15 @@ fn add_icon(
                     xcb::x::ConfigWindow::Height(icon_size),
                 ],
             });
+
+            if icons.is_empty() && !is_overlapping {
+                set_mapped(
+                    conn,
+                    tray_window,
+                    true,
+                );
+            }
+
             icons.push(window);
             set_tray_size(conn, tray_window, icon_size, icons);
 
@@ -341,6 +358,13 @@ fn remove_icon(
         });
     }
     set_tray_size(conn, tray_window, icon_size, icons);
+    if icons.is_empty() {
+        set_mapped(
+            conn,
+            tray_window,
+            false,
+        );
+    }
     conn.flush().unwrap();
 }
 
@@ -517,11 +541,6 @@ fn setup_window(
         property: atoms.shadow,
         r#type: xcb::x::ATOM_CARDINAL,
         data: &[0u32],
-    });
-
-    // map
-    conn.send_request(&x::MapWindow {
-        window,
     });
 
     conn.flush().unwrap();

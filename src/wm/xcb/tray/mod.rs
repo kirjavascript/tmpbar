@@ -14,7 +14,6 @@ pub struct Tray {
     tx_proxy: Sender<ProxyAction>,
 }
 
-// TODO: handle zero icons
 // TODO: handle zero trays
 // TODO: background colour
 
