@@ -459,7 +459,7 @@ fn setup_window(
         window,
         property: x::ATOM_WM_NAME,
         r#type: x::ATOM_STRING,
-        data: b"trayproxy",
+        data: b"xcake-tray",
     });
 
     // orientation

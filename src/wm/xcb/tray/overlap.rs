@@ -1,4 +1,4 @@
-use xcb::{x, Event, Connection};
+use xcb::{x, Event, Connection, Xid};
 use std::collections::HashSet;
 use crossbeam_channel::Sender;
 
@@ -74,11 +74,15 @@ pub fn listen(tray_window: x::Window, tx: Sender<bool>) {
             if is_overlapping == true {
                 is_overlapping = false;
                 tx.send(false).ok();
+                // _debug_overlapping(&conn, &atoms, &overlaps);
+                // warn!("{is_overlapping}");
             }
         } else {
             if is_overlapping == false {
                 is_overlapping = true;
                 tx.send(true).ok();
+                // _debug_overlapping(&conn, &atoms, &overlaps);
+                // warn!("{is_overlapping}");
             }
         }
     }
@@ -175,6 +179,17 @@ fn is_window_overlapping(
         return false
     }
 
+    // check if a tray icon
+    let parent_cookie = conn.send_request(&x::QueryTree {
+        window,
+    });
+
+    if let Ok(parent_reply) = conn.wait_for_reply(parent_cookie) {
+        if parent_reply.parent() == tray {
+            return false;
+        }
+    }
+
     let target_geom_cookie = conn.send_request(&x::GetGeometry { drawable: x::Drawable::Window(window) });
     let target_geometry_result = conn.wait_for_reply(target_geom_cookie);
 
@@ -240,7 +255,31 @@ fn rectangles_overlap(
     }
 
     x1 < x2 + w2 as i16 &&
-    x1 + w1 as i16 > x2 &&
-    y1 < y2 + h2 as i16 &&
-    y1 + h1 as i16 > y2
+        x1 + w1 as i16 > x2 &&
+        y1 < y2 + h2 as i16 &&
+        y1 + h1 as i16 > y2
+}
+
+fn _debug_overlapping(conn: &Connection, atoms: &Atoms, overlaps: &HashSet<x::Window>) {
+    for window in overlaps {
+        let cookie = conn.send_request(&xcb::x::GetProperty {
+            delete: false,
+            window: *window,
+            property: xcb::x::ATOM_WM_NAME,
+            r#type: atoms.utf8_string,
+            long_offset: 0,
+            long_length: 256,
+        });
+
+        let title = if let Ok(reply) = conn.wait_for_reply(cookie) {
+            let value = reply.value();
+            let title = String::from_utf8_lossy(value).into_owned();
+
+            title
+        } else {
+            "...".to_string()
+        };
+
+        info!("0x{:x} {0:}: {:.20}", window.resource_id(), title);
+    }
 }
