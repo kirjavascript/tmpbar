@@ -41,6 +41,7 @@ pub enum TrayEvent {
 pub enum ProxyAction {
     Position(i32, i32),
     Size(u32),
+    BgColor(u32),
     Overlap(bool),
     Destroy,
 }
@@ -183,6 +184,14 @@ impl Manager {
                 self.is_overlapping = is_overlapping;
                 self.conn.flush().unwrap();
             },
+            ProxyAction::BgColor(color) => {
+                set_bgcolor(
+                    &self.conn,
+                    self.tray_window,
+                    color,
+                );
+                self.conn.flush().unwrap();
+            },
             ProxyAction::Size(size) => {
                 self.icon_size = size;
                 set_tray_size(
@@ -244,6 +253,20 @@ fn set_pos(
         value_list: &[
             x::ConfigWindow::X(x),
             x::ConfigWindow::Y(y),
+        ],
+    });
+    conn.flush().unwrap();
+}
+
+fn set_bgcolor(
+    conn: &xcb::Connection,
+    window: x::Window,
+    color: u32,
+) {
+    conn.send_request(&x::ChangeWindowAttributes {
+        window,
+        value_list: &[
+            x::Cw::BackPixel(color),
         ],
     });
     conn.flush().unwrap();
@@ -546,6 +569,8 @@ fn setup_window(
     conn.flush().unwrap();
 
     // return;
+    //
+    // cant figure out how to do a fucking transparent background
 
     // let (depth, visual) = if let Some(visual_type) = find_rgba_visual(screen) {
     //     (32, visual_type.visual_id())

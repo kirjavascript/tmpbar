@@ -94,7 +94,9 @@ for monitor_index, monitor in monitors() do
                         size = 100,
                         click = function() return spawn("activate-linux") end
                     }),
-                    monitor_index == 1 and component("tray"),
+                    monitor_index == 1 and component("tray", {
+                        color = "#0A3A77",
+                    }),
                 },
             }),
         },

@@ -1,5 +1,5 @@
 use eframe::egui;
-use crate::config::Component;
+use crate::config::{Component, Property};
 use crate::global::Global;
 use egui::{Ui, Vec2, Color32};
 
@@ -37,4 +37,8 @@ pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
     ).round();
 
     global.tray.set_size(available_height as _);
+
+    if let Some(Property::String(color)) = comp.props().get("color") {
+        global.tray.set_bgcolor(color);
+    }
 }

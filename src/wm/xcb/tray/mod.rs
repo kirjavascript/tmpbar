@@ -2,6 +2,8 @@ mod overlap;
 mod manager;
 mod signal_hook;
 
+use crate::util::web_color_to_u32;
+
 use manager::{Manager, TrayEvent, ProxyAction};
 
 use crossbeam_channel::{unbounded, select, Receiver, Sender};
@@ -10,12 +12,12 @@ pub struct Tray {
     pub dimensions: (u32, u32),
     old_pos: (i32, i32),
     old_size: u32,
+    old_bgcolor: Option<String>,
     rx_tray: Receiver<TrayEvent>,
     tx_proxy: Sender<ProxyAction>,
 }
 
 // TODO: handle zero trays
-// TODO: background colour
 
 impl Tray {
     pub fn new(ctx: egui::Context) -> Self {
@@ -75,6 +77,7 @@ impl Tray {
             dimensions: (0, 0),
             old_pos: (0, 0),
             old_size: 20,
+            old_bgcolor: None,
             rx_tray,
             tx_proxy,
         }
@@ -93,6 +96,17 @@ impl Tray {
         if size != self.old_size {
             self.tx_proxy.send(ProxyAction::Size(size)).ok();
             self.old_size = size;
+        }
+    }
+
+    pub fn set_bgcolor(&mut self, color: &str) {
+        if Some(color) != self.old_bgcolor.as_deref() {
+            self.old_bgcolor = Some(color.to_string());
+
+            if let Some(number) = web_color_to_u32(color) {
+                let number = number >> 8;
+                self.tx_proxy.send(ProxyAction::BgColor(number)).ok();
+            }
         }
     }
 
