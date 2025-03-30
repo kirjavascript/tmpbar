@@ -19,18 +19,18 @@ for monitor_index, monitor in monitors() do
         -- crossAlign = "end",
         -- margin = { bottom = 5 },
 
-        background = function(svg) return string.format([[
-            <rect
-                x="0"
-                y="0"
-                width="%d"
-                height="%d"
-                rx="5"
-                fill="none"
-                stroke="black"
-                stroke-width="5"
-            />
-        ]], svg.width, svg.height) end,
+        -- background = function(svg) return string.format([[
+        --     <rect
+        --         x="0"
+        --         y="0"
+        --         width="%d"
+        --         height="%d"
+        --         rx="5"
+        --         fill="none"
+        --         stroke="black"
+        --         stroke-width="5"
+        --     />
+        -- ]], svg.width, svg.height) end,
 
         items = {
             component("image", {

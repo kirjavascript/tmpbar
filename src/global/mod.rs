@@ -19,6 +19,9 @@ impl Global {
         let xcb_signal: Signal<Event> = Signal::new(ctx.clone());
         crate::wm::xcb::listen(xcb_signal.clone());
 
+        let mode_listener = crate::wm::i3mode::I3Mode::new().unwrap();
+        mode_listener.start_listening().unwrap();
+
         let (lua, lua_signal) = lua::load_lua(path, ctx);
 
         let parent_path = lua.globals().get("xcake_parent_path").unwrap_or_default();

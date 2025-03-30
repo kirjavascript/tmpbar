@@ -1,6 +1,6 @@
 macro_rules! message {
     ($c:ident, $m:expr, $p:expr) => {{
-        let padding = String::from_utf8(vec![b' '; 4 - $m.len()]).unwrap();
+        let padding = String::from_utf8(vec![b' '; 5 - $m.len()]).unwrap();
         #[cfg(not(debug_assertions))]
         let file_line = "".to_string();
         #[cfg(debug_assertions)]
