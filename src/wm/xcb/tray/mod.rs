@@ -20,61 +20,61 @@ pub struct Tray {
     tx_proxy: Sender<ProxyAction>,
 }
 
+// TODO: handle zero trays
+
 impl Tray {
-    pub fn new(ctx: egui::Context, has_tray: bool) -> Self {
+    pub fn new(ctx: egui::Context) -> Self {
         let (tx_tray, rx_tray) = unbounded();
         let (tx_proxy, rx_proxy) = unbounded();
 
-        if has_tray {
+        std::thread::spawn(move || {
+            let (tx_event, rx_event) = unbounded();
+
+            let mut manager = Manager::new(
+                ctx,
+                tx_tray,
+            );
+
+            let (tx_overlap, rx_overlap) = unbounded();
+
             std::thread::spawn(move || {
-                let (tx_event, rx_event) = unbounded();
+                overlap::listen(manager.tray_window, tx_overlap);
+            });
 
-                let mut manager = Manager::new(
-                    ctx,
-                    tx_tray,
-                );
-
-                let (tx_overlap, rx_overlap) = unbounded();
-
-                std::thread::spawn(move || {
-                    overlap::listen(manager.tray_window, tx_overlap);
-                });
-
-                let clonn = manager.conn.clone();
-                std::thread::spawn(move || {
-                    loop {
-                        if let Ok(event) = clonn.wait_for_event() {
-                            tx_event.send(event).ok();
-                        }
-                    }
-                });
-
-                let rx_signal = signal_hook::hook();
-
+            let clonn = manager.conn.clone();
+            std::thread::spawn(move || {
                 loop {
-                    select! {
-                        recv(rx_event) -> event => {
-                            if let Ok(event) = event {
-                                manager.handle_event(event);
-                            }
-                        },
-                        recv(rx_proxy) -> action => {
-                            if let Ok(action) = action {
-                                manager.handle_action(action);
-                            }
-                        },
-                        recv(rx_signal) -> _ => {
-                            manager.handle_action(ProxyAction::Destroy);
-                        },
-                        recv(rx_overlap) -> is_overlapping => {
-                            if let Ok(is_overlapping) = is_overlapping {
-                                manager.handle_action(ProxyAction::Overlap(is_overlapping));
-                            }
-                        },
+                    if let Ok(event) = clonn.wait_for_event() {
+                        tx_event.send(event).ok();
                     }
                 }
             });
-        }
+
+            let rx_signal = signal_hook::hook();
+
+            loop {
+                select! {
+                    recv(rx_event) -> event => {
+                        if let Ok(event) = event {
+                            manager.handle_event(event);
+                        }
+                    },
+                    recv(rx_proxy) -> action => {
+                        if let Ok(action) = action {
+                            manager.handle_action(action);
+                        }
+                    },
+                    recv(rx_signal) -> _ => {
+                        manager.handle_action(ProxyAction::Destroy);
+                    },
+                    recv(rx_overlap) -> is_overlapping => {
+                        if let Ok(is_overlapping) = is_overlapping {
+                            manager.handle_action(ProxyAction::Overlap(is_overlapping));
+                        }
+                    },
+                }
+            }
+        });
 
         Tray {
             dimensions: (0, 0),
