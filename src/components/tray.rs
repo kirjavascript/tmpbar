@@ -12,7 +12,7 @@ pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
     // allocate size
     let (rect, _response) = ui.allocate_exact_size(size, egui::Sense::empty());
 
-    if comp.props().get("showDebug").unwrap_or_default().into() {
+    if comp.props().get("debug").unwrap_or_default().into() {
         ui.painter().rect_filled(rect, 0.0, Color32::from_rgb(0, 128, 0));
     }
 

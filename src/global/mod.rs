@@ -15,11 +15,11 @@ pub struct Global {
 }
 
 impl Global {
-    pub fn new(path: &str, ctx: egui::Context) -> Self {
+    pub fn new(path: &str, ctx: egui::Context, has_tray: bool) -> Self {
         let xcb_signal: Signal<Event> = Signal::new(ctx.clone());
         crate::wm::xcb::listen(xcb_signal.clone());
 
-        let tray = Tray::new(ctx.clone());
+        let tray = Tray::new(ctx.clone(), has_tray);
         let (lua, lua_signal) = lua::load_lua(path, ctx);
 
         let parent_path = lua.globals().get("xcake_parent_path").unwrap_or_default();

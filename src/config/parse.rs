@@ -46,6 +46,10 @@ impl Component {
     pub fn props(&mut self) -> &mut Props {
         &mut self.1
     }
+
+    pub fn props_ref(&self) -> &Props {
+        &self.1
+    }
 }
 
 #[derive(Debug, Clone)]

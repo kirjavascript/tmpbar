@@ -8,14 +8,22 @@ pub struct TmpBar {
 
 impl TmpBar {
     pub fn new(cc: &eframe::CreationContext<'_>, path: String) -> Self {
-        let global = global::Global::new(
-            &path,
-            cc.egui_ctx.clone(),
-        );
         let config = config::script::init(
             &path,
             cc.egui_ctx.clone(),
             &global.lua
+        );
+
+        let trays = crate::wm::xcb::count_trays(&config);
+
+        if trays > 1 {
+            warn!("too many trays in config ({})", trays);
+        }
+
+        let global = global::Global::new(
+            &path,
+            cc.egui_ctx.clone(),
+            trays > 0,
         );
 
         egui_extras::install_image_loaders(&cc.egui_ctx);
