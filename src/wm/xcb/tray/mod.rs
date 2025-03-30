@@ -20,7 +20,7 @@ pub struct Tray {
     tx_proxy: Sender<ProxyAction>,
 }
 
-// TODO: handle zero trays
+// TODO: make reloading dynamic
 
 impl Tray {
     pub fn new(ctx: egui::Context) -> Self {

@@ -8,7 +8,7 @@ use lua::LuaCallback;
 pub struct Global {
     pub lua: mlua::Lua,
     pub workspaces: Workspaces,
-    pub tray: Tray,
+    pub tray: Option<Tray>,
     pub parent_path: String,
     xcb_signal: Signal<Event>,
     lua_signal: Signal<LuaCallback>,
@@ -19,14 +19,13 @@ impl Global {
         let xcb_signal: Signal<Event> = Signal::new(ctx.clone());
         crate::wm::xcb::listen(xcb_signal.clone());
 
-        let tray = Tray::new(ctx.clone());
         let (lua, lua_signal) = lua::load_lua(path, ctx);
 
         let parent_path = lua.globals().get("xcake_parent_path").unwrap_or_default();
 
         Self {
             workspaces: Workspaces::new(),
-            tray,
+            tray: None,
             parent_path,
             lua,
             xcb_signal,
@@ -63,6 +62,8 @@ impl Global {
             }
         }
 
-        self.tray.signals();
+        if let Some(tray) = self.tray.as_mut() {
+            tray.signals();
+        }
     }
 }

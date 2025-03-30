@@ -1,4 +1,5 @@
 use crate::{global, config};
+use crate::wm::xcb::Tray;
 use eframe::egui;
 
 pub struct TmpBar {
@@ -8,7 +9,7 @@ pub struct TmpBar {
 
 impl TmpBar {
     pub fn new(cc: &eframe::CreationContext<'_>, path: String) -> Self {
-        let global = global::Global::new(
+        let mut global = global::Global::new(
             &path,
             cc.egui_ctx.clone(),
         );
@@ -19,9 +20,17 @@ impl TmpBar {
             &global.lua
         );
 
-        egui_extras::install_image_loaders(&cc.egui_ctx);
-
         crate::wm::xcb::window_patch(&config);
+
+        let trays = crate::wm::xcb::count_trays(&config);
+
+        if trays > 1 {
+            warn!("multiple trays in config ({})", trays);
+        } else if trays == 1 {
+            global.tray = Some(Tray::new(cc.egui_ctx.clone()));
+        }
+
+        egui_extras::install_image_loaders(&cc.egui_ctx);
 
         TmpBar {
             config,
