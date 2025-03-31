@@ -47,8 +47,24 @@ pub fn load_lua(path: &str, ctx: egui::Context) -> (mlua::Lua, Signal<LuaCallbac
     // API
 
     let spawn = lua.create_function(move |_, command: String| {
-        std::process::Command::new("/bin/sh").arg("-c").arg(command)
-            .spawn().ok();
+        use std::process::Stdio;
+        use std::os::unix::process::CommandExt;
+
+        let child = std::process::Command::new("/bin/sh")
+            .arg("-c")
+            .arg(command)
+            .stdin(Stdio::null())
+            .stdout(Stdio::null())
+            .stderr(Stdio::null())
+            .process_group(0)
+            .spawn();
+
+        if let Ok(mut child) = child {
+            std::thread::spawn(move || {
+                let _ = child.wait();
+            });
+        }
+
         Ok(())
     }).unwrap();
 

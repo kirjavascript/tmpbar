@@ -1,13 +1,14 @@
 -- TODO
 -- click on everything
 -- animated SVG for battery monitor, CPU graph
+-- change inverval to max_interval
 
 for monitor_index, monitor in monitors() do
     bar({
         monitor = monitor,
         position = "top",
         height = 30,
-        flex = true,
+        -- flex = true,
         -- orientation = "v",
 
         -- wrap = true,

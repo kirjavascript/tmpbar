@@ -20,8 +20,6 @@ pub struct Tray {
     tx_proxy: Sender<ProxyAction>,
 }
 
-// TODO: make reloading dynamic
-
 impl Tray {
     pub fn new(ctx: egui::Context) -> Self {
         let (tx_tray, rx_tray) = unbounded();
