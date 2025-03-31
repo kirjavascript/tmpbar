@@ -58,7 +58,14 @@ for monitor_index, monitor in monitors() do
             }),
             component("i3mode", {
                 render = function (mode) return component("label", {
-                    text = mode,
+                    text = mode == "default" and "" or mode,
+                    background = function(svg)
+                        local color = mode == "default" and "transparent" or "red"
+
+                        return ([[
+                            <rect x="0" y="0" width="%d" height="%d" fill="%s" rx="2"/>
+                        ]]):format(svg.width, svg.height, color)
+                    end,
                 }) end
             }),
             component("label", {
