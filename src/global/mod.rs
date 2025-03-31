@@ -3,6 +3,7 @@ mod lua;
 use crate::util::Signal;
 use crate::wm::xcb::workspaces::Workspaces;
 use crate::wm::xcb::{Event, Tray};
+use crate::wm::i3mode::I3Mode;
 use lua::LuaCallback;
 
 pub struct Global {
@@ -10,6 +11,7 @@ pub struct Global {
     pub workspaces: Workspaces,
     pub tray: Option<Tray>,
     pub parent_path: String,
+    pub i3mode: I3Mode,
     xcb_signal: Signal<Event>,
     lua_signal: Signal<LuaCallback>,
 }
@@ -19,10 +21,9 @@ impl Global {
         let xcb_signal: Signal<Event> = Signal::new(ctx.clone());
         crate::wm::xcb::listen(xcb_signal.clone());
 
-        let mode_listener = crate::wm::i3mode::I3Mode::new().unwrap();
-        mode_listener.start_listening().unwrap();
+        let (lua, lua_signal) = lua::load_lua(path, ctx.clone());
 
-        let (lua, lua_signal) = lua::load_lua(path, ctx);
+        let i3mode = I3Mode::new(ctx);
 
         let parent_path = lua.globals().get("xcake_parent_path").unwrap_or_default();
 
@@ -31,6 +32,7 @@ impl Global {
             tray: None,
             parent_path,
             lua,
+            i3mode,
             xcb_signal,
             lua_signal,
         }

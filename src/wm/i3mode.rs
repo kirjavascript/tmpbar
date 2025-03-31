@@ -4,6 +4,7 @@ use std::io::{Read, Write};
 use std::os::unix::net::UnixStream;
 use std::sync::{Arc, Mutex};
 use std::thread;
+use egui::Context;
 
 #[derive(Debug)]
 pub enum I3IpcError {
@@ -26,32 +27,37 @@ impl fmt::Display for I3IpcError {
     }
 }
 
-
 pub struct I3Mode {
     current_mode: Arc<Mutex<String>>,
 }
 
 impl I3Mode {
-    pub fn new() -> Result<Self, I3IpcError> {
+    pub fn new(ctx: Context) -> Self {
+        let mode = I3Mode {
+            current_mode: Arc::new(Mutex::new(String::from("default"))),
+        };
+
+        mode.try_listen(ctx).ok();
+
+        mode
+    }
+
+    pub fn get(&self) -> String {
+        self.current_mode.lock().unwrap().clone()
+    }
+
+    pub fn try_listen(&self, ctx: Context) -> Result<(), I3IpcError> {
         if env::var("I3SOCK").is_err() {
             return Err(I3IpcError::EnvVarNotSet);
         }
 
-        Ok(I3Mode {
-            current_mode: Arc::new(Mutex::new(String::from("default"))),
-        })
-    }
-
-    pub fn get_current_mode(&self) -> String {
-        self.current_mode.lock().unwrap().clone()
-    }
-
-    pub fn start_listening(&self) -> Result<(), I3IpcError> {
         let socket_path = env::var("I3SOCK").map_err(|_| I3IpcError::EnvVarNotSet)?;
         let mut stream = UnixStream::connect(&socket_path)
             .map_err(I3IpcError::ConnectionFailed)?;
 
         self.subscribe_to_events(&mut stream)?;
+
+        let mode = Arc::clone(&self.current_mode);
 
         thread::spawn(move || {
             loop {
@@ -84,8 +90,11 @@ impl I3Mode {
                         Some(&json[start..end])
                     }
 
-                    if let Some(mode) = extract_change(&payload) {
-                        info!("{}", mode);
+                    if let Some(next_mode) = extract_change(&payload) {
+                        info!("{}", next_mode);
+
+                        *mode.lock().unwrap() = next_mode.to_string();
+                        ctx.request_repaint();
                     }
                 }
             }
