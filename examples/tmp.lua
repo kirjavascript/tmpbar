@@ -1,5 +1,4 @@
 -- TODO
--- i3mode
 -- click on everything
 -- animated SVG for battery monitor, CPU graph
 

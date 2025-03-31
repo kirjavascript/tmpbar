@@ -10,15 +10,16 @@ pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
         let mode = global.i3mode.get();
         let result = func.call::<String, mlua::Value>(mode);
 
-        if result.is_ok() {
-            let component = result.unwrap();
-
-            let default_props = copy_default(props);
-            if let Property::Component(mut comp) = to_property(component, &default_props) {
-                crate::components::render(&mut comp, ui, global);
-            }
-        } else {
-            error!("{}", result.err().unwrap().to_string());
+        match result {
+            Ok(component) => {
+                let default_props = copy_default(props);
+                if let Property::Component(mut comp) = to_property(component, &default_props) {
+                    crate::components::render(&mut comp, ui, global);
+                }
+            },
+            Err(err) => {
+                error!("{}", err);
+            },
         }
     }
 }
