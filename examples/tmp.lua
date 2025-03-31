@@ -56,6 +56,11 @@ for monitor_index, monitor in monitors() do
                         end,
                 }) end
             }),
+            component("i3mode", {
+                render = function (mode) return component("label", {
+                    text = mode,
+                }) end
+            }),
             component("label", {
                 justify = true,
                 text = function() return "« " .. truncate(window_title(), 80) .. " »" end,

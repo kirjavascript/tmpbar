@@ -91,8 +91,6 @@ impl I3Mode {
                     }
 
                     if let Some(next_mode) = extract_change(&payload) {
-                        info!("{}", next_mode);
-
                         *mode.lock().unwrap() = next_mode.to_string();
                         ctx.request_repaint();
                     }

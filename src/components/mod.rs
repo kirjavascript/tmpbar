@@ -6,6 +6,7 @@ use egui::Ui;
 mod button;
 mod container;
 mod core;
+mod i3mode;
 mod image;
 mod input;
 mod label;
@@ -23,6 +24,7 @@ pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
 fn render_impl(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
     match comp.name() {
         "input" => input::render(comp, ui),
+        "i3mode" => i3mode::render(comp, ui, global),
         "container" => container::render(comp, ui, global),
         "button" => button::render(comp, ui),
         "image" => image::render(comp, ui, global),
