@@ -2,28 +2,29 @@ mod lua;
 
 use crate::util::Signal;
 use crate::wm::xcb::workspaces::Workspaces;
-use crate::wm::xcb::{Event, Tray};
-use crate::wm::i3mode::I3Mode;
+use crate::wm::xcb;
+use crate::wm::i3mode;
 use lua::LuaCallback;
 
 pub struct Global {
     pub lua: mlua::Lua,
     pub workspaces: Workspaces,
-    pub tray: Option<Tray>,
+    pub tray: Option<xcb::Tray>,
     pub parent_path: String,
-    pub i3mode: I3Mode,
-    xcb_signal: Signal<Event>,
+    xcb_signal: Signal<xcb::Event>,
     lua_signal: Signal<LuaCallback>,
+    i3mode_signal: Signal<String>
 }
 
 impl Global {
     pub fn new(path: &str, ctx: egui::Context) -> Self {
-        let xcb_signal: Signal<Event> = Signal::new(ctx.clone());
-        crate::wm::xcb::listen(xcb_signal.clone());
+        let xcb_signal: Signal<xcb::Event> = Signal::new(ctx.clone());
+        xcb::listen(xcb_signal.clone());
 
         let (lua, lua_signal) = lua::load_lua(path, ctx.clone());
 
-        let i3mode = I3Mode::new(ctx);
+        let i3mode_signal: Signal<String> = Signal::new(ctx);
+        i3mode::listen(i3mode_signal.clone()).ok();
 
         let parent_path = lua.globals().get("xcake_parent_path").unwrap_or_default();
 
@@ -32,25 +33,25 @@ impl Global {
             tray: None,
             parent_path,
             lua,
-            i3mode,
             xcb_signal,
             lua_signal,
+            i3mode_signal,
         }
     }
 
     pub fn signals(&mut self) {
         for event in self.xcb_signal.read() {
             match event {
-                Event::WindowTitle(title) => {
+                xcb::Event::WindowTitle(title) => {
                     self.lua.globals().set("xcake_window_title", title).ok();
                 }
-                Event::WorkspaceCurrent(current) => {
+                xcb::Event::WorkspaceCurrent(current) => {
                     self.workspaces.set_current(current);
                 }
-                Event::WorkspaceDesktops(desktops) => {
+                xcb::Event::WorkspaceDesktops(desktops) => {
                     self.workspaces.set_desktops(desktops);
                 }
-                Event::WorkspaceUrgency(urgency) => {
+                xcb::Event::WorkspaceUrgency(urgency) => {
                     self.workspaces.set_urgency(urgency);
                 }
             }
@@ -65,6 +66,10 @@ impl Global {
                     self.workspaces.focus_workspace(desktop);
                 },
             }
+        }
+
+        for mode in self.i3mode_signal.read() {
+            self.lua.globals().set("xcake_i3_mode", mode).ok();
         }
 
         if let Some(tray) = self.tray.as_mut() {

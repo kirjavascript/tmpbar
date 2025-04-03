@@ -23,7 +23,7 @@ impl<T> Signal<T> {
         std::mem::replace(&mut self.state.lock().unwrap(), vec![])
     }
 
-    pub fn has_consume(&self) -> bool {
+    pub fn consume(&self) -> bool {
         let mut r#ref = self.state.lock().unwrap();
         let has = r#ref.len() > 0;
         r#ref.clear();

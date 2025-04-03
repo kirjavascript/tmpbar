@@ -1,11 +1,36 @@
+-- private bindings
+
 function xcake_reset_state()
     xcake_bars = {}
 end
 
+-- core API
+
+function monitors()
+    return ipairs(xcake_monitors)
+end
+
+function bar(config)
+    table.insert(xcake_bars, config)
+end
+
+function component(name, config)
+    config = config or {}
+    config['xcake_component'] = name
+    return config
+end
+
+-- public bindings
+
 xcake_window_title = ""
+xcake_i3_mode = "default"
 
 function window_title()
     return xcake_window_title
+end
+
+function i3_mode()
+    return xcake_i3_mode
 end
 
 function set_workspace(value)
@@ -15,6 +40,8 @@ function set_workspace(value)
         xcake_focus_workspace(value)
     end
 end
+
+-- "stdlib"
 
 function read_file(filePath)
     if rawget(_G, "xcake_parent_path") ~= nil then
@@ -57,18 +84,4 @@ function truncate(s, length, ellipse)
     else
         return s
     end
-end
-
-function monitors()
-    return ipairs(xcake_monitors)
-end
-
-function bar(config)
-    table.insert(xcake_bars, config)
-end
-
-function component(name, config)
-    config = config or {}
-    config['xcake_component'] = name
-    return config
 end

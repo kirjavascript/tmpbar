@@ -47,7 +47,7 @@ impl eframe::App for TmpBar {
         //
         // input: pressing enter doesnt unfocus properly
 
-        if self.config.reload_signal.has_consume() {
+        if self.config.reload_signal.consume() {
             info!("reloading config");
 
             if let Err(err) = self.config.reload(&self.global.lua) {
