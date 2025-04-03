@@ -10,6 +10,7 @@ for monitor_index, monitor in monitors() do
         height = 30,
         -- flex = true,
         -- orientation = "v",
+        -- max_interval = 1000
 
         -- wrap = true,
         -- direction = "top-down",
@@ -18,6 +19,7 @@ for monitor_index, monitor in monitors() do
         -- align = "end",
         -- crossAlign = "end",
         -- margin = { bottom = 5 },
+        -- padding = { bottom = 5 },
 
         -- background = function(svg) return string.format([[
         --     <rect
@@ -76,7 +78,6 @@ for monitor_index, monitor in monitors() do
                 direction = "<",
                 items = {
                     component("label", { -- clock
-                        interval = 1000,
                         text = function() return os.date("%a %Y-%m-%d %X") end,
                     }),
                     component("label", { -- network
@@ -95,14 +96,14 @@ for monitor_index, monitor in monitors() do
                     component("button", {
                         text = "shutdown",
                         justify = true,
-                        crossJustify = true,
+                        cross_justify = true,
                         size = 100,
                         click = function() return spawn("~/.config/i3/scripts/powermenu") end
                     }),
                     component("button", {
                         text = "activate",
                         justify = true,
-                        crossJustify = true,
+                        cross_justify = true,
                         size = 100,
                         click = function() return spawn("activate-linux") end
                     }),

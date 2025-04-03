@@ -44,7 +44,7 @@ pub fn layout_from_props(props: &Props) -> egui::Layout {
         };
     }
     // layout.cross_justify = true;
-    if let Some(Property::Boolean(justify)) = props.get("crossJustify") {
+    if let Some(Property::Boolean(justify)) = props.get("cross_justify") {
         layout.cross_justify = *justify;
     }
 
