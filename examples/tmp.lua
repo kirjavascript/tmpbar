@@ -91,6 +91,11 @@ for monitor_index, monitor in monitors() do
                             return 'MEM ' .. memory().used_percent
                         end,
                     }),
+                    component("label", {
+                        text = function()
+                            return cpu_temp() .. '°C'
+                        end,
+                    }),
                     component("button", {
                         text = "shutdown",
                         justify = true,

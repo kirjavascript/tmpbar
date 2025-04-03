@@ -41,7 +41,7 @@ pub fn bind(lua: &mlua::Lua, globals: &mlua::Table) {
                 return HashMap::new()
             },
         }
-    }, std::time::Duration::from_millis(950));
+    }, std::time::Duration::from_millis(999));
 
 
     let network = lua.create_function(move |lua, ()| {

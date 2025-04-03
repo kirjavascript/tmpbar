@@ -4,10 +4,12 @@ mod log;
 mod signal;
 mod throttle;
 mod hexcolor;
+mod file;
 
 pub use signal::*;
 pub use throttle::*;
 pub use hexcolor::*;
+pub use file::*;
 
 pub fn fnv1a_hash<T: AsRef<[u8]>>(input: T) -> u64 {
     const FNV_OFFSET_BASIS: u64 = 0xcbf29ce484222325;
