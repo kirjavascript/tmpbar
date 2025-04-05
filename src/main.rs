@@ -28,7 +28,7 @@ fn main() -> eframe::Result<()> {
         viewport: egui::ViewportBuilder::default()
             .with_title("xcake-root")
             .with_inner_size([1.0, 1.0])
-            .with_position(egui::Pos2 { x: 9999., y: 9999. })
+            .with_position(egui::Pos2 { x: 99999., y: 99999. })
             .with_decorations(false)
             .with_transparent(true)
             .with_window_level(egui::WindowLevel::AlwaysOnBottom)

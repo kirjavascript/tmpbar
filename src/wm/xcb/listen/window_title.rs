@@ -35,7 +35,7 @@ pub fn handle_event(
         let cookie = conn.send_request(&xcb::x::GetProperty {
             delete: false,
             window: *active_window,
-            property: xcb::x::ATOM_WM_NAME,
+            property: atoms.net_wm_name,
             r#type: atoms.utf8_string,
             long_offset: 0,
             long_length: 256,

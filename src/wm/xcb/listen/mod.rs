@@ -10,6 +10,7 @@ xcb::atoms_struct! {
     #[derive(Copy, Clone, Debug)]
     pub(crate) struct Atoms {
         pub active_window => b"_NET_ACTIVE_WINDOW",
+        pub net_wm_name => b"_NET_WM_NAME",
         pub utf8_string => b"ATOM_UTF8_STRING",
     }
 }
