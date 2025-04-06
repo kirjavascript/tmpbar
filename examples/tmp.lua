@@ -96,6 +96,11 @@ for monitor_index, monitor in monitors() do
                             return cpu_temp() .. '°C'
                         end,
                     }),
+                    component("label", {
+                        text = function()
+                            return disk()['/'].free .. ' free'
+                        end,
+                    }),
                     component("button", {
                         text = "shutdown",
                         justify = true,

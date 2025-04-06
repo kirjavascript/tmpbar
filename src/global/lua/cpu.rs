@@ -32,11 +32,11 @@ pub fn bind(lua: &mlua::Lua, globals: &mlua::Table) {
     }, std::time::Duration::from_millis(999));
 
 
-    let memory = lua.create_function(move |_lua, ()| {
+    let cpu_temp = lua.create_function(move |_lua, ()| {
         let data = read.borrow_mut()();
 
         Ok(data)
     }).unwrap();
 
-    globals.set("cpu_temp", memory).unwrap();
+    globals.set("cpu_temp", cpu_temp).unwrap();
 }

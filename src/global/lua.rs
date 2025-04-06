@@ -3,6 +3,7 @@ use crate::wm::xcb::workspaces::WorkspaceDirection;
 
 mod bandwidth;
 mod cpu;
+mod disk;
 mod memory;
 
 #[derive(Clone)]
@@ -74,6 +75,7 @@ pub fn load_lua(path: &str, ctx: egui::Context) -> (mlua::Lua, Signal<LuaCallbac
     bandwidth::bind(&lua, &globals);
     memory::bind(&lua, &globals);
     cpu::bind(&lua, &globals);
+    disk::bind(&lua, &globals);
 
     drop(globals);
 

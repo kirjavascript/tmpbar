@@ -85,3 +85,76 @@ function truncate(s, length, ellipse)
         return s
     end
 end
+
+function log(...)
+    local args = {...}
+    local result = {}
+
+    local function serialize(val, indent, visited)
+        indent = indent or ""
+        visited = visited or {}
+
+        if visited[val] then
+            return "[Circular Reference]"
+        end
+
+        local valType = type(val)
+
+        if valType == "nil" then
+            return "nil"
+        elseif valType == "number" or valType == "boolean" then
+            return tostring(val)
+        elseif valType == "string" then
+            return string.format("%q", val)
+        elseif valType == "table" then
+            if visited[val] then
+                return "[Circular Reference]"
+            end
+            visited[val] = true
+
+            local str = "{\n"
+            local nextIndent = indent .. "  "
+
+            -- First serialize numeric indices (array part)
+            local arrayPart = {}
+            for i, v in ipairs(val) do
+                table.insert(arrayPart, nextIndent .. serialize(v, nextIndent, visited))
+            end
+
+            -- Then serialize hash part (non-numeric keys)
+            local hashPart = {}
+            for k, v in pairs(val) do
+                if type(k) ~= "number" or k < 1 or k > #val or math.floor(k) ~= k then
+                    local key = type(k) == "string" and k or "[" .. serialize(k, nextIndent, visited) .. "]"
+                    table.insert(hashPart, nextIndent .. key .. " = " .. serialize(v, nextIndent, visited))
+                end
+            end
+
+            -- Combine array and hash parts
+            local parts = {}
+            if #arrayPart > 0 then
+                table.insert(parts, table.concat(arrayPart, ",\n"))
+            end
+            if #hashPart > 0 then
+                table.insert(parts, table.concat(hashPart, ",\n"))
+            end
+
+            str = str .. table.concat(parts, ",\n") .. "\n" .. indent .. "}"
+            return str
+        elseif valType == "function" then
+            return "[Function]"
+        elseif valType == "userdata" then
+            return "[Userdata]"
+        elseif valType == "thread" then
+            return "[Thread]"
+        else
+            return "[" .. valType .. "]"
+        end
+    end
+
+    for i, v in ipairs(args) do
+        table.insert(result, serialize(v))
+    end
+
+    print(table.concat(result, "  "))
+end
