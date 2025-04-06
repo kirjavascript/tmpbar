@@ -1,5 +1,5 @@
 use probes::disk_usage::{self, DiskUsage};
-use crate::util::format_bytes;
+use crate::util::format_bytes_precision;
 
 #[derive(Clone)]
 struct Disk {
@@ -51,9 +51,9 @@ pub fn bind(lua: &mlua::Lua, globals: &mlua::Table) {
                     disk_table.set("filesystem", "")?;
                 }
 
-                disk_table.set("total", format_bytes((disk.one_k_blocks * 1024) as _))?;
-                disk_table.set("used", format_bytes((disk.one_k_blocks_used * 1024) as _))?;
-                disk_table.set("free", format_bytes((disk.one_k_blocks_free * 1024) as _))?;
+                disk_table.set("total", format_bytes_precision((disk.one_k_blocks * 1024) as _, Some(0)))?;
+                disk_table.set("used", format_bytes_precision((disk.one_k_blocks_used * 1024) as _, Some(0)))?;
+                disk_table.set("free", format_bytes_precision((disk.one_k_blocks_free * 1024) as _, Some(0)))?;
                 disk_table.set("used_percentage", disk.used_percentage)?;
 
                 table.set(disk.mountpoint.clone(), disk_table)?;
