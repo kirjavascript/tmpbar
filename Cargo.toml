@@ -15,6 +15,7 @@ eframe = { version = "0.31.1", default-features = false, features = [
     "glow",
 ] }
 egui-winit = { version = "0.31.1", features = ["x11", "wayland"] }
+egui_taffy = "0.7.0"
 
 xcb = { version = "1.4.0" }
 xcb-wm = { version = "0.4.0", features = ["ewmh", "icccm"] }

@@ -92,6 +92,16 @@ impl eframe::App for TmpBar {
                     egui::CentralPanel::default()
                         .frame(egui::Frame::new().fill(egui::Color32::TRANSPARENT))
                         .show(ctx, |ui| {
+                            // taffy: enable multipass
+                            ctx.options_mut(|options| {
+                                options.max_passes = std::num::NonZeroUsize::new(3).unwrap();
+                            });
+
+                            // taffy: disable text wrapping (egui text layouting tries to utilize minimal width possible)
+                            ctx.style_mut(|style| {
+                                style.wrap_mode = Some(egui::TextWrapMode::Extend);
+                            });
+
                             crate::components::render(
                                 &mut bar.container,
                                 ui,
