@@ -2,6 +2,7 @@
 -- click on everything
 -- animated SVG for battery monitor, CPU graph
 -- change inverval to max_interval
+-- window()
 
 for monitor_index, monitor in monitors() do
     bar({

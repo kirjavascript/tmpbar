@@ -22,11 +22,14 @@ use taffy::{
         Position,
         LengthPercentageAuto,
     },
+    geometry,
     Point,
     prelude::*,
 };
 use egui_taffy::TuiBuilderLogic;
 
+// TODO: cache?
+//https://docs.rs/egui/latest/egui/struct.Memory.html
 pub fn style_from_props(props: &Props) -> Style {
     let mut style = Style {
         // display: Display::Flex,
@@ -132,26 +135,65 @@ pub fn style_from_props(props: &Props) -> Style {
         style.inset.left = left;
     }
 
+    let width: Option<&Property> = props.get("width");
+    let height: Option<&Property> = props.get("height");
+
+    if width.is_some() || height.is_some() {
+        let width = width.map(|s| parse_dimension(&Into::<String>::into(s))).unwrap_or(Dimension::Auto);
+        let height = height.map(|s| parse_dimension(&Into::<String>::into(s))).unwrap_or(Dimension::Auto);
+        style.size = geometry::Size { width, height };
+    }
+
+    let width: Option<&Property> = props.get("min_width");
+    let height: Option<&Property> = props.get("min_height");
+
+    if width.is_some() || height.is_some() {
+        let width = width.map(|s| parse_dimension(&Into::<String>::into(s))).unwrap_or(Dimension::Auto);
+        let height = height.map(|s| parse_dimension(&Into::<String>::into(s))).unwrap_or(Dimension::Auto);
+        style.min_size = geometry::Size { width, height };
+    }
+
+    let width: Option<&Property> = props.get("max_width");
+    let height: Option<&Property> = props.get("max_height");
+
+    if width.is_some() || height.is_some() {
+        let width = width.map(|s| parse_dimension(&Into::<String>::into(s))).unwrap_or(Dimension::Auto);
+        let height = height.map(|s| parse_dimension(&Into::<String>::into(s))).unwrap_or(Dimension::Auto);
+        style.max_size = geometry::Size { width, height };
+    }
+
+    if let Some(Property::Float(ar)) = props.get("aspect_ratio") {
+        style.aspect_ratio = Some(*ar as _);
+    }
+
+    if let Some(margin) = get_spacing_from_props(props, "margin") {
+        style.margin = margin;
+    }
+
+    // if let Some(padding) = get_spacing_from_props(props, "padding") {
+    //     style.padding = padding;
+    // }
+
+
     style
 }
 
-/// Helper function to parse dimensions from strings like "100%", "100px", etc.
-fn parse_dimension(value: &str) -> Option<Dimension> {
+fn parse_dimension(value: &str) -> Dimension {
     if value.ends_with('%') {
         if let Ok(percent) = value[..value.len() - 1].parse::<f32>() {
-            return Some(Dimension::Percent(percent / 100.0));
+            return Dimension::Percent(percent / 100.0);
         }
     } else if value.ends_with("px") {
         if let Ok(pixels) = value[..value.len() - 2].parse::<f32>() {
-            return Some(Dimension::Length(pixels));
+            return Dimension::Length(pixels);
         }
     } else if let Ok(pixels) = value.parse::<f32>() {
-        return Some(Dimension::Length(pixels));
+        return Dimension::Length(pixels);
     }
-    None
+
+    Dimension::Auto
 }
 
-/// Helper function to get spacing (padding/margin) from props
 fn get_spacing_from_props(props: &Props, prefix: &str) -> Option<taffy::prelude::Rect<LengthPercentageAuto>> {
     let all_key = prefix.to_string();
     let top_key = format!("{}_top", prefix);
@@ -159,7 +201,6 @@ fn get_spacing_from_props(props: &Props, prefix: &str) -> Option<taffy::prelude:
     let bottom_key = format!("{}_bottom", prefix);
     let left_key = format!("{}_left", prefix);
 
-    // Check if there's a single value for all sides
     if let Some(all) = get_length_from_prop(props, &all_key) {
         return Some(taffy::prelude::Rect {
             top: all,
@@ -169,7 +210,6 @@ fn get_spacing_from_props(props: &Props, prefix: &str) -> Option<taffy::prelude:
         });
     }
 
-    // Otherwise, check individual sides
     let top = get_length_from_prop(props, &top_key);
     let right = get_length_from_prop(props, &right_key);
     let bottom = get_length_from_prop(props, &bottom_key);
@@ -187,7 +227,6 @@ fn get_spacing_from_props(props: &Props, prefix: &str) -> Option<taffy::prelude:
     None
 }
 
-/// Helper function to get a LengthPercentageAuto from a property
 fn get_length_from_prop(props: &Props, key: &str) -> Option<LengthPercentageAuto> {
     if let Some(Property::Integer(value)) = props.get(key) {
         Some(LengthPercentageAuto::Length(*value as f32))
@@ -196,14 +235,12 @@ fn get_length_from_prop(props: &Props, key: &str) -> Option<LengthPercentageAuto
     } else if let Some(Property::String(value)) = props.get(key) {
         if value == "auto" {
             Some(LengthPercentageAuto::Auto)
-        } else if let Some(dimension) = parse_dimension(value) {
-            match dimension {
+        } else {
+            match parse_dimension(value) {
                 Dimension::Length(len) => Some(LengthPercentageAuto::Length(len)),
                 Dimension::Percent(pct) => Some(LengthPercentageAuto::Percent(pct)),
                 _ => None,
             }
-        } else {
-            None
         }
     } else {
         None
@@ -320,66 +357,66 @@ pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
 
 
         return;
-    let props = comp.props();
-    let is_horizontal = if let Some(Property::String(dir)) = props.get("orientation") { dir.starts_with("h") } else { true };
-    let is_flex: bool = props.get("flex").unwrap_or_default().into();
+    // let props = comp.props();
+    // let is_horizontal = if let Some(Property::String(dir)) = props.get("orientation") { dir.starts_with("h") } else { true };
+    // let is_flex: bool = props.get("flex").unwrap_or_default().into();
 
-    if !is_flex {
-        let layout = core::layout_from_props(props);
+    // if !is_flex {
+    //     let layout = core::layout_from_props(props);
 
-        if let Some(Property::Array(list)) = props.get_mut("items") {
+    //     if let Some(Property::Array(list)) = props.get_mut("items") {
 
-            ui.with_layout(layout, |ui| {
-                for prop in list {
-                    if let Property::Component(comp) = prop {
-                        crate::components::render(comp, ui, global);
-                    }
-                }
-            });
-        }
+    //         ui.with_layout(layout, |ui| {
+    //             for prop in list {
+    //                 if let Property::Component(comp) = prop {
+    //                     crate::components::render(comp, ui, global);
+    //                 }
+    //             }
+    //         });
+    //     }
 
-        return;
-    }
+    //     return;
+    // }
 
-    let mut builder = StripBuilder::new(ui);
+    // let mut builder = StripBuilder::new(ui);
 
-    // get item sizes
-    if let Some(Property::Array(list)) = props.get_mut("items") {
-        for item in list {
-            if let Property::Component(comp) = item {
-                let size = match comp.props().get("size") {
-                    Some(Property::Integer(int)) => Size::exact(*int as _),
-                    Some(Property::Float(float)) => Size::relative(*float as _),
-                    _ => Size::remainder(),
-                };
+    // // get item sizes
+    // if let Some(Property::Array(list)) = props.get_mut("items") {
+    //     for item in list {
+    //         if let Property::Component(comp) = item {
+    //             let size = match comp.props().get("size") {
+    //                 Some(Property::Integer(int)) => Size::exact(*int as _),
+    //                 Some(Property::Float(float)) => Size::relative(*float as _),
+    //                 _ => Size::remainder(),
+    //             };
 
-                builder = builder.size(size);
-            }
-        }
-    }
+    //             builder = builder.size(size);
+    //         }
+    //     }
+    // }
 
-    fn render_components(props: &mut Props, mut strip: Strip, global: &mut Global) {
-        if let Some(Property::Array(list)) = props.get_mut("items") {
-            for prop in list {
-                if let Property::Component(comp) = prop {
-                    strip.cell(|ui| {
+    // fn render_components(props: &mut Props, mut strip: Strip, global: &mut Global) {
+    //     if let Some(Property::Array(list)) = props.get_mut("items") {
+    //         for prop in list {
+    //             if let Property::Component(comp) = prop {
+    //                 strip.cell(|ui| {
 
-                        core::render_layout(comp, ui, |comp, ui| {
-                            crate::components::render(comp, ui, global);
-                        });
-                    });
-                }
-            }
-        }
-    }
+    //                     core::render_layout(comp, ui, |comp, ui| {
+    //                         crate::components::render(comp, ui, global);
+    //                     });
+    //                 });
+    //             }
+    //         }
+    //     }
+    // }
 
-    if is_horizontal {
-        builder.horizontal(|strip| {
-            render_components(props, strip, global);
-        });
-    } else {
-        builder.vertical(|strip| {
-            render_components(props, strip, global);
-        });
-    }
+    // if is_horizontal {
+    //     builder.horizontal(|strip| {
+    //         render_components(props, strip, global);
+    //     });
+    // } else {
+    //     builder.vertical(|strip| {
+    //         render_components(props, strip, global);
+    //     });
+    // }
 }
