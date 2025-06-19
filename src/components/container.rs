@@ -1,12 +1,10 @@
 use eframe::egui;
 use egui::Ui;
-use crate::config::{Property, Props, Component};
+use crate::config::{Property, Component};
 use crate::components::core;
 use crate::global::Global;
 
-use egui_extras::{Size, Strip, StripBuilder};
-
-use egui_taffy::{tui, taffy};
+use egui_taffy::tui;
 use egui_taffy::TuiBuilderLogic;
 
 
@@ -16,42 +14,56 @@ use egui_taffy::TuiBuilderLogic;
 // TODO: have a style around each item
 
 pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
-    // let min_size = taffy::Size {
-    //     width: length(ui.available_size().x),
-    //     height: length(ui.available_size().y),
-    // };
-    // let default_style = || Style {
-    //     display: Display::Flex,
-    //     padding: length(8.),
-    //     gap: length(8.),
-    //     min_size,
-    //         // align_self: Some(taffy::AlignItems::End),
-    //     // justify_content: Some(taffy::AlignContent::FlexEnd),
-    //     ..Default::default()
-    // };
+
+use egui_taffy::taffy::{
+    self,
+    style::{
+        Style,
+        Display,
+    },
+    prelude::*,
+};
+    let min_size = egui_taffy::taffy::Size {
+        width: length(ui.available_size().x),
+        height: length(ui.available_size().y),
+    };
+    let style = Style {
+        display: Display::Flex,
+        // padding: length(8.),
+        // gap: length(8.),
+        // min_size,
+        size: min_size,
+        justify_content: Some(taffy::JustifyContent::SpaceBetween),
+            // align_self: Some(taffy::AlignItems::End),
+        // justify_content: Some(taffy::AlignContent::FlexEnd),
+        ..Default::default()
+    };
 
 
 // TODO: cache?
 //https://docs.rs/egui/latest/egui/struct.Memory.html
     // ui.memory_mut()
 
-    let style = core::style_from_component(comp);
+    // let style = core::style_from_component(comp, Default::detault());
     let props = comp.props();
 
+            // println!("{:#?}", style);
+
+            // std::process::exit(0);
+
     tui(ui, ui.id())
-        // .reserve_available_space()
-        // .reserve_width(1800.)
         .style(style)
         .show(|tui| {
+
 
             // TODO: do we need layout?
             if let Some(Property::Array(list)) = props.get_mut("items") {
                 for prop in list {
                     if let Property::Component(comp) = prop {
-                        let style = core::style_from_component(comp);
+                        // let style = core::style_from_component(comp, Default::default());
 
                         tui
-                            .style(style)
+                            // .style(style)
                             .ui(|ui| {
                                 crate::components::render(comp, ui, global);
                             });

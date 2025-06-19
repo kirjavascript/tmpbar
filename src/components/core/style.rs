@@ -20,16 +20,16 @@ use taffy::{
     prelude::*,
 };
 
-pub fn style_from_component(comp: &mut Component) -> Style {
+pub fn style_from_component(comp: &mut Component, base: Style) -> Style {
     if let Some(Property::Object(style)) = comp.props().get("style") {
-        style_from_props(style)
+        style_from_props(style, base)
     } else {
-        Default::default()
+        base
     }
 }
 
-pub fn style_from_props(props: &Props) -> Style {
-    let mut style: Style = Default::default();
+pub fn style_from_props(props: &Props, base: Style) -> Style {
+    let mut style: Style = base;
 
     /*
      * Unimplemented:
@@ -51,8 +51,8 @@ pub fn style_from_props(props: &Props) -> Style {
 
     if let Some(Property::String(sizing)) = props.get("box_sizing") {
         style.box_sizing = match sizing.as_str() {
-            "content-box" => BoxSizing::ContentBox,
-            "border-box" => BoxSizing::BorderBox,
+            "content_box" => BoxSizing::ContentBox,
+            "border_box" => BoxSizing::BorderBox,
             _ => BoxSizing::default(),
         };
     }

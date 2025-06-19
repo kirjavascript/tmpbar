@@ -9,6 +9,15 @@ for monitor_index, monitor in monitors() do
         monitor = monitor,
         position = "top",
         height = 130,
+
+        style = {
+            display = "flex",
+            justify_items = "stretch",
+            justify_content = "stretch",
+            align_items = "flex_end",
+            flex_direction = "column",
+            postion = "absolute",
+        },
         -- flex = true,
         -- orientation = "v",
         -- max_interval = 1000
@@ -36,6 +45,7 @@ for monitor_index, monitor in monitors() do
         -- ]], svg.width, svg.height) end,
 
         items = {
+            -- component("label", { text = "1", }), component("label", { text = "2", }), component("label", { text = "3", }),
             component("image", {
                 size = 40,
                 path = "./archlinux.svg",
