@@ -59,7 +59,7 @@ for monitor_index, monitor in monitors() do
                         end,
                 }) end
             }),
-            component("label", {
+            component("label", { -- i3 mode
                 text = function() return i3_mode() == "default" and "" or i3_mode() end,
                 background = function(svg)
                     local color = i3_mode() == "default" and "transparent" or "red"
