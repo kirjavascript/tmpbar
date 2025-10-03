@@ -6,64 +6,52 @@ use crate::global::Global;
 
 use egui_taffy::tui;
 use egui_taffy::TuiBuilderLogic;
+use egui_taffy::taffy::{
+    Size,
+    Style,
+    prelude::*,
+};
 
 
 // TODO: borders
 // TODO: position absolute title
+// TODO: block is unsized??
 
 // TODO: have a style around each item
 
-pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
+fn style_from_ui(ui: &mut egui::Ui) -> Style {
+    let rect = ui.available_size();
 
-use egui_taffy::taffy::{
-    self,
-    style::{
-        Style,
-        Display,
-    },
-    prelude::*,
-};
-    let min_size = egui_taffy::taffy::Size {
-        width: length(ui.available_size().x),
-        height: length(ui.available_size().y),
-    };
-    let style = Style {
-        display: Display::Flex,
-        // padding: length(8.),
-        // gap: length(8.),
-        // min_size,
-        size: min_size,
-        justify_content: Some(taffy::JustifyContent::SpaceBetween),
-            // align_self: Some(taffy::AlignItems::End),
-        // justify_content: Some(taffy::AlignContent::FlexEnd),
+    Style {
+        size: Size {
+            width: length(rect.x),
+            height: length(rect.y),
+        },
         ..Default::default()
-    };
+    }
+}
 
-
+pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
 // TODO: cache?
 //https://docs.rs/egui/latest/egui/struct.Memory.html
     // ui.memory_mut()
 
-    // let style = core::style_from_component(comp, Default::detault());
+    let style = core::style_from_component(comp, style_from_ui(ui));
     let props = comp.props();
-
-            // println!("{:#?}", style);
-
-            // std::process::exit(0);
 
     tui(ui, ui.id())
         .style(style)
         .show(|tui| {
 
-
             // TODO: do we need layout?
             if let Some(Property::Array(list)) = props.get_mut("items") {
                 for prop in list {
                     if let Property::Component(comp) = prop {
-                        // let style = core::style_from_component(comp, Default::default());
+                        let ui = tui.egui_ui_mut();
+                        let style = core::style_from_component(comp, style_from_ui(ui));
 
                         tui
-                            // .style(style)
+                            .style(style)
                             .ui(|ui| {
                                 crate::components::render(comp, ui, global);
                             });

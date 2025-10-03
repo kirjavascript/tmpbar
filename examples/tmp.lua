@@ -8,15 +8,15 @@ for monitor_index, monitor in monitors() do
     bar({
         monitor = monitor,
         position = "top",
-        height = 130,
+        height = 120,
 
         style = {
-            display = "flex",
-            justify_items = "stretch",
-            justify_content = "stretch",
-            align_items = "flex_end",
-            flex_direction = "column",
-            postion = "absolute",
+            -- display = "flex",
+            -- justify_items = "stretch",
+            -- justify_content = "stretch",
+            -- align_items = "flex_end",
+            -- flex_direction = "column",
+            -- postion = "absolute",
         },
         -- flex = true,
         -- orientation = "v",
@@ -31,24 +31,24 @@ for monitor_index, monitor in monitors() do
         -- margin = { bottom = 5 },
         -- padding = { bottom = 5 },
 
-        -- background = function(svg) return string.format([[
-        --     <rect
-        --         x="0"
-        --         y="0"
-        --         width="%d"
-        --         height="%d"
-        --         rx="5"
-        --         fill="none"
-        --         stroke="black"
-        --         stroke-width="5"
-        --     />
-        -- ]], svg.width, svg.height) end,
+        background = function(svg) return string.format([[
+            <rect
+                x="0"
+                y="0"
+                width="%d"
+                height="%d"
+                rx="5"
+                fill="none"
+                stroke="black"
+                stroke-width="5"
+            />
+        ]], svg.width, svg.height) end,
 
         items = {
-            -- component("label", { text = "1", }), component("label", { text = "2", }), component("label", { text = "3", }),
+            component("label", { text = "1", }), component("label", { text = "2", }), component("label", { text = "3", }),
             component("image", {
-                size = 40,
                 path = "./archlinux.svg",
+                -- style = { size = 400 },
             }),
             component("workspaces", {
                 render = function (workspace) return component("label", {
@@ -112,6 +112,10 @@ for monitor_index, monitor in monitors() do
                             return disk()['/'].free .. ' free'
                         end,
                     }),
+
+                    monitor_index == 1 and component("tray", {
+                        color = "#0A3A77",
+                    }),
                     component("button", {
                         text = "shutdown",
                         justify = true,
@@ -125,9 +129,6 @@ for monitor_index, monitor in monitors() do
                         cross_justify = true,
                         size = 100,
                         click = function() return spawn("activate-linux") end
-                    }),
-                    monitor_index == 1 and component("tray", {
-                        color = "#0A3A77",
                     }),
                 },
             }),

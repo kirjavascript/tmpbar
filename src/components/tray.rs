@@ -4,7 +4,7 @@ use crate::global::Global;
 use egui::{Ui, Vec2, Color32};
 
 pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
-    if global.tray.is_none() {
+    if global.tray.is_none() || !ui.ctx().requested_repaint_last_pass() {
         return
     }
 

@@ -132,11 +132,15 @@ pub fn style_from_props(props: &Props, base: Style) -> Style {
 
     let width: Option<&Property> = props.get("width");
     let height: Option<&Property> = props.get("height");
+    let size: Option<&Property> = props.get("size");
 
     if width.is_some() || height.is_some() {
         let width = width.map(|s| parse_dimension(&Into::<String>::into(s))).unwrap_or(Dimension::Auto);
         let height = height.map(|s| parse_dimension(&Into::<String>::into(s))).unwrap_or(Dimension::Auto);
         style.size = geometry::Size { width, height };
+    } else if size.is_some() {
+        let size = size.map(|s| parse_dimension(&Into::<String>::into(s))).unwrap_or(Dimension::Auto);
+        style.size = geometry::Size { width: size, height: size };
     }
 
     let width: Option<&Property> = props.get("min_width");
