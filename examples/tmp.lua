@@ -71,26 +71,13 @@ for monitor_index, monitor in monitors() do
                     ]]):format(svg.width, svg.height, color)
                 end,
             }),
-            component("container", {
+            component("label", {
+                debug = true,
                 style = {
                     position = "absolute",
-                    display = "flex",
-                    align_items = "center",
-                    justify_content = "center",
-                    justify_items = "center",
+                    size = 0,
+                    margin = "auto",
                 },
-                items = {
-                    component("label", {
-                        debug = true,
-                        style = {
-                            -- display = "block",
-                            -- align_self = "center",
-                        },
-                        text = function() return "« " .. truncate(window_title(), 80) .. " »" end,
-                    }),
-                },
-            }),
-            component("label", {
                 text = function() return "« " .. truncate(window_title(), 80) .. " »" end,
             }),
             component("container", {
