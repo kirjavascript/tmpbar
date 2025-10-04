@@ -112,7 +112,6 @@ for monitor_index, monitor in monitors() do
                             return disk()['/'].free .. ' free'
                         end,
                     }),
-
                     monitor_index == 1 and component("tray", {
                         color = "#0A3A77",
                     }),
@@ -123,6 +122,7 @@ for monitor_index, monitor in monitors() do
                         size = 100,
                         click = function() return spawn("~/.config/i3/scripts/powermenu") end
                     }),
+
                     component("button", {
                         text = "activate",
                         justify = true,

@@ -4,7 +4,7 @@ use crate::global::Global;
 use egui::{Ui, Vec2, Color32};
 
 pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
-    if global.tray.is_none() || !ui.ctx().requested_repaint_last_pass() {
+    if global.tray.is_none() {
         return
     }
 
@@ -14,6 +14,11 @@ pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
     let scale = ui.ctx().pixels_per_point();
 
     let size = Vec2::new((w as f32 / scale) as _, (h as f32 / scale) as _);
+
+    // grab available size before allocating
+    let available_height = scale * ui.available_height().min(
+        ui.ctx().screen_rect().height()
+    ).round();
 
     // allocate size
     let (rect, _response) = ui.allocate_exact_size(size, egui::Sense::empty());
@@ -38,11 +43,9 @@ pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
 
     tray.set_pos(x_pos as _, y_pos as _);
 
-    let available_height = scale * ui.available_height().min(
-        ui.ctx().screen_rect().height()
-    ).round();
-
-    tray.set_size(available_height as _);
+    if !ui.ctx().requested_repaint_last_pass() {
+        tray.set_size(available_height as u32);
+    }
 
     if let Some(Property::String(color)) = comp.props().get("color") {
         tray.set_bgcolor(color);
