@@ -41,12 +41,6 @@ impl TmpBar {
 
 impl eframe::App for TmpBar {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        // TODO:
-        // colours / styles / layout
-        // `cc.egui_ctx.set_visuals` and `cc.egui_ctx.set_fonts`.
-        //
-        // input: pressing enter doesnt unfocus properly
-
         if self.config.reload_signal.consume() {
             info!("reloading config");
 

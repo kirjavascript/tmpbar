@@ -37,7 +37,6 @@ pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
                         let ui = tui.egui_ui_mut();
                         let style = core::style_from_component(comp, style_from_ui(ui));
 
-                        dbg!(style.size);
                         tui
                             .style(style)
                             .ui(|ui| {

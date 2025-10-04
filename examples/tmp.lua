@@ -1,14 +1,20 @@
 -- TODO
 -- click on everything
 -- animated SVG for battery monitor, CPU graph
--- change inverval to max_interval
 -- window()
+-- import other lua functions (!)
+--
+-- colours / styles / layout
+-- `cc.egui_ctx.set_visuals` and `cc.egui_ctx.set_fonts`.
+--
+-- input: pressing enter doesnt unfocus properly
+-- make style property dynamic? make all properties?
 
 for monitor_index, monitor in monitors() do
     bar({
         monitor = monitor,
         position = "top",
-        height = 100,
+        height = 180,
 
         style = {
             -- display = "flex",
@@ -35,13 +41,35 @@ for monitor_index, monitor in monitors() do
 
         items = {
             component("label", {
-                debug = true,
+                -- debug = true,
                 style = {
                     position = "absolute",
                     margin = "auto",
                     size = "auto",
                 },
                 text = function() return "« " .. truncate(window_title(), 80) .. " »" end,
+            }),
+            component("label", { -- i3 mode
+                style = {
+                    position = "absolute",
+                    bottom = 10,
+                    margin_left = "auto",
+                    margin_right = "auto",
+                    size = "auto",
+                },
+                text = function() return i3_mode() == "default" and "" or i3_mode() end,
+                background = function(svg)
+                    local is_default = i3_mode() == "default"
+                    local color = is_default and "transparent" or "red"
+
+                    return ([[
+                        <rect x="0" y="0" width="%d" height="%d" fill="%s" rx="2"/>
+                    ]]):format(svg.width, svg.height, color)
+                end,
+            }),
+            component("image", {
+                path = "https://sharey.org/8ilgDQ.png",
+                style = { padding = 3 },
             }),
             component("image", {
                 path = "./archlinux.svg",
@@ -70,20 +98,10 @@ for monitor_index, monitor in monitors() do
                         end,
                 }) end
             }),
-            component("label", { -- i3 mode
-                text = function() return i3_mode() == "default" and "" or i3_mode() end,
-                background = function(svg)
-                    local color = i3_mode() == "default" and "transparent" or "red"
-
-                    return ([[
-                        <rect x="0" y="0" width="%d" height="%d" fill="%s" rx="2"/>
-                    ]]):format(svg.width, svg.height, color)
-                end,
-            }),
             component("container", {
                 items = {
                     component("label", { -- clock
-                        text = function() return os.date("%a %Y-%m-%d %X") end,
+                        text = function() return os.date("%Y-%m-%d %a %X") end,
                     }),
                     component("label", { -- network
                         text = function()
