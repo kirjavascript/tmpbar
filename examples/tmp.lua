@@ -34,6 +34,15 @@ for monitor_index, monitor in monitors() do
         ]], svg.width, svg.height) end,
 
         items = {
+            component("label", {
+                debug = true,
+                style = {
+                    position = "absolute",
+                    margin = "auto",
+                    size = "auto",
+                },
+                text = function() return "« " .. truncate(window_title(), 80) .. " »" end,
+            }),
             component("image", {
                 path = "./archlinux.svg",
             }),
@@ -70,15 +79,6 @@ for monitor_index, monitor in monitors() do
                         <rect x="0" y="0" width="%d" height="%d" fill="%s" rx="2"/>
                     ]]):format(svg.width, svg.height, color)
                 end,
-            }),
-            component("label", {
-                debug = true,
-                style = {
-                    position = "absolute",
-                    size = 0,
-                    margin = "auto",
-                },
-                text = function() return "« " .. truncate(window_title(), 80) .. " »" end,
             }),
             component("container", {
                 items = {
