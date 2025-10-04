@@ -6,26 +6,13 @@ use crate::global::Global;
 
 use egui_taffy::tui;
 use egui_taffy::TuiBuilderLogic;
-use egui_taffy::taffy::{
-    Size,
-    Style,
-    prelude::*,
-};
 
-fn style_from_ui(ui: &mut egui::Ui) -> Style {
-    let rect = ui.available_size();
-
-    Style {
-        size: Size {
-            width: length(rect.x),
-            height: length(rect.y),
-        },
-        ..Default::default()
-    }
+fn is_container(name: &str) -> bool {
+    name == "container" || name == "workspaces"
 }
 
 pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
-    let style = core::style_from_component(comp, style_from_ui(ui));
+    let style = core::style(comp, ui);
     let props = comp.props();
 
     tui(ui, ui.id())
@@ -35,7 +22,12 @@ pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
                 for prop in list {
                     if let Property::Component(comp) = prop {
                         let ui = tui.egui_ui_mut();
-                        let style = core::style_from_component(comp, style_from_ui(ui));
+
+                        let style = if is_container(comp.name()) {
+                            core::style_from_ui(ui)
+                        } else {
+                            core::style(comp, ui)
+                        };
 
                         tui
                             .style(style)

@@ -20,6 +20,22 @@ use taffy::{
     prelude::*,
 };
 
+pub fn style(comp: &mut Component, ui: &mut egui::Ui) -> Style {
+    style_from_component(comp, style_from_ui(ui))
+}
+
+pub fn style_from_ui(ui: &mut egui::Ui) -> Style {
+    let rect = ui.available_size();
+
+    Style {
+        size: Size {
+            width: length(rect.x),
+            height: length(rect.y),
+        },
+        ..Default::default()
+    }
+}
+
 pub fn style_from_component(comp: &mut Component, base: Style) -> Style {
     if let Some(Property::Object(style)) = comp.props().get("style") {
         style_from_props(style, base)

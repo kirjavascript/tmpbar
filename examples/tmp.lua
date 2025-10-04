@@ -14,7 +14,7 @@ for monitor_index, monitor in monitors() do
     bar({
         monitor = monitor,
         position = "top",
-        height = 180,
+        height = 130,
 
         style = {
             -- display = "flex",
@@ -40,8 +40,7 @@ for monitor_index, monitor in monitors() do
         ]], svg.width, svg.height) end,
 
         items = {
-            component("label", {
-                -- debug = true,
+            component("label", { -- window title
                 style = {
                     position = "absolute",
                     margin = "auto",
@@ -52,10 +51,10 @@ for monitor_index, monitor in monitors() do
             component("label", { -- i3 mode
                 style = {
                     position = "absolute",
-                    bottom = 10,
                     margin_left = "auto",
                     margin_right = "auto",
                     size = "auto",
+                    bottom = 10,
                 },
                 text = function() return i3_mode() == "default" and "" or i3_mode() end,
                 background = function(svg)
@@ -76,10 +75,12 @@ for monitor_index, monitor in monitors() do
             }),
             component("workspaces", {
                 style = {
-                    display = "flex",
-                    flex_direction = "column",
-                    padding = 20,
-                    gap = 10,
+                    flex_direction = "row",
+                    align_items = "center",
+                    justify_content = "center",
+                    justify_items = "center",
+                    align_content = "center",
+                    justify_self = "center",
                 },
                 render = function (workspace) return component("label", {
                         text = tostring(workspace.name):sub(1, 1),

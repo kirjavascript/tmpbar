@@ -3,8 +3,13 @@ use egui::Ui;
 use crate::config::{Property, Component, to_property, copy_default};
 use crate::global::Global;
 use crate::wm::xcb::workspaces::Workspace;
+use crate::components::core;
+
+use egui_taffy::tui;
+use egui_taffy::TuiBuilderLogic;
 
 pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
+    let style = core::style(comp, ui);
     let props = comp.props();
 
     let monitor_index: i64 = props.get("_monitor_index").unwrap_or_default().into();
@@ -16,21 +21,32 @@ pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
 
 
     if let Some(Property::Function(func)) = props.get("render") {
-        for workspace in workspaces {
-            let table = table_from_workspace(&global.lua, &workspace).unwrap();
-            let result = func.call::<mlua::Table, mlua::Value>(table);
+        tui(ui, ui.id())
+            .style(style)
+            .show(|tui| {
+                for workspace in workspaces {
+                    let table = table_from_workspace(&global.lua, &workspace).unwrap();
+                    let result = func.call::<mlua::Table, mlua::Value>(table);
 
-            if result.is_ok() {
-                let component = result.unwrap();
+                    if result.is_ok() {
+                        let component = result.unwrap();
 
-                let default_props = copy_default(props);
-                if let Property::Component(mut comp) = to_property(component, &default_props) {
-                    crate::components::render(&mut comp, ui, global);
+                        let default_props = copy_default(props);
+                        if let Property::Component(mut comp) = to_property(component, &default_props) {
+                        let ui = tui.egui_ui_mut();
+                        let style = core::style(&mut comp, ui);
+
+                        tui
+                            .style(style)
+                            .ui(|ui| {
+                                crate::components::render(&mut comp, ui, global);
+                            });
+                        }
+                    } else {
+                        error!("{}", result.err().unwrap().to_string());
+                    }
                 }
-            } else {
-                error!("{}", result.err().unwrap().to_string());
-            }
-        }
+            });
     }
 }
 
