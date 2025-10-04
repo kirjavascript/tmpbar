@@ -6,8 +6,10 @@ xcb::atoms_struct! {
     #[derive(Copy, Clone, Debug)]
     pub(crate) struct Atoms {
         pub shadow => b"_COMPTON_SHADOW",
-        // pub strut_partial => b"_NET_WM_STRUT_PARTIAL",
-        // pub strut => b"_NET_WM_STRUT",
+        pub strut_partial => b"_NET_WM_STRUT_PARTIAL",
+        pub strut => b"_NET_WM_STRUT",
+        pub windowtype => b"_NET_WM_WINDOW_TYPE",
+        pub windowtype_dock => b"_NET_WM_WINDOW_TYPE_DOCK",
     }
 }
 
@@ -82,40 +84,45 @@ pub fn window_patch(config: &ConfigScript) {
                 data: &[0u32],
             });
 
+            let strut_data = if bar.y == 0 {
+                [0u32, 0, bar.height, 0, 0, 0, 0, 0, bar.monitor.x as u32, (bar.monitor.x + bar.monitor.width as i32) as u32, 0, 0]
+            } else {
+                [0u32, 0, 0, bar.height, 0, 0, 0, 0, 0, 0, bar.monitor.x as u32, (bar.monitor.x + bar.monitor.width as i32) as u32]
+            };
+
+            conn.send_request(&xcb::x::ChangeProperty {
+                mode: xcb::x::PropMode::Replace,
+                window: *window,
+                property: atoms.strut_partial,
+                r#type: xcb::x::ATOM_CARDINAL,
+                data: &strut_data,
+            });
+
+            let strut_simple = if bar.y == 0 {
+                [0u32, 0, bar.height, 0]
+            } else {
+                [0u32, 0, 0, bar.height]
+            };
+
+            conn.send_request(&xcb::x::ChangeProperty {
+                mode: xcb::x::PropMode::Replace,
+                window: *window,
+                property: atoms.strut,
+                r#type: xcb::x::ATOM_CARDINAL,
+                data: &strut_simple,
+            });
+
+            conn.send_request(&xcb::x::ChangeProperty {
+                mode: xcb::x::PropMode::Replace,
+                window: *window,
+                property: atoms.windowtype,
+                r#type: xcb::x::ATOM_ATOM,
+                data: &[atoms.windowtype_dock],
+            });
+
             conn.flush().unwrap();
 
         }
-
-        // TODO: finish STRUT
-        // let width = 1920;
-        // let height = 1080;
-
-
-        // let data =
-        //     [
-        //      0u32, 0, 0, 0, 21, 0, 0, 0, 0, 0, 1920, 3840
-        //     ];
-
-        // let data2 = [
-        //     0u32, 0, 0, 21
-        // ];
-
-
-        // conn.send_request(&xcb::x::ChangeProperty {
-        //     mode: xcb::x::PropMode::Replace,
-        //     window: *window,
-        //     property: atoms.strut,
-        //     r#type: xcb::x::ATOM_CARDINAL,
-        //     data: &data2,
-        // });
-
-        // conn.send_request(&xcb::x::ChangeProperty {
-        //     mode: xcb::x::PropMode::Replace,
-        //     window: *window,
-        //     property: atoms.windowtype,
-        //     r#type: xcb::x::ATOM_ATOM,
-        //     data: &[atoms.windowtype_dock],
-        // });
     });
 }
 
