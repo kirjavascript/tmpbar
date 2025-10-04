@@ -8,28 +8,17 @@ for monitor_index, monitor in monitors() do
     bar({
         monitor = monitor,
         position = "top",
-        height = 120,
+        height = 100,
 
         style = {
             -- display = "flex",
-            -- justify_items = "stretch",
-            -- justify_content = "stretch",
+            -- justify_items = "flex_end",
+            -- justify_content = "flex_end",
             -- align_items = "flex_end",
             -- flex_direction = "column",
             -- postion = "absolute",
         },
-        -- flex = true,
-        -- orientation = "v",
         -- max_interval = 1000
-
-        -- wrap = true,
-        -- direction = "top-down",
-        -- justify = true,
-        -- crossJustify = true,
-        -- align = "end",
-        -- crossAlign = "end",
-        -- margin = { bottom = 5 },
-        -- padding = { bottom = 5 },
 
         background = function(svg) return string.format([[
             <rect
@@ -45,15 +34,18 @@ for monitor_index, monitor in monitors() do
         ]], svg.width, svg.height) end,
 
         items = {
-            component("label", { text = "1", }), component("label", { text = "2", }), component("label", { text = "3", }),
             component("image", {
                 path = "./archlinux.svg",
-                -- style = { size = 400 },
             }),
             component("workspaces", {
+                style = {
+                    display = "flex",
+                    flex_direction = "column",
+                    padding = 20,
+                    gap = 10,
+                },
                 render = function (workspace) return component("label", {
                         text = tostring(workspace.name):sub(1, 1),
-                        size = 100, -- TODO
                         background = function(svg)
                             local color = workspace.urgent and "red"
                                 or workspace.focused and "#0A83FD"
@@ -79,12 +71,29 @@ for monitor_index, monitor in monitors() do
                     ]]):format(svg.width, svg.height, color)
                 end,
             }),
+            component("container", {
+                style = {
+                    position = "absolute",
+                    display = "flex",
+                    align_items = "center",
+                    justify_content = "center",
+                    justify_items = "center",
+                },
+                items = {
+                    component("label", {
+                        debug = true,
+                        style = {
+                            -- display = "block",
+                            -- align_self = "center",
+                        },
+                        text = function() return "« " .. truncate(window_title(), 80) .. " »" end,
+                    }),
+                },
+            }),
             component("label", {
-                justify = true,
                 text = function() return "« " .. truncate(window_title(), 80) .. " »" end,
             }),
             component("container", {
-                direction = "<",
                 items = {
                     component("label", { -- clock
                         text = function() return os.date("%a %Y-%m-%d %X") end,
@@ -112,23 +121,19 @@ for monitor_index, monitor in monitors() do
                             return disk()['/'].free .. ' free'
                         end,
                     }),
-                    monitor_index == 1 and component("tray", {
-                        color = "#0A3A77",
-                    }),
                     component("button", {
                         text = "shutdown",
-                        justify = true,
-                        cross_justify = true,
                         size = 100,
                         click = function() return spawn("~/.config/i3/scripts/powermenu") end
                     }),
 
                     component("button", {
                         text = "activate",
-                        justify = true,
-                        cross_justify = true,
                         size = 100,
                         click = function() return spawn("activate-linux") end
+                    }),
+                    monitor_index == 1 and component("tray", {
+                        color = "#0A3A77",
                     }),
                 },
             }),

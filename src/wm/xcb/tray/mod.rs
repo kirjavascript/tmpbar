@@ -95,7 +95,6 @@ impl Tray {
 
     pub fn set_size(&mut self, size: u32) {
         if size != self.old_size {
-            info!("size {size}");
             self.tx_proxy.send(ProxyAction::Size(size)).ok();
             self.old_size = size;
         }

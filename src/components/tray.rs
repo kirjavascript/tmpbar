@@ -1,7 +1,7 @@
 use eframe::egui;
 use crate::config::{Component, Property};
 use crate::global::Global;
-use egui::{Ui, Vec2, Color32};
+use egui::{Ui, Vec2};
 
 pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
     if global.tray.is_none() {
@@ -22,10 +22,6 @@ pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
 
     // allocate size
     let (rect, _response) = ui.allocate_exact_size(size, egui::Sense::empty());
-
-    if comp.props().get("debug").unwrap_or_default().into() {
-        ui.painter().rect_filled(rect, 0.0, Color32::from_rgb(0, 128, 0));
-    }
 
     // set position of tray
     let local_pos = rect.min;

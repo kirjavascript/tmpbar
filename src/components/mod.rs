@@ -13,11 +13,14 @@ mod tray;
 mod workspaces;
 
 pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
-    // core::render_background(comp, ui, global);
-    // core::apply_scroll(comp, ui);
-    // core::render_frame(comp, ui, |comp, ui| {
-        render_impl(comp, ui, global);
-    // });
+    core::render_background(comp, ui, global);
+    core::apply_scroll(comp, ui);
+
+    if comp.props().get("debug").unwrap_or_default().into() {
+        ui.painter().rect_filled(ui.available_rect_before_wrap(), 0.0, egui::Color32::from_rgb(128, 0, 128));
+    }
+
+    render_impl(comp, ui, global);
 }
 
 fn render_impl(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
