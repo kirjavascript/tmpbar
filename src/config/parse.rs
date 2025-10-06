@@ -240,6 +240,8 @@ impl Into<String> for &Property {
     fn into(self) -> String {
         match self {
             Property::String(s) => s.to_owned(),
+            Property::Integer(i) => i.to_string(),
+            Property::Float(i) => i.to_string(),
             _ => String::default(),
         }
     }

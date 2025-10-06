@@ -74,15 +74,8 @@ for monitor_index, monitor in monitors() do
                 path = "./archlinux.svg",
             }),
             component("workspaces", {
-                style = {
-                    flex_direction = "row",
-                    align_items = "center",
-                    justify_content = "center",
-                    justify_items = "center",
-                    align_content = "center",
-                    justify_self = "center",
-                },
                 render = function (workspace) return component("label", {
+                        style = { width = "20" },
                         text = tostring(workspace.name):sub(1, 1),
                         background = function(svg)
                             local color = workspace.urgent and "red"

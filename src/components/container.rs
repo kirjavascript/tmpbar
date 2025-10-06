@@ -24,7 +24,8 @@ pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
                         let ui = tui.egui_ui_mut();
 
                         let style = if is_container(comp.name()) {
-                            core::style_from_ui(ui)
+                            // TODO: container_style
+                            Default::default()
                         } else {
                             core::style(comp, ui)
                         };

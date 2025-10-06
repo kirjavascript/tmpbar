@@ -7,21 +7,23 @@ for monitor_index, monitor in monitors() do
         style = {
             display = "flex",
             justify_content = "space_between",
-            align_items = "space_between",
+            align_items = "stretch",
+            size = "max",
         },
 
         items = {
             component("workspaces", {
                 style = {
-                    flex_direction = "row",
-                    align_items = "stretch",
-                    justify_content = "stretch",
-                    justify_items = "stretch",
-                    align_content = "stretch",
-                    justify_self = "stretch",
+                    -- size = "max",
+                    -- flex_direction = "row",
+                    -- align_items = "stretch",
+                    -- justify_content = "stretch",
+                    -- justify_items = "stretch",
+                    -- align_content = "stretch",
+                    -- justify_self = "stretch",
                 },
                 render = function (workspace) return component("label", {
-                    style = {align_self = "stretch" },
+                    style = {width = "20" },
                     text = tostring(workspace.name):sub(1, 1),
                     background = function(svg)
                         local color = workspace.urgent and "red"

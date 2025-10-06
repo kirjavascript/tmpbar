@@ -1,51 +1,25 @@
+use crate::config::{Component, Property, Props};
 use egui_taffy::taffy;
-use crate::config::{Property, Props, Component};
 use taffy::{
-    style::{
-        Style,
-        Display,
-        Dimension,
-        FlexDirection,
-        FlexWrap,
-        AlignItems,
-        AlignContent,
-        BoxSizing,
-        Overflow,
-        Position,
-        LengthPercentageAuto,
-        TextAlign,
-    },
     geometry,
-    Point,
     prelude::*,
+    style::{
+        AlignContent, AlignItems, BoxSizing, Dimension, Display, FlexDirection,
+        FlexWrap, LengthPercentageAuto, Overflow, Position, Style, TextAlign,
+    },
+    Point,
 };
 
 pub fn style(comp: &mut Component, ui: &mut egui::Ui) -> Style {
-    style_from_component(comp, style_from_ui(ui))
-}
-
-pub fn style_from_ui(ui: &mut egui::Ui) -> Style {
-    let rect = ui.available_size();
-
-    Style {
-        size: Size {
-            width: length(rect.x),
-            height: length(rect.y),
-        },
-        ..Default::default()
-    }
-}
-
-pub fn style_from_component(comp: &mut Component, base: Style) -> Style {
     if let Some(Property::Object(style)) = comp.props().get("style") {
-        style_from_props(style, base)
+        style_from_props(style, ui.available_size())
     } else {
-        base
+        Default::default()
     }
 }
 
-pub fn style_from_props(props: &Props, base: Style) -> Style {
-    let mut style: Style = base;
+fn style_from_props(props: &Props, available_size: egui::Vec2) -> Style {
+    let mut style: Style = Default::default();
 
     /*
      * Unimplemented:
@@ -151,45 +125,105 @@ pub fn style_from_props(props: &Props, base: Style) -> Style {
     let size: Option<&Property> = props.get("size");
 
     if width.is_some() || height.is_some() {
-        let width = width.map(|s| parse_dimension(&Into::<String>::into(s))).unwrap_or(Dimension::Auto);
-        let height = height.map(|s| parse_dimension(&Into::<String>::into(s))).unwrap_or(Dimension::Auto);
-        style.size = geometry::Size { width, height };
+        let mut width = width.map(|s| Into::<String>::into(s));
+        let mut height = height.map(|s| Into::<String>::into(s));
+
+        if matches!(width.as_deref(), Some("max")) {
+            width = width.map(|_| available_size.x.to_string());
+        }
+        if matches!(height.as_deref(), Some("max")) {
+            height = height.map(|_| available_size.y.to_string());
+        }
+
+        style.size = geometry::Size {
+            width: width.map(|s| parse_dimension(&s)).unwrap_or(Dimension::Auto),
+            height: height.map(|s| parse_dimension(&s)).unwrap_or(Dimension::Auto),
+        };
     } else if size.is_some() {
-        let size = size.map(|s| parse_dimension(&Into::<String>::into(s))).unwrap_or(Dimension::Auto);
-        style.size = geometry::Size { width: size, height: size };
+        let size = size.map(|s| Into::<String>::into(s));
+
+        if matches!(size.as_deref(), Some("max")) {
+            style.size = geometry::Size {
+                width: length(available_size.x),
+                height: length(available_size.y),
+            };
+        } else {
+            let size = size.map(|s| parse_dimension(&s)).unwrap_or(Dimension::Auto);
+            style.size = geometry::Size {
+                width: size,
+                height: size,
+            };
+        }
     }
 
     let width: Option<&Property> = props.get("min_width");
     let height: Option<&Property> = props.get("min_height");
 
     if width.is_some() || height.is_some() {
-        let width = width.map(|s| parse_dimension(&Into::<String>::into(s))).unwrap_or(Dimension::Auto);
-        let height = height.map(|s| parse_dimension(&Into::<String>::into(s))).unwrap_or(Dimension::Auto);
-        style.min_size = geometry::Size { width, height };
+        let mut width = width.map(|s| Into::<String>::into(s));
+        let mut height = height.map(|s| Into::<String>::into(s));
+
+        if matches!(width.as_deref(), Some("max")) {
+            width = width.map(|_| available_size.x.to_string());
+        }
+        if matches!(height.as_deref(), Some("max")) {
+            height = height.map(|_| available_size.y.to_string());
+        }
+
+        style.min_size = geometry::Size {
+            width: width.map(|s| parse_dimension(&s)).unwrap_or(Dimension::Auto),
+            height: height.map(|s| parse_dimension(&s)).unwrap_or(Dimension::Auto),
+        };
     }
 
     let width: Option<&Property> = props.get("max_width");
     let height: Option<&Property> = props.get("max_height");
 
     if width.is_some() || height.is_some() {
-        let width = width.map(|s| parse_dimension(&Into::<String>::into(s))).unwrap_or(Dimension::Auto);
-        let height = height.map(|s| parse_dimension(&Into::<String>::into(s))).unwrap_or(Dimension::Auto);
-        style.max_size = geometry::Size { width, height };
+        let mut width = width.map(|s| Into::<String>::into(s));
+        let mut height = height.map(|s| Into::<String>::into(s));
+
+        if matches!(width.as_deref(), Some("max")) {
+            width = width.map(|_| available_size.x.to_string());
+        }
+        if matches!(height.as_deref(), Some("max")) {
+            height = height.map(|_| available_size.y.to_string());
+        }
+
+        style.max_size = geometry::Size {
+            width: width.map(|s| parse_dimension(&s)).unwrap_or(Dimension::Auto),
+            height: height.map(|s| parse_dimension(&s)).unwrap_or(Dimension::Auto),
+        };
     }
 
     if let Some(Property::Float(ar)) = props.get("aspect_ratio") {
         style.aspect_ratio = Some(*ar as _);
     }
 
-    if let Some(margin) = get_spacing_from_props(props, "margin", get_lengthauto_from_prop, LengthPercentageAuto::Length(0.)) {
+    if let Some(margin) = get_spacing_from_props(
+        props,
+        "margin",
+        get_lengthauto_from_prop,
+        LengthPercentageAuto::Length(0.),
+    ) {
         style.margin = margin;
     }
 
-    if let Some(padding) = get_spacing_from_props(props, "padding", get_length_from_prop, LengthPercentage::Length(0.)) {
+    if let Some(padding) = get_spacing_from_props(
+        props,
+        "padding",
+        get_length_from_prop,
+        LengthPercentage::Length(0.),
+    ) {
         style.padding = padding;
     }
 
-    if let Some(border) = get_spacing_from_props(props, "border", get_length_from_prop, LengthPercentage::Length(0.)) {
+    if let Some(border) = get_spacing_from_props(
+        props,
+        "border",
+        get_length_from_prop,
+        LengthPercentage::Length(0.),
+    ) {
         style.border = border;
     }
 
@@ -256,7 +290,6 @@ pub fn style_from_props(props: &Props, base: Style) -> Style {
     if let Some(Property::String(text)) = props.get("flex_basis") {
         style.flex_basis = parse_dimension(text.as_str());
     }
-
 
     if let Some(Property::Float(num)) = props.get("flex_grow") {
         style.flex_grow = *num as _;
@@ -352,37 +385,33 @@ fn get_spacing_from_props<T: Clone>(
 }
 
 fn get_lengthauto_from_prop(props: &Props, key: &str) -> Option<LengthPercentageAuto> {
-    if let Some(Property::Integer(value)) = props.get(key) {
-        Some(LengthPercentageAuto::Length(*value as f32))
-    } else if let Some(Property::Float(value)) = props.get(key) {
-        Some(LengthPercentageAuto::Length(*value as f32))
-    } else if let Some(Property::String(value)) = props.get(key) {
-        if value == "auto" {
-            Some(LengthPercentageAuto::Auto)
-        } else {
-            match parse_dimension(value) {
-                Dimension::Length(len) => Some(LengthPercentageAuto::Length(len)),
-                Dimension::Percent(pct) => Some(LengthPercentageAuto::Percent(pct)),
-                _ => None,
+    match props.get(key) {
+        Some(Property::Integer(value)) => Some(LengthPercentageAuto::Length(*value as f32)),
+        Some(Property::Float(value)) => Some(LengthPercentageAuto::Length(*value as f32)),
+        Some(Property::String(value)) => {
+            if value == "auto" {
+                Some(LengthPercentageAuto::Auto)
+            } else {
+                match parse_dimension(value) {
+                    Dimension::Length(len) => Some(LengthPercentageAuto::Length(len)),
+                    Dimension::Percent(pct) => Some(LengthPercentageAuto::Percent(pct)),
+                    _ => None,
+                }
             }
         }
-    } else {
-        None
+        _ => None,
     }
 }
 
 fn get_length_from_prop(props: &Props, key: &str) -> Option<LengthPercentage> {
-    if let Some(Property::Integer(value)) = props.get(key) {
-        Some(LengthPercentage::Length(*value as f32))
-    } else if let Some(Property::Float(value)) = props.get(key) {
-        Some(LengthPercentage::Length(*value as f32))
-    } else if let Some(Property::String(value)) = props.get(key) {
-        match parse_dimension(value) {
+    match props.get(key) {
+        Some(Property::Integer(value)) => Some(LengthPercentage::Length(*value as f32)),
+        Some(Property::Float(value)) => Some(LengthPercentage::Length(*value as f32)),
+        Some(Property::String(value)) => match parse_dimension(value) {
             Dimension::Length(len) => Some(LengthPercentage::Length(len)),
             Dimension::Percent(pct) => Some(LengthPercentage::Percent(pct)),
             _ => None,
-        }
-    } else {
-        None
+        },
+        _ => None,
     }
 }
