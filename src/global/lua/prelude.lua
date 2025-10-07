@@ -44,12 +44,6 @@ end
 -- "stdlib"
 
 function read_file(filePath)
-    if rawget(_G, "xcake_parent_path") ~= nil then
-        if filePath:sub(1, 1) ~= '/' then
-            filePath = xcake_parent_path .. filePath
-        end
-    end
-
     local file, err = io.open(filePath, "r")
     if not file then
         return nil, err

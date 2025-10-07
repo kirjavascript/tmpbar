@@ -12,15 +12,20 @@ pub enum LuaCallback {
     FocusWorkspace(u32),
 }
 
-pub fn load_lua(path: &str, ctx: egui::Context) -> (mlua::Lua, Signal<LuaCallback>) {
+pub fn load_lua(path: &str, ctx: egui::Context) -> (mlua::Lua, Signal<LuaCallback>, String) {
     let lua = mlua::Lua::new();
     let globals = lua.globals();
     lua.load(include_str!("./lua/prelude.lua")).exec().unwrap();
 
-    // save parent path
+    let mut parent_path = String::new();
+
+    // set parent path and cwd
     if let Ok(path) = std::fs::canonicalize(std::path::Path::new(path)) {
         let parent = path.parent().map(|p| p.to_path_buf());
-        globals.set("xcake_parent_path", parent.unwrap().to_string_lossy() + "/").ok();
+        parent_path = format!("{}/", parent.expect("error getting parent path").to_string_lossy());
+        // if let Err(error) = std::env::set_current_dir(parent_path.to_owned()) {
+        //     error!("cannot set cwd {}", error);
+        // }
     }
 
     // callbacks
@@ -79,5 +84,5 @@ pub fn load_lua(path: &str, ctx: egui::Context) -> (mlua::Lua, Signal<LuaCallbac
 
     drop(globals);
 
-    (lua, signal)
+    (lua, signal, parent_path)
 }

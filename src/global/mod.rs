@@ -21,12 +21,10 @@ impl Global {
         let xcb_signal: Signal<xcb::Event> = Signal::new(ctx.clone());
         xcb::listen(xcb_signal.clone());
 
-        let (lua, lua_signal) = lua::load_lua(path, ctx.clone());
+        let (lua, lua_signal, parent_path) = lua::load_lua(path, ctx.clone());
 
         let i3mode_signal: Signal<String> = Signal::new(ctx);
         i3mode::listen(i3mode_signal.clone()).ok();
-
-        let parent_path = lua.globals().get("xcake_parent_path").unwrap_or_default();
 
         Self {
             workspaces: Workspaces::new(),

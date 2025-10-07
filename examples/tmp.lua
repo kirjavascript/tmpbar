@@ -29,6 +29,7 @@
 -- button = make_component("button")
 
 print("Current directory:", io.popen("pwd"):read("*l"))
+print(read_file('./test.lua'))
 -- require('./foo')
 for monitor_index, monitor in monitors() do
     bar({
