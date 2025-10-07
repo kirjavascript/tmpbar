@@ -17,11 +17,15 @@ pub struct Global {
 }
 
 impl Global {
-    pub fn new(path: &str, ctx: egui::Context) -> Self {
+    pub fn new(path: &std::path::PathBuf, ctx: egui::Context) -> Self {
         let xcb_signal: Signal<xcb::Event> = Signal::new(ctx.clone());
         xcb::listen(xcb_signal.clone());
 
-        let (lua, lua_signal, parent_path) = lua::load_lua(path, ctx.clone());
+        let (lua, lua_signal) = lua::load_lua(ctx.clone());
+
+        // set parent path
+        let parent = path.parent().map(|p| p.to_path_buf());
+        let parent_path = format!("{}/", parent.expect("error getting parent path").to_string_lossy());
 
         let i3mode_signal: Signal<String> = Signal::new(ctx);
         i3mode::listen(i3mode_signal.clone()).ok();

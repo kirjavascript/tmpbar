@@ -1,12 +1,11 @@
 use inotify::{Inotify, WatchMask};
 use crate::util::Signal;
 
-pub fn init(path: &str, reload_signal: Signal<()>) {
-    let path = path.to_string();
+pub fn init(path: &std::path::PathBuf, reload_signal: Signal<()>) {
+    let path = path.to_owned();
 
     std::thread::spawn(move || {
         let mut inotify = Inotify::init().expect("error loading inotify");
-        let path = std::path::Path::new(&path);
 
         inotify
             .watches()

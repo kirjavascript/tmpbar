@@ -1,10 +1,11 @@
 use std::fs::File;
+use std::path::PathBuf;
 use std::io::prelude::*;
 use super::parse::{Bar, parse_bars};
 use crate::util::Signal;
 
 pub struct ConfigScript {
-    pub path: String,
+    pub path: PathBuf,
     pub bars: Vec<Bar>,
     pub reload_signal: Signal<()>,
 }
@@ -16,7 +17,7 @@ impl ConfigScript {
     }
 }
 
-pub fn init(path: &str, ctx: egui::Context, lua: &mlua::Lua) -> ConfigScript {
+pub fn init(path: &PathBuf, ctx: egui::Context, lua: &mlua::Lua) -> ConfigScript {
     let mut script = ConfigScript {
         path: path.to_owned(),
         bars: Vec::new(),
@@ -41,10 +42,8 @@ pub fn init(path: &str, ctx: egui::Context, lua: &mlua::Lua) -> ConfigScript {
 
 fn load(script: &mut ConfigScript, lua: &mlua::Lua) -> Result<(), String> {
     let code = {
-        let path = std::path::Path::new(&script.path);
-
-        let mut file_result = File::open(path).map_err(|x| {
-            format!("{}: {}", path.display(), x.to_string())
+        let mut file_result = File::open(&script.path).map_err(|x| {
+            format!("{}: {}", script.path.display(), x.to_string())
         })?;
 
         let mut script = String::new();

@@ -9,6 +9,14 @@ pub struct TmpBar {
 
 impl TmpBar {
     pub fn new(cc: &eframe::CreationContext<'_>, path: String) -> Self {
+        let path = match std::fs::canonicalize(std::path::Path::new(&path)) {
+            Ok(path) => path,
+            Err(error) => {
+                error!("{}", error);
+                std::process::exit(0);
+            },
+        };
+
         let mut global = global::Global::new(
             &path,
             cc.egui_ctx.clone(),
@@ -19,6 +27,10 @@ impl TmpBar {
             cc.egui_ctx.clone(),
             &global.lua
         );
+
+        if let Err(error) = std::env::set_current_dir(&global.parent_path) {
+            error!("cannot set cwd {}", error);
+        }
 
         crate::wm::xcb::window_patch(&config);
 
