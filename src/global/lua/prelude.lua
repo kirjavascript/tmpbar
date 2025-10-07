@@ -1,7 +1,25 @@
--- private bindings
+-- "private" bindings
+
+-- track built in packages
+local keep_set = {}
+for name in pairs(package.preload) do
+    keep_set[name] = true
+end
+
+keep_set["_G"] = true
+keep_set["package"] = true
 
 function xcake_reset_state()
+    -- reset vars
     xcake_bars = {}
+    -- clear require() cache
+    for name in pairs(package.loaded) do
+        if not keep_set[name] then
+            package.loaded[name] = nil
+        end
+    end
+    -- ???
+    collectgarbage()
 end
 
 -- core API

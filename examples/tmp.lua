@@ -42,6 +42,7 @@
 -- local mod = require("mymodule")
 -- mod.hello()
 
+require('./foo')
 for monitor_index, monitor in monitors() do
     bar({
         monitor = monitor,

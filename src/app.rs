@@ -103,7 +103,7 @@ impl eframe::App for TmpBar {
                                 options.max_passes = std::num::NonZeroUsize::new(3).unwrap();
                             });
 
-                            // taffy: disable text wrapping (egui text layouting tries to utilize minimal width possible)
+                            // taffy: disable text wrapping
                             ctx.style_mut(|style| {
                                 style.wrap_mode = Some(egui::TextWrapMode::Extend);
                             });
