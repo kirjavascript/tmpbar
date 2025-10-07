@@ -27,10 +27,21 @@
 -- label = make_component("label")
 -- image = make_component("image")
 -- button = make_component("button")
+--
+-- main.lua
+-- local M = {}
 
-print("Current directory:", io.popen("pwd"):read("*l"))
-print(read_file('./test.lua'))
--- require('./foo')
+-- function M.hello()
+--     print("Hello from my inline module!")
+-- end
+
+-- -- register it as if it were a required module
+-- package.loaded["mymodule"] = M
+
+-- -- now other scripts can require it:
+-- local mod = require("mymodule")
+-- mod.hello()
+
 for monitor_index, monitor in monitors() do
     bar({
         monitor = monitor,

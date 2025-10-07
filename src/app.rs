@@ -22,15 +22,15 @@ impl TmpBar {
             cc.egui_ctx.clone(),
         );
 
+        if let Err(error) = std::env::set_current_dir(&global.parent_path) {
+            error!("cannot set cwd {}", error);
+        }
+
         let config = config::script::init(
             &path,
             cc.egui_ctx.clone(),
             &global.lua
         );
-
-        if let Err(error) = std::env::set_current_dir(&global.parent_path) {
-            error!("cannot set cwd {}", error);
-        }
 
         crate::wm::xcb::window_patch(&config);
 
