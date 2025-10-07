@@ -2,7 +2,6 @@
 -- click on everything
 -- animated SVG for battery monitor, CPU graph
 -- window()
--- import other lua functions (!)
 --
 -- colours / styles / layout
 -- `cc.egui_ctx.set_visuals` and `cc.egui_ctx.set_fonts`.
@@ -10,6 +9,27 @@
 -- input: pressing enter doesnt unfocus properly
 -- make style property dynamic? make all properties?
 
+-- API improvements: primitives for svg
+-- import other lua functions (!), also import a standard api
+--
+-- setmetatable(_G, {
+    -- __index = function(_, key)
+    --     return function(props)
+    --         return component(key, props)
+    --     end
+    -- end
+-- })
+-- image {}
+--function make_component(name)
+    -- return function(props) return component(name, props) end
+-- end
+
+-- label = make_component("label")
+-- image = make_component("image")
+-- button = make_component("button")
+
+print("Current directory:", io.popen("pwd"):read("*l"))
+-- require('./foo')
 for monitor_index, monitor in monitors() do
     bar({
         monitor = monitor,
@@ -17,12 +37,13 @@ for monitor_index, monitor in monitors() do
         height = 130,
 
         style = {
-            -- display = "flex",
-            -- justify_items = "flex_end",
-            -- justify_content = "flex_end",
+            display = "flex",
+            justify_items = "flex_end",
+            justify_content = "space_between",
             -- align_items = "flex_end",
             -- flex_direction = "column",
             -- postion = "absolute",
+            size = "max",
         },
         -- max_interval = 1000
 
@@ -44,7 +65,6 @@ for monitor_index, monitor in monitors() do
                 style = {
                     position = "absolute",
                     margin = "auto",
-                    size = "auto",
                 },
                 text = function() return "« " .. truncate(window_title(), 80) .. " »" end,
             }),
@@ -54,12 +74,12 @@ for monitor_index, monitor in monitors() do
                     margin_left = "auto",
                     margin_right = "auto",
                     size = "auto",
-                    bottom = 10,
+                    bottom = 3,
                 },
-                text = function() return i3_mode() == "default" and "" or i3_mode() end,
+                text = function() return i3_mode() == "default" and "" or "« "..i3_mode().." »" end,
                 background = function(svg)
                     local is_default = i3_mode() == "default"
-                    local color = is_default and "transparent" or "red"
+                    local color = is_default and "transparent" or "darkred"
 
                     return ([[
                         <rect x="0" y="0" width="%d" height="%d" fill="%s" rx="2"/>
@@ -68,10 +88,11 @@ for monitor_index, monitor in monitors() do
             }),
             component("image", {
                 path = "https://sharey.org/8ilgDQ.png",
-                style = { padding = 3 },
+                style = { padding = 3, size = "max", },
             }),
             component("image", {
                 path = "./archlinux.svg",
+                style = { size = "max" },
             }),
             component("workspaces", {
                 render = function (workspace) return component("label", {
