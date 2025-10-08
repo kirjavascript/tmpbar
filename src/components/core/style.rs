@@ -11,7 +11,11 @@ use taffy::{
 };
 
 pub fn style(comp: &mut Component, ui: &mut egui::Ui) -> Style {
-    if let Some(Property::Object(style)) = comp.props().get("style") {
+    style_prop("style", comp, ui)
+}
+
+pub fn style_prop(prop: &str, comp: &mut Component, ui: &mut egui::Ui) -> Style {
+    if let Some(Property::Object(style)) = comp.props().get(prop) {
         style_from_props(style, ui.available_size())
     } else {
         Default::default()

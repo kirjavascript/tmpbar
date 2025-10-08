@@ -81,7 +81,11 @@ builtin_modules["wm"] = true
 local sys = {}
 
 function sys.exec(cmd)
-    local handle = io.popen(cmd)
+    local handle, err = io.popen(cmd)
+    if not handle then
+        return nil, err
+    end
+
     local result = handle:read("*a")
     handle:close()
     return result
