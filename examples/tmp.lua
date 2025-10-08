@@ -9,9 +9,9 @@
 -- input: pressing enter doesnt unfocus properly
 -- make style property dynamic? make all properties?
 
--- API improvements: primitives for svg
--- move background to style
--- support "red" for background
+-- API improvements: primitives for svg?
+--
+-- text style
 
 local ui = require('ui')
 local wm = require('wm')
@@ -31,21 +31,20 @@ for monitor_index, monitor in ui.monitors() do
             -- flex_direction = "column",
             -- postion = "absolute",
             size = "max",
+            background = function(svg) return string.format([[
+                <rect
+                    x="0"
+                    y="0"
+                    width="%d"
+                    height="%d"
+                    rx="5"
+                    fill="none"
+                    stroke="black"
+                    stroke-width="5"
+                />
+            ]], svg.width, svg.height) end,
         },
         -- max_interval = 1000
-
-        background = function(svg) return string.format([[
-            <rect
-                x="0"
-                y="0"
-                width="%d"
-                height="%d"
-                rx="5"
-                fill="none"
-                stroke="black"
-                stroke-width="5"
-            />
-        ]], svg.width, svg.height) end,
 
         items = {
             ui.label({ -- window title
@@ -62,18 +61,14 @@ for monitor_index, monitor in ui.monitors() do
                     margin_right = "auto",
                     size = "auto",
                     bottom = 3,
+                    background_color = function()
+                        local is_default = wm.i3_mode() == "default"
+                        return is_default and "transparent" or "darkred"
+                    end,
                 },
                 text = function()
                     local mode = wm.i3_mode()
                     return (mode == "default") and "" or (" « " .. mode .. " » ")
-                end,
-                background = function(svg)
-                    local is_default = wm.i3_mode() == "default"
-                    local color = is_default and "transparent" or "darkred"
-
-                    return ([[
-                        <rect width="%d" height="%d" fill="%s" rx="2"/>
-                    ]]):format(svg.width, svg.height, color)
                 end,
             }),
             ui.image({
@@ -86,18 +81,16 @@ for monitor_index, monitor in ui.monitors() do
             }),
             ui.workspaces({
                 render = function (workspace) return ui.label({
-                        style = { width = "20" },
+                        style = {
+                            width = "20",
+                            background_color = function()
+                                return workspace.urgent and "red"
+                                    or workspace.focused and "#0A83FD"
+                                    or workspace.visible and "#0022CC"
+                                    or "black"
+                            end,
+                        },
                         text = tostring(workspace.name):sub(1, 1),
-                        background = function(svg)
-                            local color = workspace.urgent and "red"
-                                or workspace.focused and "#0A83FD"
-                                or workspace.visible and "#0022CC"
-                                or "black"
-
-                            return ([[
-                                <rect x="0" y="0" width="12" height="%d" fill="%s" rx="2"/>
-                            ]]):format(svg.height, color)
-                        end,
                         click = function()
                             wm.set_workspace(workspace.number)
                         end,
@@ -157,7 +150,10 @@ for _, monitor in ui.monitors() do
         monitor = monitor,
         position = "bottom",
         height = 1,
-        -- TODO: black background
+
+        style = {
+            background_color = "black",
+        },
 
         scroll = function(delta)
             wm.set_workspace(delta > 0 and "next" or "prev")

@@ -215,7 +215,7 @@ pub fn get_text(props: &Props, attr: &str) -> String {
         Some(Property::String(text)) => {
             text.to_owned()
         }
-        _ => "[no text]".to_string()
+        _ => "".to_string()
     }
 }
 
