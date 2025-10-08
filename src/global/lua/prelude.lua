@@ -1,20 +1,21 @@
 -- "private" bindings
 
 -- track built in packages
-local keep_set = {}
+local builtin_modules = {}
 for name in pairs(package.preload) do
-    keep_set[name] = true
+    builtin_modules[name] = true
 end
 
-keep_set["_G"] = true
-keep_set["package"] = true
+builtin_modules["_G"] = true
+builtin_modules["package"] = true
 
+---@diagnostic disable: lowercase-global
 function xcake_reset_state()
     -- reset vars
     xcake_bars = {}
     -- clear require() cache
     for name in pairs(package.loaded) do
-        if not keep_set[name] then
+        if not builtin_modules[name] then
             package.loaded[name] = nil
         end
     end
@@ -22,42 +23,60 @@ function xcake_reset_state()
     collectgarbage()
 end
 
--- core API
+-- public modules
 
-function monitors()
+local ui = {}
+
+function ui.monitors()
+    ---@diagnostic disable: undefined-global
     return ipairs(xcake_monitors)
 end
 
-function bar(config)
+function ui.bar(config)
     table.insert(xcake_bars, config)
 end
 
-function component(name, config)
+function ui.component(name, config)
     config = config or {}
     config['xcake_component'] = name
     return config
 end
 
--- public bindings
+-- wildcard access for ui.label etc
+local mt = getmetatable(ui) or {}
+mt.__index = function(_, key)
+    return function(...)
+        return ui.component(key, ...)
+    end
+end
+setmetatable(ui, mt)
+
+package.loaded["ui"] = ui
+builtin_modules["ui"] = true
+
+local wm = {}
 
 xcake_window_title = ""
 xcake_i3_mode = "default"
 
-function window_title()
+function wm.window_title()
     return xcake_window_title
 end
 
-function i3_mode()
+function wm.i3_mode()
     return xcake_i3_mode
 end
 
-function set_workspace(value)
+function wm.set_workspace(value)
     if type(value) == "string" then
         xcake_cycle_workspace(value)
     elseif type(value) == "number" then
         xcake_focus_workspace(value)
     end
 end
+
+package.loaded["wm"] = wm
+builtin_modules["wm"] = true
 
 -- "stdlib"
 
@@ -164,7 +183,7 @@ function log(...)
         end
     end
 
-    for i, v in ipairs(args) do
+    for _, v in ipairs(args) do
         table.insert(result, serialize(v))
     end
 
