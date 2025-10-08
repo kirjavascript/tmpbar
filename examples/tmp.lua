@@ -12,6 +12,7 @@
 -- API improvements: primitives for svg?
 --
 -- text style
+--https://docs.rs/egui/latest/egui/struct.FontDefinitions.html
 
 local ui = require('ui')
 local wm = require('wm')
