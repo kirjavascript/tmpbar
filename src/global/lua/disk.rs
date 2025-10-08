@@ -63,5 +63,5 @@ pub fn bind(lua: &mlua::Lua, globals: &mlua::Table) {
         Ok(table)
     }).unwrap();
 
-    globals.set("disk", disk).unwrap();
+    globals.set("xcake_disk", disk).unwrap();
 }

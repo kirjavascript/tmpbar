@@ -38,5 +38,5 @@ pub fn bind(lua: &mlua::Lua, globals: &mlua::Table) {
         Ok(data)
     }).unwrap();
 
-    globals.set("cpu_temp", cpu_temp).unwrap();
+    globals.set("xcake_cpu_temp", cpu_temp).unwrap();
 }

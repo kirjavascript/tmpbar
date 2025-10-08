@@ -78,6 +78,38 @@ end
 package.loaded["wm"] = wm
 builtin_modules["wm"] = true
 
+local sys = {}
+
+function sys.exec(cmd)
+    local handle = io.popen(cmd)
+    local result = handle:read("*a")
+    handle:close()
+    return result
+end
+
+function sys.spawn(...)
+    return xcake_spawn(...)
+end
+
+function sys.memory(...)
+    return xcake_memory(...)
+end
+
+function sys.disk(...)
+    return xcake_disk(...)
+end
+
+function sys.cpu_temp(...)
+    return xcake_cpu_temp(...)
+end
+
+function sys.bandwidth(...)
+    return xcake_bandwidth(...)
+end
+
+package.loaded["sys"] = sys
+builtin_modules["sys"] = true
+
 -- "stdlib"
 
 function read_file(filePath)
@@ -95,13 +127,6 @@ function read_file(filePath)
 
     file:close()
     return content
-end
-
-function exec(cmd)
-    local handle = io.popen(cmd)
-    local result = handle:read("*a")
-    handle:close()
-    return result
 end
 
 function trim(s)

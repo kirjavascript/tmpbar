@@ -59,6 +59,6 @@ pub fn bind(lua: &mlua::Lua, globals: &mlua::Table) {
         Ok(table)
     }).unwrap();
 
-    globals.set("bandwidth", network).unwrap();
+    globals.set("xcake_bandwidth", network).unwrap();
 
 }

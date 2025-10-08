@@ -13,7 +13,7 @@
 
 local ui = require('ui')
 local wm = require('wm')
--- stats
+local sys = require('sys')
 
 for monitor_index, monitor in ui.monitors() do
     ui.bar({
@@ -108,7 +108,7 @@ for monitor_index, monitor in ui.monitors() do
                     }),
                     ui.label({ -- network
                         text = function()
-                            local bw = bandwidth();
+                            local bw = sys.bandwidth();
                             return bw.enp3s0 and bw.enp3s0.down
                                 or bw.eth0 and bw.eth0.down
                                 or '[no interface]'
@@ -116,29 +116,29 @@ for monitor_index, monitor in ui.monitors() do
                     }),
                     ui.label({
                         text = function()
-                            return 'MEM ' .. memory().used_percent
+                            return 'MEM ' .. sys.memory().used_percent
                         end,
                     }),
                     ui.label({
                         text = function()
-                            return cpu_temp() .. '°C'
+                            return sys.cpu_temp() .. '°C'
                         end,
                     }),
                     ui.label({
                         text = function()
-                            return disk()['/'].free .. ' free'
+                            return sys.disk()['/'].free .. ' free'
                         end,
                     }),
                     ui.button({
                         text = "shutdown",
                         size = 100,
-                        click = function() return spawn("~/.config/i3/scripts/powermenu") end
+                        click = function() return sys.spawn("~/.config/i3/scripts/powermenu") end
                     }),
 
                     ui.button({
                         text = "activate",
                         size = 100,
-                        click = function() return spawn("activate-linux") end
+                        click = function() return sys.spawn("activate-linux") end
                     }),
                     monitor_index == 1 and ui.tray({
                         color = "#0A3A77",

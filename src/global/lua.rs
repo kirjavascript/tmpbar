@@ -64,7 +64,7 @@ pub fn load_lua(ctx: egui::Context) -> (mlua::Lua, Signal<LuaCallback>) {
         Ok(())
     }).unwrap();
 
-    globals.set("spawn", spawn).unwrap();
+    globals.set("xcake_spawn", spawn).unwrap();
 
     bandwidth::bind(&lua, &globals);
     memory::bind(&lua, &globals);
