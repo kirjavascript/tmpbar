@@ -10,6 +10,8 @@
 -- make style property dynamic? make all properties?
 
 -- API improvements: primitives for svg
+-- move background to style
+-- support "red" for background
 
 local ui = require('ui')
 local wm = require('wm')
@@ -63,14 +65,14 @@ for monitor_index, monitor in ui.monitors() do
                 },
                 text = function()
                     local mode = wm.i3_mode()
-                    return (mode == "default") and "" or ("« " .. mode .. " »")
+                    return (mode == "default") and "" or (" « " .. mode .. " » ")
                 end,
                 background = function(svg)
                     local is_default = wm.i3_mode() == "default"
                     local color = is_default and "transparent" or "darkred"
 
                     return ([[
-                        <rect x="0" y="0" width="%d" height="%d" fill="%s" rx="2"/>
+                        <rect width="%d" height="%d" fill="%s" rx="2"/>
                     ]]):format(svg.width, svg.height, color)
                 end,
             }),
