@@ -7,30 +7,35 @@ for _, monitor in ui.monitors() do
         height = 80,
 
         style = {
-            justify_content = "space_between",
             size = "max",
-        },
+            justify_content = "space_between",
+            background = function(svg) return string.format([[
+                <defs>
+                    <linearGradient id="grad" x1="0%%" y1="0%%" x2="100%%" y2="0%%">
+                        <stop offset="2%%" stop-color="green" />
+                        <stop offset="70%%" stop-color="orange" />
+                    </linearGradient>
+                </defs>
 
-        background = function(svg) return string.format([[
-            <rect width="%d" height="%d" fill="green" />
-        ]], svg.width, svg.height) end,
+                <rect width="%d" height="%d" fill="url(#grad)" />
+            ]], svg.width, svg.height) end,
+        },
 
         items = {
             ui.label({
                 style = {
+                    background = "rebeccapurple",
                     position = "absolute",
                     margin = "auto",
                 },
-                background = function(svg) return string.format([[
-                    <rect width="%d" height="%d" fill="pink" />
-                ]], svg.width, svg.height) end,
                 text = "centre"
             }),
             ui.container({
-                style = { gap = 10 },
-                background = function(svg) return string.format([[
-                    <rect width="%d" height="%d" fill="red" />
-                ]], svg.width, svg.height) end,
+                style = {
+                    background = "darkred",
+                    gap = 10,
+                    padding = 20,
+                },
                 items = {
                     ui.label({ text = "left" }),
                     ui.label({ text = "left2" }),
@@ -39,13 +44,12 @@ for _, monitor in ui.monitors() do
             }),
             ui.container({
                 style = {
+                    background = "steelblue",
                     flex_direction = "column",
                     justify_content = "space_around",
-                    size = "max",
+                    height = "max",
+                    width = 200,
                 },
-                background = function(svg) return string.format([[
-                    <rect width="%d" height="%d" fill="blue" />
-                ]], svg.width, svg.height) end,
                 items = {
                     ui.label({ text = "right" }),
                     ui.label({ text = "right2" }),

@@ -1,15 +1,3 @@
-use eframe::egui;
-use egui::Ui;
-use crate::config::{Component, Property};
-use crate::global::Global;
-
-pub fn render_background(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
-    if let Some(Property::Function(func)) = comp.props().get("background") {
-        let rect = ui.available_rect_before_wrap();
-        svg_image(&global.lua, func, &rect).paint_at(ui, rect);
-    }
-}
-
 pub fn svg_image<'a>(lua: &mlua::Lua, func: &mlua::OwnedFunction, rect: &egui::Rect) -> egui::Image<'a> {
     let width = (rect.max.x - rect.min.x).floor();
     let height = (rect.max.y - rect.min.y).floor();
