@@ -104,8 +104,10 @@ impl Tray {
         if Some(color) != self.old_bgcolor.as_deref() {
             self.old_bgcolor = Some(color.to_string());
 
-            if let Some(number) = web_color_to_u32(color) {
-                let number = number >> 8;
+            if let Ok(color) = csscolorparser::parse(color) {
+                let [r, g, b, _] = color.to_rgba8();
+
+                let number = ((r as u32) << 16) + ((g as u32) << 8) + b as u32;
                 self.tx_proxy.send(ProxyAction::BgColor(number)).ok();
             }
         }

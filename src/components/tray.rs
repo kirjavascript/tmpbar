@@ -43,7 +43,9 @@ pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
         tray.set_size(available_height as u32);
     }
 
-    if let Some(Property::String(color)) = comp.props().get("color") {
-        tray.set_bgcolor(color);
+    if let Some(Property::Object(style)) = comp.props().get("style") {
+        if let Some(Property::String(color)) = style.get("background_color") {
+            tray.set_bgcolor(color);
+        }
     }
 }

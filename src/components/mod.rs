@@ -16,12 +16,6 @@ pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
     core::render_background(comp, ui, global);
     core::apply_scroll(comp, ui);
 
-    // TODO: https://docs.rs/egui_taffy/0.9.0/egui_taffy/bg/simple/struct.TuiBackground.html
-
-    if comp.props().get("debug").unwrap_or_default().into() {
-        ui.painter().rect_filled(ui.available_rect_before_wrap(), 0.0, egui::Color32::from_rgb(128, 0, 128));
-    }
-
     match comp.name() {
         "input" => input::render(comp, ui),
         "container" => container::render(comp, ui, global),

@@ -3,6 +3,8 @@ use egui::Ui;
 use crate::config::{Component, Property, get_text};
 use crate::global::Global;
 
+// TODO: https://docs.rs/egui_taffy/0.9.0/egui_taffy/bg/simple/struct.TuiBackground.html
+
 pub fn render_background(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
     if let Some(Property::Object(style)) = comp.props().get("style") {
         if let Some(Property::Function(func)) = style.get("background") {

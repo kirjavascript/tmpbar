@@ -37,7 +37,6 @@ for _, monitor in ui.monitors() do
                     padding = 20,
                 },
                 items = {
-                    ui.label({ text = "left" }),
                     ui.label({ text = "left2" }),
                     ui.label({ text = "left3" }),
                 },

@@ -13,6 +13,7 @@
 --
 -- text style
 --https://docs.rs/egui/latest/egui/struct.FontDefinitions.html
+--https://github.com/emilk/egui/discussions/3868
 
 local ui = require('ui')
 local wm = require('wm')
@@ -98,6 +99,9 @@ for monitor_index, monitor in ui.monitors() do
                 }) end
             }),
             ui.container({
+                style = {
+                    -- height = "max",
+                },
                 items = {
                     ui.label({ -- clock
                         text = function() return os.date("%Y-%m-%d %a %X") end,
@@ -137,7 +141,9 @@ for monitor_index, monitor in ui.monitors() do
                         click = function() return sys.spawn("activate-linux") end
                     }),
                     monitor_index == 1 and ui.tray({
-                        color = "#0A3A77",
+                        style = {
+                            background_color = "#0A3A77",
+                        },
                     }),
                 },
             }),
