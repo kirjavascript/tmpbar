@@ -13,7 +13,7 @@ pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
     let props = comp.props();
 
     let monitor_index: i64 = props.get("_monitor_index").unwrap_or_default().into();
-    let show_all: bool = props.get("showAll").unwrap_or_default().into();
+    let show_all: bool = props.get("show_all").unwrap_or_default().into();
 
     let workspaces: Vec<Workspace> = global.workspaces.list().into_iter().filter(|workspace| {
         show_all || workspace.monitor_index == monitor_index as u32
@@ -33,14 +33,14 @@ pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
 
                         let default_props = copy_default(props);
                         if let Property::Component(mut comp) = to_property(component, &default_props) {
-                        let ui = tui.egui_ui_mut();
-                        let style = core::style(&mut comp, ui);
+                            let ui = tui.egui_ui_mut();
+                            let style = core::style(&mut comp, ui);
 
-                        tui
-                            .style(style)
-                            .ui(|ui| {
-                                crate::components::render(&mut comp, ui, global);
-                            });
+                            tui
+                                .style(style)
+                                .ui(|ui| {
+                                    crate::components::render(&mut comp, ui, global);
+                                });
                         }
                     } else {
                         error!("{}", result.err().unwrap().to_string());
