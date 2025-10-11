@@ -23,7 +23,7 @@ for monitor_index, monitor in ui.monitors() do
     ui.bar({
         monitor = monitor,
         position = "top",
-        height = 130,
+        height = 130, -- move to style
 
         style = {
             display = "flex",

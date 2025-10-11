@@ -46,6 +46,8 @@ pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
     if let Some(Property::Object(style)) = comp.props().get("style") {
         if let Some(Property::String(color)) = style.get("background_color") {
             tray.set_bgcolor(color);
+        } else if let Some(Property::String(color)) = style.get("background") {
+            tray.set_bgcolor(color);
         }
     }
 }

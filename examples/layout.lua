@@ -1,6 +1,6 @@
 local ui = require('ui')
 
-for _, monitor in ui.monitors() do
+for index, monitor in ui.monitors() do
     ui.bar({
         monitor = monitor,
         position = "top",
@@ -34,9 +34,10 @@ for _, monitor in ui.monitors() do
                 style = {
                     background = "darkred",
                     gap = 10,
-                    padding = 20,
+                    padding = 10,
                 },
                 items = {
+                    ui.label({ text = "left1" }),
                     ui.label({ text = "left2" }),
                     ui.label({ text = "left3" }),
                 },
@@ -50,8 +51,15 @@ for _, monitor in ui.monitors() do
                     width = 200,
                 },
                 items = {
-                    ui.label({ text = "right" }),
+                    index == 1 and ui.tray({
+                        style = {
+                            background_color = "steelblue",
+                            height = 20,
+                            align_self = "end",
+                        },
+                    }),
                     ui.label({ text = "right2" }),
+                    ui.label({ text = "right", style = { background_color = "pink" }, }),
                     ui.label({ text = "right3" }),
                 },
             }),

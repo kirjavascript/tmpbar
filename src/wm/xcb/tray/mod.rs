@@ -5,8 +5,6 @@ mod count_trays;
 
 pub use count_trays::*;
 
-use crate::util::web_color_to_u32;
-
 use manager::{Manager, TrayEvent, ProxyAction};
 
 use crossbeam_channel::{unbounded, select, Receiver, Sender};
