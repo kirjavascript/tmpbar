@@ -15,5 +15,7 @@ pub fn render(comp: &mut Component, ui: &mut Ui) {
         text
     };
 
-    ui.label(text);
+    ui.vertical_centered(|ui| {
+        ui.label(text);
+    });
 }

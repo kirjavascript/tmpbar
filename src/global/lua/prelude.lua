@@ -1,3 +1,50 @@
+-- "stdlib"
+
+local function read_file(filePath)
+    local file, err = io.open(filePath, "r")
+    if not file then
+        return nil, err
+    end
+
+    local content = {}
+    local byte = file:read(1)
+    while byte do
+        table.insert(content, string.byte(byte))
+        byte = file:read(1)
+    end
+
+    file:close()
+    return content
+end
+
+local function trim(s)
+    return (s:gsub("^%s*(.-)%s*$", "%1"))
+end
+
+---@diagnostic disable: lowercase-global
+function truncate(s, length, ellipse)
+    ellipse = ellipse or "..."
+    if #s > length then
+        return string.sub(s, 1, length) .. ellipse
+    else
+        return s
+    end
+end
+
+local function throttle(fn, delay)
+    local last_call = 0
+    local value
+    return function(...)
+        local now = os.clock()
+        if now - last_call >= delay or value == nil then
+            last_call = now
+            value = fn(...)
+        end
+
+        return value
+    end
+end
+
 -- "private" bindings
 
 -- track built in packages
@@ -111,40 +158,30 @@ function sys.bandwidth(...)
     return xcake_bandwidth(...)
 end
 
+local get_ip = throttle(function()
+    return trim(sys.exec([[
+        local_ip=$(
+          if command -v ip >/dev/null 2>&1; then
+            ip route get 8.8.8.8 2>/dev/null | awk '{for(i=1;i<=NF;i++) if ($i=="src") print $(i+1)}'
+          elif command -v hostname >/dev/null 2>&1 && hostname -I >/dev/null 2>&1; then
+            hostname -I | awk '{print $1}'
+          elif command -v ifconfig >/dev/null 2>&1; then
+            ifconfig | grep -Eo 'inet (addr:)?([0-9]+\.){3}[0-9]+' | grep -vE '127\.0\.0\.1|255\.255\.255\.255' | awk '{print $2; exit}'
+          fi
+        )
+
+        echo "$local_ip"
+    ]]))
+end, 120.0)
+
+function sys.ip()
+    return get_ip()
+end
+
+print(sys.ip())
+
 package.loaded["sys"] = sys
 builtin_modules["sys"] = true
-
--- "stdlib"
-
-function read_file(filePath)
-    local file, err = io.open(filePath, "r")
-    if not file then
-        return nil, err
-    end
-
-    local content = {}
-    local byte = file:read(1)
-    while byte do
-        table.insert(content, string.byte(byte))
-        byte = file:read(1)
-    end
-
-    file:close()
-    return content
-end
-
-function trim(s)
-    return (s:gsub("^%s*(.-)%s*$", "%1"))
-end
-
-function truncate(s, length, ellipse)
-    ellipse = ellipse or "..."
-    if #s > length then
-        return string.sub(s, 1, length) .. ellipse
-    else
-        return s
-    end
-end
 
 function log(...)
     local args = {...}

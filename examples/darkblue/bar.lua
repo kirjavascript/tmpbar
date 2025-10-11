@@ -30,8 +30,9 @@ for index, monitor in ui.monitors() do
             }),
             ui.container({
                 items = {
-                    ui.image({ path = "./assets/manjaro.svg", style = { size = 24 } }),
+                    ui.image({ path = "./assets/manjaro.svg", style = { size = 26, padding_right = 3, } }),
                     ui.workspaces({
+                        style = { gap = 3 },
                         render = function (workspace) return ui.label({
                                 style = {
                                     height = 23,
@@ -86,7 +87,21 @@ for index, monitor in ui.monitors() do
                         end,
                     }),
                     -- battery
-                    -- ip
+                    ui.image({
+                        style = {
+                            margin_left = 10,
+                            align_self = "center",
+                            size = 15,
+                        },
+                        path = "./assets/ip.svg",
+                    }),
+                    ui.label({ -- ip
+                        style = { margin_left = 5,align_self = "center" },
+                        text = function()
+                            return sys.ip()
+                        end,
+                    }),
+
                     ui.image({
                         style = {
                             margin_left = 10,
@@ -136,7 +151,7 @@ for index, monitor in ui.monitors() do
                             background_color = "black",
                             height = 20,
                             margin_left = 10,
-                            align_self = "end",
+                            align_self = "center",
                         },
                     }),
                     ui.image({
