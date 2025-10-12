@@ -178,8 +178,6 @@ function sys.ip()
     return get_ip()
 end
 
-print(sys.ip())
-
 package.loaded["sys"] = sys
 builtin_modules["sys"] = true
 

@@ -32,22 +32,21 @@ for index, monitor in ui.monitors() do
                 items = {
                     ui.image({ path = "./assets/manjaro.svg", style = { size = 26, padding_right = 3, } }),
                     ui.workspaces({
-                        style = { gap = 3 },
+                        style = { gap = 3, height = 23 },
                         render = function (workspace) return ui.label({
-                                style = {
-                                    height = 23,
-                                    width = 20,
-                                    background_color = function()
-                                        return workspace.urgent and "red"
-                                            or workspace.focused and blue
-                                            or workspace.visible and darkblue
-                                            or "black"
-                                    end,
-                                },
-                                text = tostring(workspace.name):sub(1, 1),
-                                click = function()
-                                    wm.set_workspace(workspace.number)
+                            style = {
+                                width = 20,
+                                background_color = function()
+                                    return workspace.urgent and "red"
+                                        or workspace.focused and blue
+                                        or workspace.visible and darkblue
+                                        or "black"
                                 end,
+                            },
+                            text = tostring(workspace.name):sub(1, 1),
+                            click = function()
+                                wm.set_workspace(workspace.number)
+                            end,
                         }) end
                     }),
                     ui.label({ -- i3 mode
