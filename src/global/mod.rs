@@ -21,11 +21,15 @@ impl Global {
         let xcb_signal: Signal<xcb::Event> = Signal::new(ctx.clone());
         xcb::listen(xcb_signal.clone());
 
-        let (lua, lua_signal) = lua::load_lua(ctx.clone());
-
         // set parent path
         let parent = path.parent().map(|p| p.to_path_buf());
         let parent_path = format!("{}/", parent.expect("error getting parent path").to_string_lossy());
+
+        if let Err(error) = std::env::set_current_dir(&parent_path) {
+            error!("cannot set cwd {}", error);
+        }
+
+        let (lua, lua_signal) = lua::load_lua(ctx.clone());
 
         let i3mode_signal: Signal<String> = Signal::new(ctx);
         i3mode::listen(i3mode_signal.clone()).ok();

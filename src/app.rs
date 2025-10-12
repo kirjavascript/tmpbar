@@ -22,9 +22,7 @@ impl TmpBar {
             cc.egui_ctx.clone(),
         );
 
-        if let Err(error) = std::env::set_current_dir(&global.parent_path) {
-            error!("cannot set cwd {}", error);
-        }
+        // [!] cwd is now set to the location of the config
 
         let config = config::script::init(
             &path,

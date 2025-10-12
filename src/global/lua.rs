@@ -5,6 +5,7 @@ mod bandwidth;
 mod cpu;
 mod disk;
 mod memory;
+mod fonts;
 
 #[derive(Clone)]
 pub enum LuaCallback {
@@ -15,11 +16,12 @@ pub enum LuaCallback {
 pub fn load_lua(ctx: egui::Context) -> (mlua::Lua, Signal<LuaCallback>) {
     let lua = mlua::Lua::new();
     let globals = lua.globals();
+
     lua.load(include_str!("./lua/prelude.lua")).exec().unwrap();
 
     // callbacks
 
-    let signal: Signal<LuaCallback> = Signal::new(ctx);
+    let signal: Signal<LuaCallback> = Signal::new(ctx.clone());
 
     let fn_signal = signal.clone();
     let cycle_workspace = lua.create_function(move |_, direction: String| {
@@ -66,10 +68,16 @@ pub fn load_lua(ctx: egui::Context) -> (mlua::Lua, Signal<LuaCallback>) {
 
     globals.set("xcake_spawn", spawn).unwrap();
 
+    // stats
+
     bandwidth::bind(&lua, &globals);
     memory::bind(&lua, &globals);
     cpu::bind(&lua, &globals);
     disk::bind(&lua, &globals);
+
+    // fonts
+
+    fonts::bind(&ctx, &lua, &globals);
 
     drop(globals);
 

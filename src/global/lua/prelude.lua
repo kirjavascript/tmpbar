@@ -163,8 +163,6 @@ local get_ip = throttle(function()
         local_ip=$(
           if command -v ip >/dev/null 2>&1; then
             ip route get 8.8.8.8 2>/dev/null | awk '{for(i=1;i<=NF;i++) if ($i=="src") print $(i+1)}'
-          elif command -v hostname >/dev/null 2>&1 && hostname -I >/dev/null 2>&1; then
-            hostname -I | awk '{print $1}'
           elif command -v ifconfig >/dev/null 2>&1; then
             ifconfig | grep -Eo 'inet (addr:)?([0-9]+\.){3}[0-9]+' | grep -vE '127\.0\.0\.1|255\.255\.255\.255' | awk '{print $2; exit}'
           fi
