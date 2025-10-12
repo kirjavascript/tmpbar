@@ -83,6 +83,10 @@ function ui.bar(config)
     table.insert(xcake_bars, config)
 end
 
+function ui.add_font(name, path)
+    xcake_add_font(name, path)
+end
+
 function ui.component(name, config)
     config = config or {}
     config['xcake_component'] = name

@@ -1,10 +1,8 @@
 local ui = require('ui')
 
-xcake_load_font("Hack", "./Hack-Regular.ttf")
-xcake_load_font("CyberBlast", "./CyberBlast.otf")
-xcake_load_font("ByteBounce", "./ByteBounce.ttf")
-
-
+ui.add_font("CyberBlast", "./CyberBlast.otf")
+ui.add_font("ByteBounce", "./ByteBounce.ttf")
+ui.add_font("Hack", "./Hack-Regular.ttf")
 
 for _, monitor in ui.monitors() do
     ui.bar({
@@ -21,10 +19,10 @@ for _, monitor in ui.monitors() do
 
         items = {
             ui.label({
-                text = "Hello with Hack font!",
+                text = "Hello with CycberBlast",
                 style = {
-                    font_family = "Hack",
-                    font_size = 16,
+                    font_family = "CyberBlast",
+                    font_size = 40,
                     color = "red"
                 }
             }),

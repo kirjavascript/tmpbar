@@ -17,7 +17,7 @@ pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
 
     // grab available size before allocating
     let available_height = scale * ui.available_height().min(
-        ui.ctx().screen_rect().height()
+        ui.ctx().viewport_rect().height()
     ).round();
 
     // allocate size
