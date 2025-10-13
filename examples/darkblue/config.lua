@@ -14,6 +14,7 @@ for index, monitor in ui.monitors() do
         style = {
             size = "max",
             justify_content = "space_between",
+            color = "#DDD",
             background = function(svg) return string.format([[
                 <rect width="%d" height="%d" fill="black" />
                 <rect x="0" y="%d" width="%d" height="2" fill="%s" />
@@ -25,6 +26,7 @@ for index, monitor in ui.monitors() do
                 style = {
                     position = "absolute",
                     margin = "auto",
+                    padding_bottom = 4,
                 },
                 text = function() return "« " .. truncate(wm.window_title(), 80) .. " »" end,
             }),
