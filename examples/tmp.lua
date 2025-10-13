@@ -1,18 +1,11 @@
 -- TODO
 -- click on everything
 -- animated SVG for battery monitor, CPU graph
--- window()
---
--- colours / styles / layout
--- `cc.egui_ctx.set_visuals` and `cc.egui_ctx.set_fonts`.
---
 -- input: pressing enter doesnt unfocus properly
 -- make style property dynamic? make all properties?
-
--- API improvements: primitives for svg?
 --
 -- text style
---https://docs.rs/egui/latest/egui/struct.FontDefinitions.html
+-- layout
 --https://github.com/emilk/egui/discussions/3868
 
 local ui = require('ui')
