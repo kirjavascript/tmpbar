@@ -12,6 +12,7 @@ pub fn render(comp: &mut Component, ui: &mut Ui) {
         text
     };
 
+    // TODO: try widget_visual
     // TODO: validate font first
     // TODO: preprocess font to cascade?
     // TODO: function, only apply if style

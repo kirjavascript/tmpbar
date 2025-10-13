@@ -14,6 +14,7 @@ for _, monitor in ui.monitors() do
             size = "max",
             justify_content = "space_around",
             background_color = "black",
+            color = "red",
             padding = 10,
         },
 
