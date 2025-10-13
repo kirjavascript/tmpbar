@@ -6,9 +6,7 @@ pub fn bind(ctx: &egui::Context, lua: &mlua::Lua, globals: &mlua::Table) {
     let fonts = Rc::new(RefCell::new(egui::FontDefinitions::default()));
 
     let load_font = lua.create_function(move |_, (name, path): (String, String)| {
-        use std::fs;
-
-        match fs::read(&path) {
+        match std::fs::read(&path) {
             Ok(font_data) => {
                 let mut fonts = fonts.borrow_mut();
 

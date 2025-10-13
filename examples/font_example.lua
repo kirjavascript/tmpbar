@@ -19,7 +19,7 @@ for _, monitor in ui.monitors() do
 
         items = {
             ui.label({
-                text = "Hello with CycberBlast",
+                text = "Hello with CyberBlast",
                 style = {
                     font_family = "CyberBlast",
                     font_size = 40,
@@ -28,11 +28,11 @@ for _, monitor in ui.monitors() do
             }),
 
             ui.label({
-                text = "Hello with Hack font!",
+                text = "Hello with Hack",
                 style = {
                     font_family = "Hack",
                     font_size = 16,
-                    color = "red"
+                    color = "rebeccapurple"
                 }
             }),
             ui.label({

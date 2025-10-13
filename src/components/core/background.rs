@@ -24,13 +24,12 @@ pub fn render_background(comp: &mut Component, ui: &mut Ui, global: &mut Global)
 }
 
 fn background_color(text: &str, ui: &mut Ui) {
-    match csscolorparser::parse(text) {
+    match crate::util::color_parse(text) {
         Ok(color) => {
-            let [r, g, b, a] = color.to_rgba8();
-            ui.painter().rect_filled(ui.available_rect_before_wrap(), 0.0, egui::Color32::from_rgba_unmultiplied(r, g, b, a));
+            ui.painter().rect_filled(ui.available_rect_before_wrap(), 0.0, color);
         },
         Err(err) => {
-            error!("{}: color {}", text, err);
+            error!("{}", err);
         },
     }
 }
