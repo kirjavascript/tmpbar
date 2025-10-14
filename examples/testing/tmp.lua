@@ -2,13 +2,12 @@
 -- click on everything
 -- animated SVG for battery monitor, CPU graph
 -- input: pressing enter doesnt unfocus properly
--- make style property dynamic? make all properties?
 --
--- button style
+-- button/input style
+--https://github.com/emilk/egui/discussions/3868
 -- text layout
 -- battery sys
 -- cpu% sys
---https://github.com/emilk/egui/discussions/3868
 
 local ui = require('ui')
 local wm = require('wm')
@@ -23,9 +22,9 @@ for monitor_index, monitor in ui.monitors() do
             height = 130,
             justify_items = 'flex_end',
             justify_content = 'space_between',
-            -- align_items = "flex_end",
-            -- flex_direction = "column",
-            -- postion = "absolute",
+            -- align_items = 'flex_end',
+            -- flex_direction = 'column',
+            -- postion = 'absolute',
             background = function(svg) return string.format([[
                 <rect
                     x="0"

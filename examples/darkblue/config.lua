@@ -71,6 +71,7 @@ for index, monitor in ui.monitors() do
             }),
             ui.container({
                 style = {
+                    height = 18,
                 },
                 items = {
                     ui.label({ -- memory
@@ -101,7 +102,7 @@ for index, monitor in ui.monitors() do
                         path = './assets/ip.svg',
                     }),
                     ui.label({ -- ip
-                        style = { margin_left = 5,align_self = 'center' },
+                        style = { margin_left = 5, align_self = 'center' },
                         text = function()
                             return sys.ip()
                         end,
