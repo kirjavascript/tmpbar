@@ -6,6 +6,8 @@
 --
 -- button style
 -- text layout
+-- battery sys
+-- cpu% sys
 --https://github.com/emilk/egui/discussions/3868
 
 local ui = require('ui')
@@ -147,9 +149,9 @@ for _, monitor in ui.monitors() do
     ui.bar({
         monitor = monitor,
         position = 'bottom',
-        height = 1,
 
         style = {
+            height = 1,
             background_color = 'black',
         },
 
