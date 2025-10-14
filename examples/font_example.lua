@@ -51,7 +51,7 @@ for _, monitor in ui.monitors() do
             ui.label({
                 text = "Large custom font",
                 style = {
-                    font_family = "Hack2",
+                    font_family = "Hack",
                     color = "#00FF00",
                     font_size = 24
                 }

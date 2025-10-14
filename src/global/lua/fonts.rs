@@ -17,11 +17,6 @@ pub fn bind(ctx: &egui::Context, lua: &mlua::Lua, globals: &mlua::Table) {
                     vec![name.clone()]
                 );
 
-                let proportional = fonts.families.get_mut(&egui::FontFamily::Proportional).unwrap();
-                if !proportional.contains(&name) {
-                    proportional.insert(0, name.to_owned());
-                }
-
                 ctx_clone.set_fonts(fonts.clone());
                 Ok(())
             },

@@ -1,20 +1,18 @@
 use std::fs::File;
 use std::path::PathBuf;
 use std::io::prelude::*;
-use super::parse::{Bar, parse_bars, Property};
-use crate::util::{Signal, color_parse};
+use super::parse::{Bar, parse_bars};
+use crate::util::{Signal};
 
 pub struct ConfigScript {
     pub path: PathBuf,
     pub bars: Vec<Bar>,
     pub reload_signal: Signal<()>,
-    ctx: egui::Context,
 }
 
 impl ConfigScript {
     pub fn reload(&mut self, lua: &mlua::Lua) -> Result<(), String> {
         load(self, lua)?;
-        self.set_visual();
         Ok(())
     }
 }
@@ -23,13 +21,10 @@ pub fn init(path: &PathBuf, ctx: egui::Context, lua: &mlua::Lua) -> ConfigScript
     let mut script = ConfigScript {
         path: path.to_owned(),
         bars: Vec::new(),
-        reload_signal: Signal::new(ctx.clone()),
-        ctx,
+        reload_signal: Signal::new(ctx),
     };
 
-
     let load_result = load(&mut script, lua);
-    script.set_visual();
 
     match load_result {
         Ok(_) => {
@@ -92,23 +87,4 @@ fn set_monitors(lua: &mlua::Lua, globals: &mlua::Table) -> mlua::Result<()> {
     globals.set("xcake_monitors", monitors)?;
 
     Ok(())
-}
-
-impl ConfigScript {
-    pub fn set_visual(&mut self) {
-        if let Some(bar) = self.bars.get(0) {
-            if let Some(Property::Object(style)) = bar.container.props_ref().get("style") {
-                if let Some(Property::String(color)) = style.get("color") {
-                    match color_parse(color) {
-                        Ok(color) => {
-                            let mut visuals = egui::Visuals::default();
-                            visuals.override_text_color = Some(color);
-                            self.ctx.set_visuals(visuals);
-                        },
-                        Err(err) => error!("{}", err),
-                    }
-                }
-            }
-        }
-    }
 }

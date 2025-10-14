@@ -1,16 +1,20 @@
 mod lua;
+pub mod theme;
 
 use crate::util::Signal;
 use crate::wm::xcb::workspaces::Workspaces;
 use crate::wm::xcb;
 use crate::wm::i3mode;
 use lua::LuaCallback;
+pub use theme::Theme;
 
 pub struct Global {
     pub lua: mlua::Lua,
     pub workspaces: Workspaces,
     pub tray: Option<xcb::Tray>,
     pub parent_path: String,
+    pub theme: Theme,
+    ctx: egui::Context,
     xcb_signal: Signal<xcb::Event>,
     lua_signal: Signal<LuaCallback>,
     i3mode_signal: Signal<String>
@@ -31,7 +35,7 @@ impl Global {
 
         let (lua, lua_signal) = lua::load_lua(ctx.clone());
 
-        let i3mode_signal: Signal<String> = Signal::new(ctx);
+        let i3mode_signal: Signal<String> = Signal::new(ctx.clone());
         i3mode::listen(i3mode_signal.clone()).ok();
 
         Self {
@@ -39,9 +43,11 @@ impl Global {
             tray: None,
             parent_path,
             lua,
+            theme: Theme::default(),
             xcb_signal,
             lua_signal,
             i3mode_signal,
+            ctx,
         }
     }
 
@@ -80,6 +86,33 @@ impl Global {
 
         if let Some(tray) = self.tray.as_mut() {
             tray.signals();
+        }
+    }
+
+    pub fn set_theme(&mut self, config: &crate::config::ConfigScript) {
+        use crate::config::Property;
+
+        if let Some(bar) = config.bars.get(0) {
+            if let Some(Property::Object(style)) = bar.container.props_ref().get("style") {
+                if let Some(Property::String(color)) = style.get("color") {
+                    match crate::util::color_parse(color) {
+                        Ok(color) => {
+                            let mut visuals = egui::Visuals::default();
+                            visuals.override_text_color = Some(color);
+                            self.ctx.set_visuals(visuals);
+
+                            self.theme.color = Some(color);
+                        },
+                        Err(err) => error!("{}", err),
+                    }
+                }
+                if let Some(Property::String(family)) = style.get("font_family") {
+                    self.theme.font_family = Some(family.to_owned());
+                }
+                if let Some(Property::Integer(size)) = style.get("font_size") {
+                    self.theme.font_size = Some(*size as _);
+                }
+            }
         }
     }
 }

@@ -30,6 +30,8 @@ impl TmpBar {
             &global.lua
         );
 
+        global.set_theme(&config);
+
         crate::wm::xcb::window_patch(&config);
 
         let trays = crate::wm::xcb::count_trays(&config);
@@ -57,6 +59,7 @@ impl eframe::App for TmpBar {
             if let Err(err) = self.config.reload(&self.global.lua) {
                 error!("{}", err);
             } else {
+                self.global.set_theme(&self.config);
                 crate::wm::xcb::window_patch(&self.config);
             }
         }
