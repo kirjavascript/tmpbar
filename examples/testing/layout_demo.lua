@@ -50,13 +50,6 @@ for index, monitor in ui.monitors() do
                     width = 200,
                 },
                 items = {
-                    index == 1 and ui.tray({
-                        style = {
-                            background_color = 'steelblue',
-                            height = 20,
-                            align_self = 'end',
-                        },
-                    }),
                     ui.label({ text = 'right2' }),
                     ui.label({ text = 'right', style = { background_color = 'pink' }, }),
                     ui.label({ text = 'right3' }),
