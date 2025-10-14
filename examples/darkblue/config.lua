@@ -41,6 +41,7 @@ for index, monitor in ui.monitors() do
                         render = function (workspace) return ui.label({
                             style = {
                                 width = 20,
+                                -- align_self = 'center',
                                 background_color = function()
                                     return workspace.urgent and 'red'
                                         or workspace.focused and blue
@@ -74,7 +75,7 @@ for index, monitor in ui.monitors() do
                 items = {
                     ui.label({ -- memory
                         style = { align_self = 'center', },
-                        text = function() return 'MEM ' .. sys.memory().used_percent end,
+                        text = function() return 'ram ' .. sys.memory().used_percent end,
                     }),
                     ui.image({
                         style = {

@@ -4,8 +4,8 @@
 -- input: pressing enter doesnt unfocus properly
 -- make style property dynamic? make all properties?
 --
--- text style
--- layout
+-- button style
+-- text layout
 --https://github.com/emilk/egui/discussions/3868
 
 local ui = require('ui')
@@ -15,16 +15,15 @@ local sys = require('sys')
 for monitor_index, monitor in ui.monitors() do
     ui.bar({
         monitor = monitor,
-        position = "top",
+        position = 'top',
 
         style = {
             height = 130,
-            justify_items = "flex_end",
-            justify_content = "space_between",
+            justify_items = 'flex_end',
+            justify_content = 'space_between',
             -- align_items = "flex_end",
             -- flex_direction = "column",
             -- postion = "absolute",
-            size = "max",
             background = function(svg) return string.format([[
                 <rect
                     x="0"
@@ -43,45 +42,45 @@ for monitor_index, monitor in ui.monitors() do
         items = {
             ui.label({ -- window title
                 style = {
-                    position = "absolute",
-                    margin = "auto",
+                    position = 'absolute',
+                    margin = 'auto',
                 },
-                text = function() return "« " .. truncate(wm.window_title(), 80) .. " »" end,
+                text = function() return '« ' .. truncate(wm.window_title(), 80) .. ' »' end,
             }),
             ui.label({ -- i3 mode
                 style = {
-                    position = "absolute",
-                    margin_left = "auto",
-                    margin_right = "auto",
-                    size = "auto",
+                    position = 'absolute',
+                    margin_left = 'auto',
+                    margin_right = 'auto',
+                    size = 'auto',
                     bottom = 3,
                     background_color = function()
-                        local is_default = wm.i3_mode() == "default"
-                        return is_default and "transparent" or "darkred"
+                        local is_default = wm.i3_mode() == 'default'
+                        return is_default and 'transparent' or 'darkred'
                     end,
                 },
                 text = function()
                     local mode = wm.i3_mode()
-                    return (mode == "default") and "" or (" « " .. mode .. " » ")
+                    return (mode == 'default') and '' or (' « ' .. mode .. ' » ')
                 end,
             }),
             ui.image({
-                path = "https://sharey.org/8ilgDQ.png",
-                style = { padding = 3, size = "max", },
+                path = 'https://sharey.org/8ilgDQ.png',
+                style = { padding = 3, size = 'max', },
             }),
             ui.image({
-                path = "./archlinux.svg",
-                style = { size = "max" },
+                path = './assets/archlinux.svg',
+                style = { size = 'max' },
             }),
             ui.workspaces({
                 render = function (workspace) return ui.label({
                         style = {
-                            width = "20",
+                            width = '20',
                             background_color = function()
-                                return workspace.urgent and "red"
-                                    or workspace.focused and "#0A83FD"
-                                    or workspace.visible and "#0022CC"
-                                    or "black"
+                                return workspace.urgent and 'red'
+                                    or workspace.focused and '#0A83FD'
+                                    or workspace.visible and '#0022CC'
+                                    or 'black'
                             end,
                         },
                         text = tostring(workspace.name):sub(1, 1),
@@ -92,11 +91,11 @@ for monitor_index, monitor in ui.monitors() do
             }),
             ui.container({
                 style = {
-                    -- height = "max",
+                    -- height = 'max',
                 },
                 items = {
                     ui.label({ -- clock
-                        text = function() return os.date("%Y-%m-%d %a %X") end,
+                        text = function() return os.date('%Y-%m-%d %a %X') end,
                     }),
                     ui.label({ -- network
                         text = function()
@@ -122,19 +121,19 @@ for monitor_index, monitor in ui.monitors() do
                         end,
                     }),
                     ui.button({
-                        text = "shutdown",
+                        text = 'shutdown',
                         size = 100,
-                        click = function() return sys.spawn("~/.config/i3/scripts/powermenu") end
+                        click = function() return sys.spawn('~/.config/i3/scripts/powermenu') end
                     }),
 
                     ui.button({
-                        text = "activate",
+                        text = 'activate',
                         size = 100,
-                        click = function() return sys.spawn("activate-linux") end
+                        click = function() return sys.spawn('activate-linux') end
                     }),
                     monitor_index == 1 and ui.tray({
                         style = {
-                            background_color = "#0A3A77",
+                            background_color = '#0A3A77',
                         },
                     }),
                 },
@@ -147,15 +146,15 @@ end
 for _, monitor in ui.monitors() do
     ui.bar({
         monitor = monitor,
-        position = "bottom",
+        position = 'bottom',
         height = 1,
 
         style = {
-            background_color = "black",
+            background_color = 'black',
         },
 
         scroll = function(delta)
-            wm.set_workspace(delta > 0 and "next" or "prev")
+            wm.set_workspace(delta > 0 and 'next' or 'prev')
         end,
     })
 end

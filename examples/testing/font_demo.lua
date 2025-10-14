@@ -1,7 +1,7 @@
 local ui = require('ui')
 
-ui.add_font("CyberBlast", "./CyberBlast.otf")
-ui.add_font("Hack", "./Hack-Regular.ttf")
+ui.add_font("CyberBlast", "./assets/CyberBlast.otf")
+ui.add_font("Hack", "./assets/Hack-Regular.ttf")
 
 for _, monitor in ui.monitors() do
     ui.bar({
