@@ -36,17 +36,6 @@ for _, monitor in ui.monitors() do
             }),
             ui.label({
                 text = "Default font with default color",
-                style = {
-                    font_size = 14
-                }
-            }),
-            ui.label({
-                text = "Monospace font",
-                style = {
-                    font_family = "monospace",
-                    color = "darkred",
-                    font_size = 18
-                }
             }),
             ui.label({
                 text = "Large custom font",

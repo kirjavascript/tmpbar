@@ -33,7 +33,7 @@ pub fn bind(lua: &mlua::Lua, globals: &mlua::Table) {
         }
 
         None
-    }, std::time::Duration::from_millis(999));
+    }, std::time::Duration::from_millis(3000));
 
 
     let disk = lua.create_function(move |lua, ()| {

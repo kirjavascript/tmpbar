@@ -36,7 +36,7 @@ pub fn bind(lua: &mlua::Lua, globals: &mlua::Table) {
                 (free as f64 / total as f64) * 100.,
             ),
         }
-    }, std::time::Duration::from_millis(999));
+    }, std::time::Duration::from_millis(3000));
 
 
     let memory = lua.create_function(move |lua, ()| {

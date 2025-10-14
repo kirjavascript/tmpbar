@@ -92,6 +92,8 @@ impl Global {
     pub fn set_theme(&mut self, config: &crate::config::ConfigScript) {
         use crate::config::Property;
 
+        let default = Theme::default();
+
         if let Some(bar) = config.bars.get(0) {
             if let Some(Property::Object(style)) = bar.container.props_ref().get("style") {
                 if let Some(Property::String(color)) = style.get("color") {
@@ -101,16 +103,26 @@ impl Global {
                             visuals.override_text_color = Some(color);
                             self.ctx.set_visuals(visuals);
 
-                            self.theme.color = Some(color);
+                            self.theme.color = color;
                         },
                         Err(err) => error!("{}", err),
                     }
+                } else {
+                    self.theme.color = default.color;
                 }
+
                 if let Some(Property::String(family)) = style.get("font_family") {
-                    self.theme.font_family = Some(family.to_owned());
+                    self.theme.font_family = egui::FontFamily::Name(family.to_owned().into());
+                } else {
+                    self.theme.font_family = default.font_family;
                 }
+
                 if let Some(Property::Integer(size)) = style.get("font_size") {
-                    self.theme.font_size = Some(*size as _);
+                    self.theme.font_size = *size as _;
+                } else if let Some(Property::Float(size)) = style.get("font_size") {
+                    self.theme.font_size = *size as _;
+                } else {
+                    self.theme.font_size = default.font_size;
                 }
             }
         }

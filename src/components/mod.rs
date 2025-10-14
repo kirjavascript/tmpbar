@@ -21,7 +21,7 @@ pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
         "container" => container::render(comp, ui, global),
         "button" => button::render(comp, ui),
         "image" => image::render(comp, ui, global),
-        "label" => label::render(comp, ui),
+        "label" => label::render(comp, ui, global),
         "workspaces" => workspaces::render(comp, ui, global),
         "tray" => tray::render(comp, ui, global),
         _ => {

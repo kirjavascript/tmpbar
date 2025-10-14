@@ -1,15 +1,15 @@
 pub struct Theme {
-    pub color: Option<egui::Color32>,
-    pub font_family: Option<String>,
-    pub font_size: Option<f32>,
+    pub color: egui::Color32,
+    pub font_family: egui::FontFamily,
+    pub font_size: f32,
 }
 
 impl Default for Theme {
     fn default() -> Self {
         Self {
-            color: None,
-            font_family: None,
-            font_size: None,
+            color: egui::Color32::from_rgb(180, 180, 180),
+            font_family: egui::FontFamily::Proportional,
+            font_size: 14.0,
         }
     }
 }
