@@ -81,7 +81,7 @@ for index, monitor in ui.monitors() do
                         style = {
                             margin_left = 10,
                             align_self = 'center',
-                            size = 18,
+                            size = 12,
                         },
                         path = './assets/disk.svg',
                     }),
@@ -96,7 +96,7 @@ for index, monitor in ui.monitors() do
                         style = {
                             margin_left = 10,
                             align_self = 'center',
-                            size = 15,
+                            size = 12,
                         },
                         path = './assets/ip.svg',
                     }),
@@ -111,7 +111,7 @@ for index, monitor in ui.monitors() do
                         style = {
                             margin_left = 10,
                             align_self = 'center',
-                            size = 15,
+                            size = 12,
                         },
                         path = './assets/bandwidth.svg',
                     }),
@@ -129,7 +129,7 @@ for index, monitor in ui.monitors() do
                         style = {
                             margin_left = 10,
                             align_self = 'center',
-                            size = 15,
+                            size = 12,
                         },
                         path = './assets/cpu.svg',
                     }),
@@ -143,7 +143,7 @@ for index, monitor in ui.monitors() do
                         style = {
                             margin_left = 10,
                             align_self = 'center',
-                            size = 15,
+                            size = 12,
                         },
                         path = './assets/clock.svg',
                     }),
