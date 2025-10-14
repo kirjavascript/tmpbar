@@ -1,4 +1,5 @@
 -- TODO
+-- xwinwrap + windows-live.mp4 + netscape
 -- click on everything
 -- animated SVG for battery monitor, CPU graph
 -- input: pressing enter doesnt unfocus properly

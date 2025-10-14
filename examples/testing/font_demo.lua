@@ -1,47 +1,47 @@
 local ui = require('ui')
 
-ui.add_font("CyberBlast", "./assets/CyberBlast.otf")
-ui.add_font("Hack", "./assets/Hack-Regular.ttf")
+ui.load_font('CyberBlast', './assets/CyberBlast.otf')
+ui.load_font('Hack', './assets/Hack-Regular.ttf')
 
 for _, monitor in ui.monitors() do
     ui.bar({
         monitor = monitor,
-        position = "top",
+        position = 'top',
 
         style = {
             height = 60,
-            justify_content = "space_around",
-            background_color = "black",
-            color = "red",
+            justify_content = 'space_around',
+            background_color = 'black',
+            color = 'red',
             padding = 10,
         },
 
         items = {
             ui.label({
-                text = "Hello with CyberBlast",
+                text = 'Hello with CyberBlast',
                 style = {
-                    font_family = "CyberBlast",
+                    font_family = 'CyberBlast',
                     font_size = 40,
-                    color = "red"
+                    color = 'red'
                 }
             }),
 
             ui.label({
-                text = "Hello with Hack",
+                text = 'Hello with Hack',
                 style = {
-                    font_family = "Hack",
+                    font_family = 'Hack',
                     font_size = 16,
-                    color = "rebeccapurple"
+                    color = 'rebeccapurple'
                 }
             }),
             ui.label({
-                text = "Default font with default color",
+                text = 'Default font with default color',
             }),
             ui.label({
-                text = "Large custom font",
+                text = 'Large custom font',
                 style = {
-                    font_family = "Hack",
-                    color = "#00FF00",
+                    font_family = 'Hack',
+                    color = '#00FF00',
                     font_size = 24
                 }
             })

@@ -5,7 +5,7 @@ local sys = require('sys')
 local blue = '#0A83FD'
 local darkblue = '#0022CC'
 
-ui.add_font('Hack', './assets/ttf/Hack-Bold.ttf')
+ui.load_font('Hack', './assets/ttf/Hack-Bold.ttf')
 
 for index, monitor in ui.monitors() do
     ui.bar({

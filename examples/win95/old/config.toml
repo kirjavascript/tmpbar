@@ -1,0 +1,34 @@
+[bar.default]
+position = "bottom"
+workspace-scroll = true
+layout = [
+    "start",
+    "workspaces",
+    "tray",
+    "wintray",
+]
+
+[component.workspaces]
+type = "workspaces"
+show-all = true
+format = "{name}"
+
+[component.start]
+type = "image"
+src = "assets/start.png"
+
+[component.wintray]
+type = "container"
+halign = "end"
+layout = [
+    "clock",
+]
+
+[component.clock]
+type = "clock"
+timestamp = "%H:%M %p"
+
+[component.tray]
+type = "tray"
+icon-size = 15
+icon-spacing = 5

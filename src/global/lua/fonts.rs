@@ -27,5 +27,5 @@ pub fn bind(ctx: &egui::Context, lua: &mlua::Lua, globals: &mlua::Table) {
         }
     }).unwrap();
 
-    globals.set("xcake_add_font", load_font).unwrap();
+    globals.set("xcake_load_font", load_font).unwrap();
 }

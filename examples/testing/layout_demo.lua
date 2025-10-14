@@ -1,6 +1,6 @@
 local ui = require('ui')
 
-for index, monitor in ui.monitors() do
+for _, monitor in ui.monitors() do
     ui.bar({
         monitor = monitor,
         position = 'top',
