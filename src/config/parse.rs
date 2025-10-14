@@ -77,7 +77,6 @@ pub fn parse_bars(lua: &mlua::Lua) -> mlua::Result<Vec<Bar>> {
 
         let position: String = value.get("position").unwrap_or_else(|_| "top".to_string());
         let position = if position == "top".to_string() { Position::Top } else { Position::Bottom };
-        let height: u32 = value.get("height").unwrap_or(25);
 
         let empty_table = lua.create_table()?;
         let monitor: Table = value.get("monitor").unwrap_or_else(|_| empty_table);
@@ -101,11 +100,29 @@ pub fn parse_bars(lua: &mlua::Lua) -> mlua::Result<Vec<Bar>> {
 
         let top_props = to_property(Value::Table(value), &default_props);
 
-        let top_props = if let Property::Object(props) = top_props {
+        let mut top_props = if let Property::Object(props) = top_props {
             props
         } else {
             HashMap::new()
         };
+
+        // get height and set size of bar container
+
+        let mut height: u32 = 25;
+
+        if let Some(Property::Object(style)) = top_props.get_mut("style") {
+            if let Some(Property::Integer(style_height)) = style.get("height") {
+                height = *style_height as _;
+            }
+
+            style.remove("height");
+            style.remove("width");
+            style.insert("size".to_string(), Property::String("max".to_string()));
+        } else {
+            let mut style = HashMap::new();
+            style.insert("size".to_string(), Property::String("max".to_string()));
+            top_props.insert("style".to_string(), Property::Object(style));
+        }
 
         bars.push(Bar {
             id,

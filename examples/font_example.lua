@@ -1,17 +1,15 @@
 local ui = require('ui')
 
 ui.add_font("CyberBlast", "./CyberBlast.otf")
-ui.add_font("ByteBounce", "./ByteBounce.ttf")
 ui.add_font("Hack", "./Hack-Regular.ttf")
 
 for _, monitor in ui.monitors() do
     ui.bar({
         monitor = monitor,
         position = "top",
-        height = 60,
 
         style = {
-            size = "max",
+            height = 60,
             justify_content = "space_around",
             background_color = "black",
             color = "red",
@@ -53,7 +51,7 @@ for _, monitor in ui.monitors() do
             ui.label({
                 text = "Large custom font",
                 style = {
-                    font_family = "Hack",
+                    font_family = "Hack2",
                     color = "#00FF00",
                     font_size = 24
                 }

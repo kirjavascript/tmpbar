@@ -16,10 +16,9 @@ for monitor_index, monitor in ui.monitors() do
     ui.bar({
         monitor = monitor,
         position = "top",
-        height = 130, -- move to style
 
         style = {
-            display = "flex",
+            height = 130,
             justify_items = "flex_end",
             justify_content = "space_between",
             -- align_items = "flex_end",

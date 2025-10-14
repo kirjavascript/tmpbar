@@ -4,10 +4,9 @@ for index, monitor in ui.monitors() do
     ui.bar({
         monitor = monitor,
         position = "top",
-        height = 80,
 
         style = {
-            size = "max",
+            height = 80,
             justify_content = "space_between",
             background = function(svg) return string.format([[
                 <defs>

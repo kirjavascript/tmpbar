@@ -9,12 +9,11 @@ for index, monitor in ui.monitors() do
     ui.bar({
         monitor = monitor,
         position = "top",
-        height = 27,
 
         style = {
-            size = "max",
-            justify_content = "space_between",
+            height = 27,
             color = "#DDD",
+            justify_content = "space_between",
             background = function(svg) return string.format([[
                 <rect width="%d" height="%d" fill="black" />
                 <rect x="0" y="%d" width="%d" height="2" fill="%s" />
@@ -170,9 +169,9 @@ for _, monitor in ui.monitors() do
     ui.bar({
         monitor = monitor,
         position = "bottom",
-        height = 1,
 
         style = {
+            height = 1,
             background_color = "black",
         },
 
