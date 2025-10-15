@@ -37,11 +37,15 @@ for index, monitor in ui.monitors() do
                 items = {
                     ui.image({ path = './assets/manjaro.svg', style = { size = 26, padding_right = 3, } }),
                     ui.workspaces({
-                        style = { gap = 3, height = 23 },
+                        style = {
+                            gap = 3,
+                            height = 23,
+                        },
                         render = function (workspace) return ui.label({
                             style = {
                                 width = 20,
-                                -- align_self = 'center',
+                                text_align = 'center',
+                                text_valign = 'center',
                                 background_color = function()
                                     return workspace.urgent and 'red'
                                         or workspace.focused and blue
@@ -57,6 +61,9 @@ for index, monitor in ui.monitors() do
                     }),
                     ui.label({ -- i3 mode
                         style = {
+                            min_width = 100,
+                            margin_left = 10,
+                            text_valign = 'center',
                             background_color = function()
                                 local is_default = wm.i3_mode() == 'default'
                                 return is_default and 'transparent' or blue

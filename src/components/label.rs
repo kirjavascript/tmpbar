@@ -16,7 +16,16 @@ pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
 
     let rich_text = core::richtext(text, props, &global.theme);
 
-    ui.vertical_centered(|ui| {
-        ui.label(rich_text);
-    });
+    let layout = core::text_layout(props);
+
+    match layout {
+        Some(layout) => {
+            ui.with_layout(layout, |ui| {
+                ui.label(rich_text);
+            });
+        },
+        None => {
+            ui.label(rich_text);
+        },
+    }
 }

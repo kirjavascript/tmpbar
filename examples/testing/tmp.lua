@@ -5,10 +5,8 @@
 -- input: pressing enter doesnt unfocus properly
 --
 -- button/input style
---https://github.com/emilk/egui/discussions/3868
 -- battery sys
 -- cpu% sys
--- text layout
 
 local ui = require('ui')
 local wm = require('wm')
@@ -45,10 +43,14 @@ for monitor_index, monitor in ui.monitors() do
         items = {
             ui.label({
                 style = {
-                    background = 'red',
-                    width = 200,
+                    background = 'yellow',
+                    color = 'black',
+                    width = 150,
+                    text_align = 'max',
+                    text_valign = 'max',
+                    font_size = 55,
                 },
-                text = 'foobar',
+                text = 'JS',
             }),
             ui.label({ -- window title
                 style = {
