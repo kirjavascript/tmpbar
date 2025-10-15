@@ -1,14 +1,14 @@
 -- TODO
--- xwinwrap + windows-live.mp4 + netscape
+-- exec('xwinwrap') + windows-live.mp4 + netscape
 -- click on everything
 -- animated SVG for battery monitor, CPU graph
 -- input: pressing enter doesnt unfocus properly
 --
 -- button/input style
 --https://github.com/emilk/egui/discussions/3868
--- text layout
 -- battery sys
 -- cpu% sys
+-- text layout
 
 local ui = require('ui')
 local wm = require('wm')
@@ -26,6 +26,7 @@ for monitor_index, monitor in ui.monitors() do
             -- align_items = 'flex_end',
             -- flex_direction = 'column',
             -- postion = 'absolute',
+            color = 'pink',
             background = function(svg) return string.format([[
                 <rect
                     x="0"
@@ -42,6 +43,13 @@ for monitor_index, monitor in ui.monitors() do
         -- max_interval = 1000
 
         items = {
+            ui.label({
+                style = {
+                    background = 'red',
+                    width = 200,
+                },
+                text = 'foobar',
+            }),
             ui.label({ -- window title
                 style = {
                     position = 'absolute',
@@ -66,13 +74,20 @@ for monitor_index, monitor in ui.monitors() do
                     return (mode == 'default') and '' or (' « ' .. mode .. ' » ')
                 end,
             }),
-            ui.image({
-                path = 'https://sharey.org/8ilgDQ.png',
-                style = { padding = 3, size = 'max', },
-            }),
-            ui.image({
-                path = './assets/archlinux.svg',
-                style = { size = 'max' },
+            ui.container({
+                style = {
+                    flex_direction = 'column',
+                },
+                items = {
+                    ui.image({
+                        path = 'https://sharey.org/8ilgDQ.png',
+                        style = { padding = 3, size = 60, },
+                    }),
+                    ui.image({
+                        path = './assets/archlinux.svg',
+                        style = { size = 100 },
+                    }),
+                },
             }),
             ui.workspaces({
                 render = function (workspace) return ui.label({
@@ -93,7 +108,6 @@ for monitor_index, monitor in ui.monitors() do
             }),
             ui.container({
                 style = {
-                    -- height = 'max',
                 },
                 items = {
                     ui.label({ -- clock
