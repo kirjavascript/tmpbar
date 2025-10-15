@@ -86,15 +86,15 @@ impl eframe::App for TmpBar {
                         "This egui backend doesn't support multiple viewports"
                     );
 
-                    let max_interval: usize = {
-                        let val: usize = bar.container.props().get("max_interval").unwrap_or_default().into();
+                    let min_interval: usize = {
+                        let val: usize = bar.container.props().get("min_interval").unwrap_or_default().into();
                         match val {
                             0 => 1000,
                             _ => val,
                         }
                     };
 
-                    ctx.request_repaint_after(std::time::Duration::from_millis(max_interval as _));
+                    ctx.request_repaint_after(std::time::Duration::from_millis(min_interval as _));
 
                     egui::CentralPanel::default()
                         .frame(egui::Frame::new().fill(egui::Color32::TRANSPARENT))

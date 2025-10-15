@@ -38,7 +38,7 @@ for monitor_index, monitor in ui.monitors() do
                 />
             ]], svg.width, svg.height) end,
         },
-        -- max_interval = 1000
+        -- min_interval = 1000
 
         items = {
             ui.label({

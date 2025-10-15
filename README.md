@@ -2,11 +2,12 @@
 
 customizable statusbar for your windowmanager
 
-* expressive configuration with Lua
+* dynamic Lua configuration
+* expressive flexbox layout
 * hot config reloading
-* windowmanager neutral config
 * system tray integration
 * multibar/multimonitor support
+* windowmanager neutral config
 * more rice than feudal japan
 
 tmpbar is written in Rust using egui and XCB
