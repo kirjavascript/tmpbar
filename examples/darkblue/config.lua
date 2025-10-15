@@ -63,6 +63,7 @@ for index, monitor in ui.monitors() do
                         style = {
                             min_width = 100,
                             margin_left = 10,
+                            text_align = 'center',
                             text_valign = 'center',
                             background_color = function()
                                 local is_default = wm.i3_mode() == 'default'

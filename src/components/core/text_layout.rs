@@ -22,7 +22,7 @@ pub fn text_layout(props: &Props) -> Option<egui::Layout> {
             _ => egui::Align::Min,
         }
     } else {
-        egui::Align::Max
+        egui::Align::Min
     };
 
     // halign
@@ -31,10 +31,10 @@ pub fn text_layout(props: &Props) -> Option<egui::Layout> {
             "min" | "start" | "left" => egui::Align::Min,
             "max" | "end" | "right" => egui::Align::Max,
             "center" => egui::Align::Center,
-            _ => egui::Align::Center,
+            _ => egui::Align::Min,
         }
     } else {
-        egui::Align::Center
+        egui::Align::Min
     };
 
     Some(egui::Layout {
