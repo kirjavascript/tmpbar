@@ -14,18 +14,34 @@ pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
     }
 
     // from file
-    let props = comp.props();
+    let path: String = comp.props().get("path").unwrap_or_default().into();
+    let image = egui::Image::from_uri(global.resolve_path(&path));
+    let image = image.fit_to_original_size(1.);
+    let size = image.load_and_calc_size(ui, egui::Vec2 {
+        x: f32::MAX,
+        y: f32::MAX,
+    });
 
-    let path: String = props.get("path").unwrap_or_default().into();
+    if let Some(size) = size {
+        let available = ui.available_size();
+        let width = available.y / size.y * size.x;
 
-    let path = if path.starts_with("file://")
-        || path.starts_with("http://")
-        || path.starts_with("https://")
-        || path.starts_with("/") {
-            path
-    } else {
-        format!("file://{}{}", global.parent_path, path)
-    };
+        let mut image = image;
 
-    ui.add(egui::Image::from_uri(path));
+        if available.x > 0. && width > available.x {
+            image = image.max_size(egui::Vec2 {
+                x: available.x,
+                y: available.x / size.x * size.y,
+            });
+        } else {
+            image = image.max_size(egui::Vec2 {
+                x: width,
+                y: available.y,
+            });
+        }
+
+        ui.centered_and_justified(|ui| {
+            ui.add(image);
+        });
+    }
 }

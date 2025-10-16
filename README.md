@@ -2,17 +2,13 @@
 
 customizable statusbar for your windowmanager
 
+* windowmanager neutral config
+* multibar/multimonitor support
 * dynamic Lua configuration
 * expressive flexbox layout
 * hot config reloading
 * system tray integration
-* multibar/multimonitor support
-* windowmanager neutral config
 * more rice than feudal japan
-
-tmpbar is written in Rust using egui and XCB
-
-[request a feature or file a bug](https://github.com/kirjavascript/tmpbar/issues)
 
 ## quickstart
 
@@ -26,4 +22,4 @@ view the [examples](./examples)
 
 ### notes
 
-this project is a full rewrite of [cakeybar](https://github.com/kirjavascript/cakeybar)
+this project was a reimagining of [another bar](https://github.com/kirjavascript/cakeybar)

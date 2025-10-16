@@ -31,7 +31,6 @@ pub fn bind(lua: &mlua::Lua, globals: &mlua::Table) {
         None
     }, std::time::Duration::from_millis(3000));
 
-
     let cpu_temp = lua.create_function(move |_lua, ()| {
         let data = read.borrow_mut()();
 

@@ -127,4 +127,15 @@ impl Global {
             }
         }
     }
+
+    pub fn resolve_path(&self, path: &str) -> String {
+        if path.starts_with("file://")
+            || path.starts_with("http://")
+            || path.starts_with("https://")
+            || path.starts_with("/") {
+                path.to_owned()
+        } else {
+            format!("file://{}{}", self.parent_path, path)
+        }
+    }
 }

@@ -6,7 +6,10 @@
 --
 -- button/input style
 -- battery sys
+--  https://github.com/svartalf/rust-battery
 -- cpu% sys
+-- pixels_per_point might be wrong
+-- image sizing
 
 local ui = require('ui')
 local wm = require('wm')

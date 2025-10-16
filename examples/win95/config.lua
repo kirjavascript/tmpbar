@@ -9,19 +9,35 @@ ui.load_font('W95FA', './fonts/w95fa/W95FA.otf')
 for _, monitor in ui.monitors() do
     ui.bar({
         monitor = monitor,
-        position = 'bottom',
+        position = 'top',
 
         style = {
-            height = 28,
+            height = 50,
+            color = 'black',
             background_color = grey,
             font_family = 'W95FA',
             font_size = 14,
-            color = 'black',
+            -- justify_content = 'space_between',
         },
 
         items = {
+            ui.image({
+                path = './old/assets/start.png',
+                style = {
+                    -- height = 22,
+                    width = 200,
+                    background_color = 'pink',
+                },
+                -- text = 'Start',
+            }),
+
             ui.label({
-                text = 'Start',
+                style = {
+                    -- background_image = './old/assets/start.png',
+                    font_family = 'MSGothic',
+                    font_size = 14,
+                },
+                text = 'スタート',
             })
         }
     })

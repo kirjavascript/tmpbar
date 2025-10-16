@@ -12,6 +12,9 @@ pub fn render_background(comp: &mut Component, ui: &mut Ui, global: &mut Global)
             super::svg_image(&global.lua, func, &rect).paint_at(ui, rect);
         } else if let Some(Property::String(string)) = style.get("background") {
             background_color(string, ui);
+        } else if let Some(Property::String(string)) = style.get("background_image") {
+            let rect = ui.available_rect_before_wrap();
+            egui::Image::from_uri(global.resolve_path(string)).paint_at(ui, rect);
         } else {
             let string = get_text(style, "background_color");
 
@@ -19,7 +22,6 @@ pub fn render_background(comp: &mut Component, ui: &mut Ui, global: &mut Global)
                 background_color(&string, ui);
             }
         }
-
     }
 }
 
