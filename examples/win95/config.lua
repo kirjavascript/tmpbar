@@ -12,7 +12,7 @@ for _, monitor in ui.monitors() do
         position = 'top',
 
         style = {
-            height = 50,
+            height = 24,
             color = 'black',
             background_color = grey,
             font_family = 'W95FA',
@@ -24,11 +24,10 @@ for _, monitor in ui.monitors() do
             ui.image({
                 path = './old/assets/start.png',
                 style = {
-                    -- height = 22,
-                    width = 200,
+                    -- height = 220,
+                    -- width = 200,
                     background_color = 'pink',
                 },
-                -- text = 'Start',
             }),
 
             ui.label({
@@ -38,7 +37,11 @@ for _, monitor in ui.monitors() do
                     font_size = 14,
                 },
                 text = 'スタート',
-            })
+            }),
+
+            ui.label({
+                text = 'Windows 95 testing...',
+            }),
         }
     })
 end

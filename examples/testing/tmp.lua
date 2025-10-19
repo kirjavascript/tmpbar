@@ -4,10 +4,10 @@
 -- animated SVG for battery monitor, CPU graph
 -- input: pressing enter doesnt unfocus properly
 --
--- button/input style
 -- battery sys
 --  https://github.com/svartalf/rust-battery
 -- cpu% sys
+-- button/input style
 -- pixels_per_point might be wrong
 -- image sizing
 

@@ -16,32 +16,54 @@ pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
     // from file
     let path: String = comp.props().get("path").unwrap_or_default().into();
     let image = egui::Image::from_uri(global.resolve_path(&path));
-    let image = image.fit_to_original_size(1.);
-    let size = image.load_and_calc_size(ui, egui::Vec2 {
-        x: f32::MAX,
-        y: f32::MAX,
-    });
 
-    if let Some(size) = size {
-        let available = ui.available_size();
-        let width = available.y / size.y * size.x;
+    // let image = image.fit_to_original_size(1.);
+    // let size = image.load_and_calc_size(ui, egui::Vec2 {
+    //     x: 100.,
+    //     y: 100.,
+    // });
 
-        let mut image = image;
+    // println!("{size:#?}");
 
-        if available.x > 0. && width > available.x {
-            image = image.max_size(egui::Vec2 {
-                x: available.x,
-                y: available.x / size.x * size.y,
-            });
-        } else {
-            image = image.max_size(egui::Vec2 {
-                x: width,
-                y: available.y,
-            });
-        }
+    // if let Some(size) = size {
+    //     let available = ui.available_size();
+
+    //     // use paint at / reserve space
+    //     let width = available.y / size.y * size.x;
+
+    //     // let mut image = image.fit_to_original_size(2.);
+
+    //     // TODO: center
+
+    //     if available.x > 0. && width > available.x {
+    //         let width = available.x;
+    //         let height = available.x / size.x * size.y;
+    //         let size = egui::Pos2 { x: width, y: height };
+
+    //         let min = ui.next_widget_position();
+
+    //         ui.allocate_space(size.to_vec2());
+
+    //         image.paint_at(ui, egui::Rect {
+    //             min,
+    //             max: size,
+    //         });
+    //     } else {
+    //         let height = available.y;
+    //         let size = egui::Pos2 { x: width, y: height };
+
+    //         let min = ui.next_widget_position();
+
+    //         ui.allocate_space(size.to_vec2());
+
+    //         image.paint_at(ui, egui::Rect {
+    //             min,
+    //             max: size,
+    //         });
+    //     }
 
         ui.centered_and_justified(|ui| {
             ui.add(image);
         });
-    }
+    // }
 }

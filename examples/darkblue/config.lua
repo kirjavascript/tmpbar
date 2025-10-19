@@ -35,7 +35,7 @@ for index, monitor in ui.monitors() do
             }),
             ui.container({
                 items = {
-                    ui.image({ path = './assets/manjaro.svg', style = { size = 26, padding_right = 3, } }),
+                    ui.image({ path = './assets/manjaro.svg', style = { padding_right = 3, } }),
                     ui.workspaces({
                         style = {
                             gap = 3,
