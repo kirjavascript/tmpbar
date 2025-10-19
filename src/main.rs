@@ -25,6 +25,7 @@ fn main() -> eframe::Result<()> {
     let path = args.config.as_ref().expect("unreachable").to_string();
 
     let native_options = eframe::NativeOptions {
+        renderer: eframe::Renderer::Glow,
         viewport: egui::ViewportBuilder::default()
             .with_title("xcake-root")
             .with_inner_size([1.0, 1.0])
@@ -33,7 +34,8 @@ fn main() -> eframe::Result<()> {
             .with_transparent(true)
             .with_window_level(egui::WindowLevel::AlwaysOnBottom)
             .with_window_type(egui::viewport::X11WindowType::Toolbar)
-            ,..Default::default()
+            ,
+        ..Default::default()
     };
     eframe::run_native(
         "🍰",

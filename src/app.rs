@@ -17,9 +17,15 @@ impl TmpBar {
             },
         };
 
+        let gl = cc
+            .gl
+            .as_ref()
+            .expect("glow backend expected");
+
         let mut global = global::Global::new(
             &path,
             cc.egui_ctx.clone(),
+            gl.clone(),
         );
 
         // [!] cwd is now set to the location of the config

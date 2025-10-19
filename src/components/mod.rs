@@ -9,6 +9,7 @@ mod core;
 mod image;
 mod input;
 mod label;
+mod shader;
 mod tray;
 mod workspaces;
 
@@ -22,8 +23,9 @@ pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
         "button" => button::render(comp, ui),
         "image" => image::render(comp, ui, global),
         "label" => label::render(comp, ui, global),
-        "workspaces" => workspaces::render(comp, ui, global),
+        "shader" => shader::render(comp, ui, global),
         "tray" => tray::render(comp, ui, global),
+        "workspaces" => workspaces::render(comp, ui, global),
         _ => {
             ui.label(format!("[unknown {:?}]", comp.name()));
         }

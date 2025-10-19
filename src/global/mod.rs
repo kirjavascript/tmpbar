@@ -8,20 +8,28 @@ use crate::wm::i3mode;
 use lua::LuaCallback;
 pub use theme::Theme;
 
+use eframe::glow;
+use std::sync::Arc;
+
 pub struct Global {
     pub lua: mlua::Lua,
     pub workspaces: Workspaces,
     pub tray: Option<xcb::Tray>,
     pub parent_path: String,
     pub theme: Theme,
-    ctx: egui::Context,
+    pub ctx: egui::Context,
+    pub gl: Arc<glow::Context>,
     xcb_signal: Signal<xcb::Event>,
     lua_signal: Signal<LuaCallback>,
     i3mode_signal: Signal<String>
 }
 
 impl Global {
-    pub fn new(path: &std::path::PathBuf, ctx: egui::Context) -> Self {
+    pub fn new(
+        path: &std::path::PathBuf,
+        ctx: egui::Context,
+        gl: Arc<glow::Context>,
+    ) -> Self {
         let xcb_signal: Signal<xcb::Event> = Signal::new(ctx.clone());
         xcb::listen(xcb_signal.clone());
 
@@ -48,6 +56,7 @@ impl Global {
             lua_signal,
             i3mode_signal,
             ctx,
+            gl,
         }
     }
 
