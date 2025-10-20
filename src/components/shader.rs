@@ -6,27 +6,6 @@ use crate::global::Global;
 use eframe::glow;
 
 #[derive(Clone)]
-struct Shader {
-    program: glow::Program,
-    vertex_array: glow::VertexArray,
-}
-
-impl Shader {
-    fn paint(&self, gl: &glow::Context) {
-        use glow::HasContext as _;
-        unsafe {
-            gl.use_program(Some(self.program));
-            gl.uniform_1_f32(
-                gl.get_uniform_location(self.program, "u_angle").as_ref(),
-                32.,
-            );
-            gl.bind_vertex_array(Some(self.vertex_array));
-            gl.draw_arrays(glow::TRIANGLES, 0, 3);
-        }
-    }
-}
-
-#[derive(Clone)]
 struct ShaderState {
     inner: Option<Shader>,
 }
@@ -106,8 +85,29 @@ impl ShaderState {
     }
 }
 
+#[derive(Clone)]
+struct Shader {
+    program: glow::Program,
+    vertex_array: glow::VertexArray,
+}
+
+impl Shader {
+    fn paint(&self, gl: &glow::Context) {
+        use glow::HasContext as _;
+        unsafe {
+            gl.use_program(Some(self.program));
+            gl.uniform_1_f32(
+                gl.get_uniform_location(self.program, "u_angle").as_ref(),
+                32.,
+            );
+            gl.bind_vertex_array(Some(self.vertex_array));
+            gl.draw_arrays(glow::TRIANGLES, 0, 3);
+        }
+    }
+}
+
 pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
-    // uniqueness relies on the face that each component is a child of a TUI cell
+    // uniqueness relies on the fact that each component is a child of a TUI cell
     let id = ui.id();
 
     let mut state: ShaderState = ui
