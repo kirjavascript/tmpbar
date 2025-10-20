@@ -4,6 +4,8 @@ ui.bar({
     monitor = { index = 2 },
     position = 'top',
 
+    min_interval = 0,
+
     style = {
         height = 300,
     },
@@ -34,8 +36,9 @@ ui.bar({
                 out vec4 FragColor;
 
                 uniform int numChecks = 8; // number of squares per row/column
-
                 void main() {
+                    //ALBEDO = vec3(float(mod(UV.x, 0.2) > 0.1 != mod(UV.y, 0.2) > 0.1));
+
                     // Scale UV to number of checks
                     vec2 scaled = vUV * float(numChecks);
 
@@ -63,11 +66,11 @@ ui.bar({
                     vec4(0.0, 0.0, 1.0, 1.0)
                     );
                 out vec4 v_color;
-                uniform float u_angle;
+                uniform float time_delta;
                 void main() {
                     v_color = colors[gl_VertexID];
                     gl_Position = vec4(verts[gl_VertexID], 0.0, 1.0);
-                    gl_Position.x *= cos(u_angle);
+                    gl_Position.x *= cos(time_delta);
                 }
             ]],
             fragment = [[

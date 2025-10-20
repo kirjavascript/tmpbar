@@ -67,6 +67,7 @@ impl eframe::App for TmpBar {
             } else {
                 self.global.set_theme(&self.config);
                 crate::wm::xcb::window_patch(&self.config);
+                ctx.memory_mut(|mem| mem.data.clear());
             }
         }
 
@@ -93,10 +94,11 @@ impl eframe::App for TmpBar {
                     );
 
                     let min_interval: usize = {
-                        let val: usize = bar.container.props().get("min_interval").unwrap_or_default().into();
-                        match val {
-                            0 => 1000,
-                            _ => val,
+                        match bar.container.props().get("min_interval") {
+                            Some(config::Property::Integer(num)) => *num as usize,
+                            Some(config::Property::Float(num)) => *num as usize,
+                            Some(config::Property::Boolean(_)) => 0,
+                            _ => 1000,
                         }
                     };
 

@@ -1,9 +1,9 @@
-use eframe::egui;
 use egui::Ui;
 use crate::config::{Component, Property};
 use crate::global::Global;
 
 use eframe::glow;
+use std::time::Instant;
 
 #[derive(Clone)]
 struct ShaderState {
@@ -79,6 +79,7 @@ impl ShaderState {
                 self.inner = Some(Shader {
                     program,
                     vertex_array,
+                    start: Instant::now(),
                 });
             }
         }
@@ -89,16 +90,18 @@ impl ShaderState {
 struct Shader {
     program: glow::Program,
     vertex_array: glow::VertexArray,
+    start: Instant,
 }
 
 impl Shader {
     fn paint(&self, gl: &glow::Context) {
         use glow::HasContext as _;
+
         unsafe {
             gl.use_program(Some(self.program));
             gl.uniform_1_f32(
-                gl.get_uniform_location(self.program, "u_angle").as_ref(),
-                32.,
+                gl.get_uniform_location(self.program, "time_delta").as_ref(),
+                self.start.elapsed().as_secs_f32(),
             );
             gl.bind_vertex_array(Some(self.vertex_array));
             gl.draw_arrays(glow::TRIANGLES, 0, 3);
