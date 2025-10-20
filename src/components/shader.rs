@@ -50,22 +50,24 @@ impl ShaderState {
                             .expect("Cannot create shader");
                         gl.shader_source(shader, &format!("{shader_version}\n{shader_source}"));
                         gl.compile_shader(shader);
-                        assert!(
-                            gl.get_shader_compile_status(shader),
-                            "Failed to compile {shader_type}: {}",
-                            gl.get_shader_info_log(shader)
-                        );
+                        if !gl.get_shader_compile_status(shader) {
+                            error!(
+                                "failed to compile {shader_type}: {}",
+                                gl.get_shader_info_log(shader)
+                            );
+                        }
                         gl.attach_shader(program, shader);
                         shader
                     })
                 .collect();
 
                 gl.link_program(program);
-                assert!(
-                    gl.get_program_link_status(program),
-                    "{}",
-                    gl.get_program_info_log(program)
-                );
+                if !gl.get_program_link_status(program) {
+                    error!(
+                        "{}",
+                        gl.get_program_info_log(program)
+                    );
+                }
 
                 for shader in shaders {
                     gl.detach_shader(program, shader);

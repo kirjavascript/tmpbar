@@ -17,6 +17,29 @@ ui.bar({
             },
             version = '#version 330 core',
             vertex = [[
+void main() {
+    const vec4 positions[3] = vec4[3](
+        vec4(-1.0, -1.0, 0.0, 1.0),
+        vec4( 3.0, -1.0, 0.0, 1.0),
+        vec4(-1.0,  3.0, 0.0, 1.0)
+    );
+    gl_Position = positions[gl_VertexID];
+}
+            ]],
+            fragment = [[
+                out vec4 color;
+
+                void main() {
+                    color = vec4(1.0); // white
+                }
+            ]],
+        }),
+        ui.shader({
+            style = {
+                size = 300,
+            },
+            version = '#version 330 core',
+            vertex = [[
                 out vec2 vUV;
 
                 void main() {
@@ -37,7 +60,6 @@ ui.bar({
 
                 uniform int numChecks = 8; // number of squares per row/column
                 void main() {
-                    //ALBEDO = vec3(float(mod(UV.x, 0.2) > 0.1 != mod(UV.y, 0.2) > 0.1));
 
                     // Scale UV to number of checks
                     vec2 scaled = vUV * float(numChecks);
