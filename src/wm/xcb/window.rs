@@ -84,6 +84,10 @@ pub fn window_patch(config: &ConfigScript) {
                 data: &[0u32],
             });
 
+            conn.flush().unwrap();
+
+            std::thread::sleep(std::time::Duration::from_millis(100));
+
             let strut_data = if bar.y == 0 {
                 [0u32, 0, bar.height, 0, 0, 0, 0, 0, bar.monitor.x as u32, (bar.monitor.x + bar.monitor.width as i32) as u32, 0, 0]
             } else {

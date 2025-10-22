@@ -11,7 +11,6 @@ ui.bar({
     },
 
     items = {
-        ui.label({ text = function() return os.date('%Y-%m-%d %a %X') end }),
         ui.shader({
             style = {
                 size = 300,

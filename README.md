@@ -2,12 +2,13 @@
 
 customizable statusbar for your windowmanager
 
-* windowmanager neutral config
-* multibar/multimonitor support
-* dynamic Lua configuration
-* expressive flexbox layout
+* Lua for configuration
+* flexbox for layout
+* SVG or custom shaders for graphics
 * hot config reloading
 * system tray integration
+* windowmanager neutral config
+* multibar/multimonitor support
 * more rice than feudal japan
 
 ## quickstart
