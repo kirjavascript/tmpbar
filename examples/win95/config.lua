@@ -24,8 +24,8 @@ for _, monitor in ui.monitors() do
             ui.image({
                 path = './old/assets/start.png',
                 style = {
-                    -- height = 220,
-                    -- width = 200,
+                    -- height = 24,
+                    -- width = 100,
                     background_color = 'pink',
                 },
             }),

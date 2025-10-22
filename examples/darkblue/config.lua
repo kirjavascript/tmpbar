@@ -38,7 +38,6 @@ for index, monitor in ui.monitors() do
                     ui.image({
                         path = './assets/manjaro.svg',
                         style = {
-                            size = 26, -- TODO: this should be optional
                             padding_right = 3,
                         }
                     }),

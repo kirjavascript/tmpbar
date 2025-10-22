@@ -9,7 +9,6 @@
 -- cpu% sys
 -- button/input style
 -- pixels_per_point might be wrong
--- image sizing
 
 local ui = require('ui')
 local wm = require('wm')
