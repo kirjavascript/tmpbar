@@ -13,6 +13,7 @@
 local ui = require('ui')
 local wm = require('wm')
 local sys = require('sys')
+local util = require('util')
 
 for monitor_index, monitor in ui.monitors() do
     ui.bar({
@@ -59,7 +60,7 @@ for monitor_index, monitor in ui.monitors() do
                     position = 'absolute',
                     margin = 'auto',
                 },
-                text = function() return '« ' .. truncate(wm.window_title(), 80) .. ' »' end,
+                text = function() return '« ' .. util.truncate(wm.window_title(), 80) .. ' »' end,
             }),
             ui.label({ -- i3 mode
                 style = {
@@ -117,29 +118,6 @@ for monitor_index, monitor in ui.monitors() do
                     ui.label({ -- clock
                         text = function() return os.date('%Y-%m-%d %a %X') end,
                     }),
-                    ui.label({ -- network
-                        text = function()
-                            local bw = sys.bandwidth();
-                            return bw.enp3s0 and bw.enp3s0.down
-                                or bw.eth0 and bw.eth0.down
-                                or '[no interface]'
-                        end,
-                    }),
-                    ui.label({
-                        text = function()
-                            return 'MEM ' .. sys.memory().used_percent
-                        end,
-                    }),
-                    ui.label({
-                        text = function()
-                            return sys.cpu_temp() .. '°C'
-                        end,
-                    }),
-                    ui.label({
-                        text = function()
-                            return sys.disk()['/'].free .. ' free'
-                        end,
-                    }),
                     ui.button({
                         text = 'shutdown',
                         size = 100,
@@ -159,22 +137,5 @@ for monitor_index, monitor in ui.monitors() do
                 },
             }),
         },
-    })
-end
-
--- tiny workspace switcher at the bottom
-for _, monitor in ui.monitors() do
-    ui.bar({
-        monitor = monitor,
-        position = 'bottom',
-
-        style = {
-            height = 1,
-            background_color = 'black',
-        },
-
-        scroll = function(delta)
-            wm.set_workspace(delta > 0 and 'next' or 'prev')
-        end,
     })
 end

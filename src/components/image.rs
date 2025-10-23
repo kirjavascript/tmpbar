@@ -23,8 +23,6 @@ pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
 
     if let Some(size) = size {
         let available = ui.available_size();
-
-        // use paint at / reserve space
         let width = available.y / size.y * size.x;
 
         if available.x > 0. && width > available.x {

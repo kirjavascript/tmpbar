@@ -1,6 +1,7 @@
 local ui = require('ui')
 local wm = require('wm')
 local sys = require('sys')
+local util = require('util')
 
 local blue = '#0A83FD'
 local darkblue = '#0022CC'
@@ -31,7 +32,7 @@ for index, monitor in ui.monitors() do
                     margin = 'auto',
                     padding_bottom = 4,
                 },
-                text = function() return '« ' .. truncate(wm.window_title(), 80) .. ' »' end,
+                text = function() return '« ' .. util.truncate(wm.window_title(), 80) .. ' »' end,
             }),
             ui.container({
                 items = {
@@ -116,11 +117,12 @@ for index, monitor in ui.monitors() do
                     }),
                     ui.label({ -- ip
                         style = { margin_left = 5, align_self = 'center' },
-                        text = function()
-                            return sys.ip()
-                        end,
+                        text = util.throttle(function()
+                            return util.trim(sys.exec([[
+                                ip route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if ($i=="src") print $(i+1)}'
+                            ]]))
+                        end, 300.0),
                     }),
-
                     ui.image({
                         style = {
                             margin_left = 10,
