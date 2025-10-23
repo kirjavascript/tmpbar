@@ -2,13 +2,13 @@
 -- exec('xwinwrap') + windows-live.mp4 + netscape
 -- click on everything
 -- animated SVG for battery monitor, CPU graph
+--
+-- button/input style / behaviour
 -- input: pressing enter doesnt unfocus properly
 --
 -- battery sys
 --  https://github.com/svartalf/rust-battery
 -- cpu% sys
--- button/input style
--- pixels_per_point might be wrong (images? flexsize?)
 
 local ui = require('ui')
 local wm = require('wm')

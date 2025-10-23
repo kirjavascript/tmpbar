@@ -24,6 +24,7 @@ pub fn style_prop(prop: &str, comp: &mut Component, ui: &mut egui::Ui) -> Style 
 
 fn style_from_props(props: &Props, ui: &mut egui::Ui) -> Style {
     let available_size = ui.available_size();
+    let ppp = ui.pixels_per_point();
 
     let mut style: Style = Default::default();
 
@@ -99,7 +100,7 @@ fn style_from_props(props: &Props, ui: &mut egui::Ui) -> Style {
     }
 
     if let Some(Property::Float(width)) = props.get("scrollbar_width") {
-        style.scrollbar_width = *width as _;
+        style.scrollbar_width = *width as f32 / ppp;
     }
 
     if let Some(Property::String(pos)) = props.get("position") {
@@ -110,19 +111,19 @@ fn style_from_props(props: &Props, ui: &mut egui::Ui) -> Style {
         };
     }
 
-    if let Some(top) = get_lengthauto_from_prop(props, "top") {
+    if let Some(top) = get_lengthauto_from_prop(props, "top", ppp) {
         style.inset.top = top;
     }
 
-    if let Some(right) = get_lengthauto_from_prop(props, "right") {
+    if let Some(right) = get_lengthauto_from_prop(props, "right", ppp) {
         style.inset.right = right;
     }
 
-    if let Some(bottom) = get_lengthauto_from_prop(props, "bottom") {
+    if let Some(bottom) = get_lengthauto_from_prop(props, "bottom", ppp) {
         style.inset.bottom = bottom;
     }
 
-    if let Some(left) = get_lengthauto_from_prop(props, "left") {
+    if let Some(left) = get_lengthauto_from_prop(props, "left", ppp) {
         style.inset.left = left;
     }
 
@@ -135,15 +136,15 @@ fn style_from_props(props: &Props, ui: &mut egui::Ui) -> Style {
         let mut height = height.map(|s| Into::<String>::into(s));
 
         if matches!(width.as_deref(), Some("max")) {
-            width = width.map(|_| available_size.x.to_string());
+            width = width.map(|_| (available_size.x * ppp).to_string());
         }
         if matches!(height.as_deref(), Some("max")) {
-            height = height.map(|_| available_size.y.to_string());
+            height = height.map(|_| (available_size.y * ppp).to_string());
         }
 
         style.size = geometry::Size {
-            width: width.map(|s| parse_dimension(&s)).unwrap_or(Dimension::Auto),
-            height: height.map(|s| parse_dimension(&s)).unwrap_or(Dimension::Auto),
+            width: width.map(|s| parse_dimension(&s, ppp)).unwrap_or(Dimension::Auto),
+            height: height.map(|s| parse_dimension(&s, ppp)).unwrap_or(Dimension::Auto),
         };
     } else if size.is_some() {
         let size = size.map(|s| Into::<String>::into(s));
@@ -154,7 +155,7 @@ fn style_from_props(props: &Props, ui: &mut egui::Ui) -> Style {
                 height: length(available_size.y),
             };
         } else {
-            let size = size.map(|s| parse_dimension(&s)).unwrap_or(Dimension::Auto);
+            let size = size.map(|s| parse_dimension(&s, ppp)).unwrap_or(Dimension::Auto);
             style.size = geometry::Size {
                 width: size,
                 height: size,
@@ -170,15 +171,15 @@ fn style_from_props(props: &Props, ui: &mut egui::Ui) -> Style {
         let mut height = height.map(|s| Into::<String>::into(s));
 
         if matches!(width.as_deref(), Some("max")) {
-            width = width.map(|_| available_size.x.to_string());
+            width = width.map(|_| (available_size.x * ppp).to_string());
         }
         if matches!(height.as_deref(), Some("max")) {
-            height = height.map(|_| available_size.y.to_string());
+            height = height.map(|_| (available_size.y * ppp).to_string());
         }
 
         style.min_size = geometry::Size {
-            width: width.map(|s| parse_dimension(&s)).unwrap_or(Dimension::Auto),
-            height: height.map(|s| parse_dimension(&s)).unwrap_or(Dimension::Auto),
+            width: width.map(|s| parse_dimension(&s, ppp)).unwrap_or(Dimension::Auto),
+            height: height.map(|s| parse_dimension(&s, ppp)).unwrap_or(Dimension::Auto),
         };
     }
 
@@ -190,15 +191,15 @@ fn style_from_props(props: &Props, ui: &mut egui::Ui) -> Style {
         let mut height = height.map(|s| Into::<String>::into(s));
 
         if matches!(width.as_deref(), Some("max")) {
-            width = width.map(|_| available_size.x.to_string());
+            width = width.map(|_| (available_size.x * ppp).to_string());
         }
         if matches!(height.as_deref(), Some("max")) {
-            height = height.map(|_| available_size.y.to_string());
+            height = height.map(|_| (available_size.y * ppp).to_string());
         }
 
         style.max_size = geometry::Size {
-            width: width.map(|s| parse_dimension(&s)).unwrap_or(Dimension::Auto),
-            height: height.map(|s| parse_dimension(&s)).unwrap_or(Dimension::Auto),
+            width: width.map(|s| parse_dimension(&s, ppp)).unwrap_or(Dimension::Auto),
+            height: height.map(|s| parse_dimension(&s, ppp)).unwrap_or(Dimension::Auto),
         };
     }
 
@@ -211,6 +212,7 @@ fn style_from_props(props: &Props, ui: &mut egui::Ui) -> Style {
         "margin",
         get_lengthauto_from_prop,
         LengthPercentageAuto::Length(0.),
+        ppp,
     ) {
         style.margin = margin;
     }
@@ -220,6 +222,7 @@ fn style_from_props(props: &Props, ui: &mut egui::Ui) -> Style {
         "padding",
         get_length_from_prop,
         LengthPercentage::Length(0.),
+        ppp,
     ) {
         style.padding = padding;
     }
@@ -229,6 +232,7 @@ fn style_from_props(props: &Props, ui: &mut egui::Ui) -> Style {
         "border",
         get_length_from_prop,
         LengthPercentage::Length(0.),
+        ppp,
     ) {
         style.border = border;
     }
@@ -257,7 +261,7 @@ fn style_from_props(props: &Props, ui: &mut egui::Ui) -> Style {
         style.justify_content = parse_content(text.as_str());
     }
 
-    if let Some(gap) = get_length_from_prop(props, "gap") {
+    if let Some(gap) = get_length_from_prop(props, "gap", ppp) {
         style.gap = geometry::Size {
             width: gap,
             height: gap,
@@ -294,7 +298,7 @@ fn style_from_props(props: &Props, ui: &mut egui::Ui) -> Style {
     }
 
     if let Some(Property::String(text)) = props.get("flex_basis") {
-        style.flex_basis = parse_dimension(text.as_str());
+        style.flex_basis = parse_dimension(text.as_str(), ppp);
     }
 
     if let Some(Property::Float(num)) = props.get("flex_grow") {
@@ -336,17 +340,17 @@ fn parse_align(text: &str) -> Option<AlignItems> {
     }
 }
 
-fn parse_dimension(value: &str) -> Dimension {
+fn parse_dimension(value: &str, ppp: f32) -> Dimension {
     if value.ends_with('%') {
         if let Ok(percent) = value[..value.len() - 1].parse::<f32>() {
             return Dimension::Percent(percent / 100.0);
         }
     } else if value.ends_with("px") {
         if let Ok(pixels) = value[..value.len() - 2].parse::<f32>() {
-            return Dimension::Length(pixels);
+            return Dimension::Length(pixels / ppp);
         }
     } else if let Ok(pixels) = value.parse::<f32>() {
-        return Dimension::Length(pixels);
+        return Dimension::Length(pixels / ppp);
     }
 
     Dimension::Auto
@@ -355,8 +359,9 @@ fn parse_dimension(value: &str) -> Dimension {
 fn get_spacing_from_props<T: Clone>(
     props: &Props,
     prefix: &str,
-    get_length_from_prop: impl Fn(&Props, &str) -> Option<T>,
+    get_length_from_prop: impl Fn(&Props, &str, f32) -> Option<T>,
     default: T,
+    ppp: f32,
 ) -> Option<taffy::prelude::Rect<T>> {
     let all_key = prefix.to_string();
     let top_key = format!("{}_top", prefix);
@@ -364,7 +369,7 @@ fn get_spacing_from_props<T: Clone>(
     let bottom_key = format!("{}_bottom", prefix);
     let left_key = format!("{}_left", prefix);
 
-    if let Some(all) = get_length_from_prop(props, &all_key) {
+    if let Some(all) = get_length_from_prop(props, &all_key, ppp) {
         return Some(taffy::prelude::Rect {
             top: all.clone(),
             right: all.clone(),
@@ -373,10 +378,10 @@ fn get_spacing_from_props<T: Clone>(
         });
     }
 
-    let top = get_length_from_prop(props, &top_key);
-    let right = get_length_from_prop(props, &right_key);
-    let bottom = get_length_from_prop(props, &bottom_key);
-    let left = get_length_from_prop(props, &left_key);
+    let top = get_length_from_prop(props, &top_key, ppp);
+    let right = get_length_from_prop(props, &right_key, ppp);
+    let bottom = get_length_from_prop(props, &bottom_key, ppp);
+    let left = get_length_from_prop(props, &left_key, ppp);
 
     if top.is_some() || right.is_some() || bottom.is_some() || left.is_some() {
         return Some(taffy::prelude::Rect {
@@ -390,16 +395,16 @@ fn get_spacing_from_props<T: Clone>(
     None
 }
 
-fn get_lengthauto_from_prop(props: &Props, key: &str) -> Option<LengthPercentageAuto> {
+fn get_lengthauto_from_prop(props: &Props, key: &str, ppp: f32) -> Option<LengthPercentageAuto> {
     match props.get(key) {
-        Some(Property::Integer(value)) => Some(LengthPercentageAuto::Length(*value as f32)),
-        Some(Property::Float(value)) => Some(LengthPercentageAuto::Length(*value as f32)),
+        Some(Property::Integer(value)) => Some(LengthPercentageAuto::Length(*value as f32 / ppp)),
+        Some(Property::Float(value)) => Some(LengthPercentageAuto::Length(*value as f32 / ppp)),
         Some(Property::String(value)) => {
             if value == "auto" {
                 Some(LengthPercentageAuto::Auto)
             } else {
-                match parse_dimension(value) {
-                    Dimension::Length(len) => Some(LengthPercentageAuto::Length(len)),
+                match parse_dimension(value, ppp) {
+                    Dimension::Length(len) => Some(LengthPercentageAuto::Length(len / ppp)),
                     Dimension::Percent(pct) => Some(LengthPercentageAuto::Percent(pct)),
                     _ => None,
                 }
@@ -409,12 +414,12 @@ fn get_lengthauto_from_prop(props: &Props, key: &str) -> Option<LengthPercentage
     }
 }
 
-fn get_length_from_prop(props: &Props, key: &str) -> Option<LengthPercentage> {
+fn get_length_from_prop(props: &Props, key: &str, ppp: f32) -> Option<LengthPercentage> {
     match props.get(key) {
-        Some(Property::Integer(value)) => Some(LengthPercentage::Length(*value as f32)),
-        Some(Property::Float(value)) => Some(LengthPercentage::Length(*value as f32)),
-        Some(Property::String(value)) => match parse_dimension(value) {
-            Dimension::Length(len) => Some(LengthPercentage::Length(len)),
+        Some(Property::Integer(value)) => Some(LengthPercentage::Length(*value as f32 / ppp)),
+        Some(Property::Float(value)) => Some(LengthPercentage::Length(*value as f32 / ppp)),
+        Some(Property::String(value)) => match parse_dimension(value, ppp) {
+            Dimension::Length(len) => Some(LengthPercentage::Length(len / ppp)),
             Dimension::Percent(pct) => Some(LengthPercentage::Percent(pct)),
             _ => None,
         },

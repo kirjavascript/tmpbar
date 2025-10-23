@@ -29,6 +29,14 @@ for _, monitor in ui.monitors() do
                     background_color = 'blue',
                 },
             }),
+
+            ui.label({
+                style = {
+                    position = 'absolute',
+                    left = 20,
+                    background_color = 'red',
+                },
+            }),
             ui.image({
                 path = './old/assets/start.png',
                 style = {
@@ -39,7 +47,7 @@ for _, monitor in ui.monitors() do
                 path = './old/assets/start.png',
                 style = {
                     height = 22,
-                    -- width = 100,
+                    width = 54,
                     background_color = 'pink',
                 },
             }),
