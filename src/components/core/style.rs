@@ -16,13 +16,15 @@ pub fn style(comp: &mut Component, ui: &mut egui::Ui) -> Style {
 
 pub fn style_prop(prop: &str, comp: &mut Component, ui: &mut egui::Ui) -> Style {
     if let Some(Property::Object(style)) = comp.props().get(prop) {
-        style_from_props(style, ui.available_size())
+        style_from_props(style, ui)
     } else {
         Default::default()
     }
 }
 
-fn style_from_props(props: &Props, available_size: egui::Vec2) -> Style {
+fn style_from_props(props: &Props, ui: &mut egui::Ui) -> Style {
+    let available_size = ui.available_size();
+
     let mut style: Style = Default::default();
 
     /*

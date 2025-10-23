@@ -17,10 +17,24 @@ for _, monitor in ui.monitors() do
             background_color = grey,
             font_family = 'W95FA',
             font_size = 14,
+            gap = 10,
             -- justify_content = 'space_between',
         },
 
         items = {
+            ui.label({
+                style = {
+                    height = 20,
+                    width = 100,
+                    background_color = 'blue',
+                },
+            }),
+            ui.image({
+                path = './old/assets/start.png',
+                style = {
+                    height = 20,
+                },
+            }),
             ui.image({
                 path = './old/assets/start.png',
                 style = {

@@ -8,7 +8,7 @@
 --  https://github.com/svartalf/rust-battery
 -- cpu% sys
 -- button/input style
--- pixels_per_point might be wrong
+-- pixels_per_point might be wrong (images? flexsize?)
 
 local ui = require('ui')
 local wm = require('wm')
