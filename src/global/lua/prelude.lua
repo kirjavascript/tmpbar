@@ -1,6 +1,6 @@
--- "stdlib"
+-- 'stdlib'
 
--- "private" bindings
+-- 'private' bindings
 
 -- track built in packages
 local builtin_modules = {}
@@ -8,8 +8,8 @@ for name in pairs(package.preload) do
     builtin_modules[name] = true
 end
 
-builtin_modules["_G"] = true
-builtin_modules["package"] = true
+builtin_modules['_G'] = true
+builtin_modules['package'] = true
 
 ---@diagnostic disable: lowercase-global
 function xcake_reset_state()
@@ -57,13 +57,13 @@ mt.__index = function(_, key)
 end
 setmetatable(ui, mt)
 
-package.loaded["ui"] = ui
-builtin_modules["ui"] = true
+package.loaded['ui'] = ui
+builtin_modules['ui'] = true
 
 local wm = {}
 
-xcake_window_title = ""
-xcake_i3_mode = "default"
+xcake_window_title = ''
+xcake_i3_mode = 'default'
 
 function wm.window_title()
     return xcake_window_title
@@ -74,15 +74,15 @@ function wm.i3_mode()
 end
 
 function wm.set_workspace(value)
-    if type(value) == "string" then
+    if type(value) == 'string' then
         xcake_cycle_workspace(value)
-    elseif type(value) == "number" then
+    elseif type(value) == 'number' then
         xcake_focus_workspace(value)
     end
 end
 
-package.loaded["wm"] = wm
-builtin_modules["wm"] = true
+package.loaded['wm'] = wm
+builtin_modules['wm'] = true
 
 local sys = {}
 
@@ -92,7 +92,7 @@ function sys.exec(cmd)
         return nil, err
     end
 
-    local result = handle:read("*a")
+    local result = handle:read('*a')
     handle:close()
     return result
 end
@@ -110,15 +110,16 @@ function sys.disk(...)
 end
 
 function sys.cpu_temp(...)
-    return xcake_cpu_temp(...)
+    local temp = xcake_cpu_temp(...)
+    return temp and string.format('%.1f', temp) or '???'
 end
 
 function sys.bandwidth(...)
     return xcake_bandwidth(...)
 end
 
-package.loaded["sys"] = sys
-builtin_modules["sys"] = true
+package.loaded['sys'] = sys
+builtin_modules['sys'] = true
 
 local util = {}
 
@@ -127,11 +128,11 @@ function util.window_title()
 end
 
 function util.trim(s)
-    return (s:gsub("^%s*(.-)%s*$", "%1"))
+    return (s:gsub('^%s*(.-)%s*$', '%1'))
 end
 
 function util.truncate(s, length, ellipse)
-    ellipse = ellipse or "..."
+    ellipse = ellipse or '...'
     if #s > length then
         return string.sub(s, 1, length) .. ellipse
     else
@@ -154,7 +155,7 @@ function util.throttle(fn, delay)
 end
 
 function util.read_file(filePath)
-    local file, err = io.open(filePath, "r")
+    local file, err = io.open(filePath, 'r')
     if not file then
         return nil, err
     end
@@ -170,37 +171,37 @@ function util.read_file(filePath)
     return content
 end
 
-package.loaded["util"] = util
-builtin_modules["util"] = true
+package.loaded['util'] = util
+builtin_modules['util'] = true
 
 function log(...)
     local args = {...}
     local result = {}
 
     local function serialize(val, indent, visited)
-        indent = indent or ""
+        indent = indent or ''
         visited = visited or {}
 
         if visited[val] then
-            return "[Circular Reference]"
+            return '[Circular Reference]'
         end
 
         local valType = type(val)
 
-        if valType == "nil" then
-            return "nil"
-        elseif valType == "number" or valType == "boolean" then
+        if valType == 'nil' then
+            return 'nil'
+        elseif valType == 'number' or valType == 'boolean' then
             return tostring(val)
-        elseif valType == "string" then
-            return string.format("%q", val)
-        elseif valType == "table" then
+        elseif valType == 'string' then
+            return string.format('%q', val)
+        elseif valType == 'table' then
             if visited[val] then
-                return "[Circular Reference]"
+                return '[Circular Reference]'
             end
             visited[val] = true
 
-            local str = "{\n"
-            local nextIndent = indent .. "  "
+            local str = '{\n'
+            local nextIndent = indent .. '  '
 
             -- First serialize numeric indices (array part)
             local arrayPart = {}
@@ -211,31 +212,31 @@ function log(...)
             -- Then serialize hash part (non-numeric keys)
             local hashPart = {}
             for k, v in pairs(val) do
-                if type(k) ~= "number" or k < 1 or k > #val or math.floor(k) ~= k then
-                    local key = type(k) == "string" and k or "[" .. serialize(k, nextIndent, visited) .. "]"
-                    table.insert(hashPart, nextIndent .. key .. " = " .. serialize(v, nextIndent, visited))
+                if type(k) ~= 'number' or k < 1 or k > #val or math.floor(k) ~= k then
+                    local key = type(k) == 'string' and k or '[' .. serialize(k, nextIndent, visited) .. ']'
+                    table.insert(hashPart, nextIndent .. key .. ' = ' .. serialize(v, nextIndent, visited))
                 end
             end
 
             -- Combine array and hash parts
             local parts = {}
             if #arrayPart > 0 then
-                table.insert(parts, table.concat(arrayPart, ",\n"))
+                table.insert(parts, table.concat(arrayPart, ',\n'))
             end
             if #hashPart > 0 then
-                table.insert(parts, table.concat(hashPart, ",\n"))
+                table.insert(parts, table.concat(hashPart, ',\n'))
             end
 
-            str = str .. table.concat(parts, ",\n") .. "\n" .. indent .. "}"
+            str = str .. table.concat(parts, ',\n') .. '\n' .. indent .. '}'
             return str
-        elseif valType == "function" then
-            return "[Function]"
-        elseif valType == "userdata" then
-            return "[Userdata]"
-        elseif valType == "thread" then
-            return "[Thread]"
+        elseif valType == 'function' then
+            return '[Function]'
+        elseif valType == 'userdata' then
+            return '[Userdata]'
+        elseif valType == 'thread' then
+            return '[Thread]'
         else
-            return "[" .. valType .. "]"
+            return '[' .. valType .. ']'
         end
     end
 
@@ -243,5 +244,5 @@ function log(...)
         table.insert(result, serialize(v))
     end
 
-    print(table.concat(result, "  "))
+    print(table.concat(result, '  '))
 end

@@ -30,7 +30,7 @@ inotify = "0.10.2"
 signal-hook = "0.3.17"
 
 probes = "0.7.1"
-sysinfo = "0.37.2"
+systemstat = "0.2.5"
 
 # egui features
 serde = { version = "1", features = ["derive"] }
