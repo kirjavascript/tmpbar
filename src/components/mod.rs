@@ -15,7 +15,6 @@ mod workspaces;
 
 pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
     core::render_background(comp, ui, global);
-    core::apply_scroll(comp, ui);
 
     match comp.name() {
         "input" => input::render(comp, ui),
@@ -30,4 +29,6 @@ pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
             ui.label(format!("[unknown {:?}]", comp.name()));
         }
     }
+
+    core::apply_scroll(comp, ui);
 }

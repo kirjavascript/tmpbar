@@ -1,7 +1,7 @@
 local ui = require('ui')
 
 ui.bar({
-    monitor = { index = 2 },
+    -- monitor = { index = 2 },
     position = 'top',
 
     min_interval = 0,
