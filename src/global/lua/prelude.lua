@@ -109,6 +109,10 @@ function sys.disk(...)
     return xcake_disk(...)
 end
 
+function sys.batteries(...)
+    return xcake_battery_info(...)
+end
+
 function sys.cpu_temp(...)
     local temp = xcake_cpu_temp(...)
     return temp and string.format('%.1f', temp) or '???'

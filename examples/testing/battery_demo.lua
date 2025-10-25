@@ -1,4 +1,4 @@
-local batteries = xcake_battery_info()
+local batteries = require('sys').batteries()
 
 print("Found " .. #batteries .. " battery(ies)")
 
