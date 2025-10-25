@@ -2,6 +2,7 @@ use crate::util::Signal;
 use crate::wm::xcb::workspaces::WorkspaceDirection;
 
 mod bandwidth;
+mod battery;
 mod cpu;
 mod disk;
 mod memory;
@@ -71,6 +72,7 @@ pub fn load_lua(ctx: egui::Context) -> (mlua::Lua, Signal<LuaCallback>) {
     // stats
 
     bandwidth::bind(&lua, &globals);
+    battery::bind(&lua, &globals);
     memory::bind(&lua, &globals);
     cpu::bind(&lua, &globals);
     disk::bind(&lua, &globals);

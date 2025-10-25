@@ -6,7 +6,6 @@
 -- button/input style / behaviour
 -- click on everything
 --
--- slider??
 -- volume
 -- battery sys
 --  https://github.com/svartalf/rust-battery
