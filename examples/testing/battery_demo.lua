@@ -30,3 +30,5 @@ for i, battery in ipairs(batteries) do
     print("  State: " .. battery.state)
     print()
 end
+
+os.exit()

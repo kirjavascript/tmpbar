@@ -13,3 +13,5 @@ print("  Volume Percent: " .. string.format("%.1f%%", volume.percent))
 print("  Is Muted: " .. tostring(volume.is_muted))
 print("  Range: " .. volume.min .. " - " .. volume.max)
 print()
+
+os.exit()
