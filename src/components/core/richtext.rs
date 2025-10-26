@@ -9,7 +9,11 @@ pub fn richtext(text: impl Into<String>, props: &Props, theme: &Theme) -> egui::
 
     if let Some(Property::Object(style)) = props.get("style") {
         if let Some(Property::String(family)) = style.get("font_family") {
-            font_family = FontFamily::Name(family.clone().into());
+            if family == "monospace" {
+                font_family = FontFamily::Monospace;
+            } else {
+                font_family = FontFamily::Name(family.clone().into());
+            }
         }
 
         if let Some(Property::Float(size)) = style.get("font_size") {

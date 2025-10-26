@@ -22,9 +22,7 @@ for monitor_index, monitor in ui.monitors() do
             height = 130,
             justify_items = 'flex_end',
             justify_content = 'space_between',
-            -- align_items = 'flex_end',
-            -- flex_direction = 'column',
-            -- postion = 'absolute',
+            font_family = 'monospace',
             color = 'pink',
             background = function(svg) return string.format([[
                 <rect

@@ -121,7 +121,11 @@ impl Global {
                 }
 
                 if let Some(Property::String(family)) = style.get("font_family") {
-                    self.theme.font_family = egui::FontFamily::Name(family.to_owned().into());
+                    if family == "monospace" {
+                        self.theme.font_family = egui::FontFamily::Monospace;
+                    } else {
+                        self.theme.font_family = egui::FontFamily::Name(family.to_owned().into());
+                    }
                 } else {
                     self.theme.font_family = default.font_family;
                 }
