@@ -152,7 +152,7 @@ for index, monitor in ui.monitors() do
                     ui.label({
                         style = { margin_left = 5, align_self = 'center' },
                         text = function()
-                            return sys.cpu_temp() .. '°C'
+                            return sys.cpu.temp() .. '°C'
                         end,
                     }),
                     ui.image({

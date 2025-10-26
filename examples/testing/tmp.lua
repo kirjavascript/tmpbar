@@ -5,8 +5,6 @@
 -- input: pressing enter doesnt unfocus properly
 -- button/input style / behaviour
 -- click on everything
---
--- cpu% sys
 
 local ui = require('ui')
 local wm = require('wm')
@@ -115,6 +113,12 @@ for monitor_index, monitor in ui.monitors() do
                 items = {
                     ui.label({ -- clock
                         text = function() return os.date('%Y-%m-%d %a %X') end,
+                    }),
+                    ui.label({ -- cpu usage
+                        text = function()
+                            local usage = sys.cpu.usage()
+                            return string.format('CPU: %.1f%%', usage)
+                        end,
                     }),
                     ui.button({
                         text = 'shutdown',

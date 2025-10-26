@@ -113,9 +113,15 @@ function sys.batteries(...)
     return xcake_battery_info(...)
 end
 
-function sys.cpu_temp(...)
+sys.cpu = {}
+
+function sys.cpu.temp(...)
     local temp = xcake_cpu_temp(...)
     return temp and string.format('%.1f', temp) or '???'
+end
+
+function sys.cpu.usage(...)
+    return xcake_cpu_usage(...)
 end
 
 function sys.bandwidth(...)
