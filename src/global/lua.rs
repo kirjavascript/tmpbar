@@ -19,6 +19,14 @@ pub fn load_lua(ctx: egui::Context) -> (mlua::Lua, Signal<LuaCallback>) {
     let lua = mlua::Lua::new();
     let globals = lua.globals();
 
+    let lua_args = crate::config::args::dashdash_args();
+
+    let arg_table = lua.create_table().unwrap();
+    for (i, arg) in lua_args.into_iter().enumerate() {
+        arg_table.set(i + 1, arg).unwrap();
+    }
+    lua.globals().set("arg", arg_table).unwrap();
+
     lua.load(include_str!("./lua/prelude.lua")).exec().unwrap();
 
     // callbacks

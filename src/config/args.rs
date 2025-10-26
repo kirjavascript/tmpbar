@@ -13,7 +13,14 @@ pub struct Args {
 pub fn get() -> Args {
     let args: Vec<String> = env::args().collect();
 
-    match Args::parse_args(&args[1..], ParsingStyle::AllOptions) {
+    let split = args.iter().position(|x| x == "--");
+
+    let args = match split {
+        Some(i) => &args[1..i],
+        None => &args[1..],
+    };
+
+    match Args::parse_args(args, ParsingStyle::AllOptions) {
         Ok(args) => {
             if args.help_requested() {
                 eprintln!("{} {}\n", super::NAME, super::VERSION);
@@ -25,6 +32,17 @@ pub fn get() -> Args {
             error!("{}", err);
             std::process::exit(0);
         },
+    }
+}
+
+pub fn dashdash_args() -> Vec<String> {
+    let args: Vec<String> = env::args().collect();
+
+    let split = args.iter().position(|x| x == "--");
+
+    match split {
+        Some(i) => args[i + 1..].to_vec(),
+        None => vec![],
     }
 }
 

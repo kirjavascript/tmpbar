@@ -3,13 +3,11 @@ mod log;
 
 mod signal;
 mod throttle;
-mod file;
 mod format_bytes;
 mod csscolor;
 
 pub use signal::*;
 pub use throttle::*;
-pub use file::*;
 pub use format_bytes::*;
 pub use csscolor::*;
 

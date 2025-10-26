@@ -5,6 +5,8 @@
 -- input: pressing enter doesnt unfocus properly
 -- button/input style / behaviour
 -- click on everything
+--
+-- fix invalid font
 
 local ui = require('ui')
 local wm = require('wm')
