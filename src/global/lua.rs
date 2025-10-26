@@ -7,6 +7,7 @@ mod cpu;
 mod disk;
 mod memory;
 mod fonts;
+mod volume;
 
 #[derive(Clone)]
 pub enum LuaCallback {
@@ -76,6 +77,7 @@ pub fn load_lua(ctx: egui::Context) -> (mlua::Lua, Signal<LuaCallback>) {
     memory::bind(&lua, &globals);
     cpu::bind(&lua, &globals);
     disk::bind(&lua, &globals);
+    volume::bind(&lua, &globals);
 
     // fonts
 

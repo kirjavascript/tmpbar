@@ -6,9 +6,6 @@
 -- button/input style / behaviour
 -- click on everything
 --
--- volume
--- battery sys
---  https://github.com/svartalf/rust-battery
 -- cpu% sys
 
 local ui = require('ui')

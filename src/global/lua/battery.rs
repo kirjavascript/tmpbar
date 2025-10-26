@@ -49,7 +49,7 @@ pub fn bind(lua: &mlua::Lua, globals: &mlua::Table) {
                 state: format!("{:?}", battery.state()),
             }
         }).collect::<Vec<_>>()
-    }, std::time::Duration::from_millis(5000));
+    }, std::time::Duration::from_millis(3000));
 
     let battery_info = lua.create_function(move |lua, ()| {
         let data = read.borrow_mut()();

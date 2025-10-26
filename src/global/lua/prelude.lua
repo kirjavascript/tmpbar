@@ -122,6 +122,20 @@ function sys.bandwidth(...)
     return xcake_bandwidth(...)
 end
 
+sys.volume = {}
+
+function sys.volume.info(...)
+    return xcake_volume_info(...)
+end
+
+function sys.volume.mute(...)
+    return xcake_set_mute(...)
+end
+
+function sys.volume.set(...)
+    return xcake_set_volume(...)
+end
+
 package.loaded['sys'] = sys
 builtin_modules['sys'] = true
 
