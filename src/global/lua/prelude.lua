@@ -147,10 +147,6 @@ builtin_modules['sys'] = true
 
 local util = {}
 
-function util.window_title()
-    return xcake_window_title
-end
-
 function util.trim(s)
     return (s:gsub('^%s*(.-)%s*$', '%1'))
 end
