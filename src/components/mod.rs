@@ -19,7 +19,7 @@ pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
     match comp.name() {
         "input" => input::render(comp, ui),
         "container" => container::render(comp, ui, global),
-        "button" => button::render(comp, ui),
+        "button" => button::render(comp, ui, global),
         "image" => image::render(comp, ui, global),
         "label" => label::render(comp, ui, global),
         "shader" => shader::render(comp, ui, global),
@@ -30,5 +30,5 @@ pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
         }
     }
 
-    core::apply_scroll(comp, ui);
+    core::events(comp, ui, global);
 }

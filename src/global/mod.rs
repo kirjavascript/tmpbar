@@ -19,6 +19,7 @@ pub struct Global {
     pub theme: Theme,
     pub ctx: egui::Context,
     pub gl: Arc<glow::Context>,
+    pub capture_event: bool,
     xcb_signal: Signal<xcb::Event>,
     lua_signal: Signal<LuaCallback>,
     i3mode_signal: Signal<String>
@@ -57,10 +58,12 @@ impl Global {
             i3mode_signal,
             ctx,
             gl,
+            capture_event: true,
         }
     }
 
     pub fn frame(&mut self) {
+        self.capture_event = true;
         self.set_theme_families();
         self.signals();
     }

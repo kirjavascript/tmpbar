@@ -107,6 +107,7 @@ impl eframe::App for TmpBar {
                     egui::CentralPanel::default()
                         .frame(egui::Frame::new().fill(egui::Color32::TRANSPARENT))
                         .show(ctx, |ui| {
+
                             // taffy: enable multipass
                             ctx.options_mut(|options| {
                                 options.max_passes = std::num::NonZeroUsize::new(3).unwrap();
@@ -122,6 +123,9 @@ impl eframe::App for TmpBar {
                                 ui,
                                 &mut self.global
                             );
+
+                            // force default cursor
+                            ctx.output_mut(|o| o.cursor_icon = egui::CursorIcon::Default);
                     });
                 },
             );

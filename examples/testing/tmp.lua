@@ -16,6 +16,8 @@ for monitor_index, monitor in ui.monitors() do
         monitor = monitor,
         position = 'top',
 
+        click = function() print('bar') end,
+
         style = {
             height = 130,
             justify_items = 'flex_end',
@@ -39,6 +41,7 @@ for monitor_index, monitor in ui.monitors() do
 
         items = {
             ui.label({
+                click = function() print('JS') end,
                 style = {
                     background = 'yellow',
                     color = 'black',
