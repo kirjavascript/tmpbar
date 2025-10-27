@@ -17,9 +17,9 @@ pub struct Global {
     pub tray: Option<xcb::Tray>,
     pub parent_path: String,
     pub theme: Theme,
+    pub capture_event: bool,
     pub ctx: egui::Context,
     pub gl: Arc<glow::Context>,
-    pub capture_event: bool,
     xcb_signal: Signal<xcb::Event>,
     lua_signal: Signal<LuaCallback>,
     i3mode_signal: Signal<String>
@@ -53,12 +53,12 @@ impl Global {
             parent_path,
             lua,
             theme: Theme::default(),
+            capture_event: true,
             xcb_signal,
             lua_signal,
             i3mode_signal,
             ctx,
             gl,
-            capture_event: true,
         }
     }
 

@@ -4,10 +4,6 @@ local counter = 0
 local input_text = ''
 local status_message = 'Ready'
 
--- implement stop propagation (global.captureEvent)
--- ui.render()
--- make a program launcher
-
 for _, monitor in ui.monitors() do
     ui.bar({
         monitor = monitor,

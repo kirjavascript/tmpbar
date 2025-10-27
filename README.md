@@ -11,6 +11,8 @@ customizable statusbar for your windowmanager
 * multibar/multimonitor support
 * more rice than feudal japan
 
+tmpbar is built with egui and XCB
+
 ## quickstart
 
 ```bash
@@ -23,4 +25,4 @@ view the [examples](./examples)
 
 ### notes
 
-this project was a reimagining of [another bar](https://github.com/kirjavascript/cakeybar)
+this project is a reimagining of [another bar](https://github.com/kirjavascript/cakeybar)
