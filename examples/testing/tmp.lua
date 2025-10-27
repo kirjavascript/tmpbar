@@ -4,6 +4,10 @@
 --
 -- input: pressing enter doesnt unfocus properly
 -- button/input style
+--
+-- mnousemove event
+-- shader x y position
+-- win95 bar
 
 local ui = require('ui')
 local wm = require('wm')
