@@ -1,6 +1,7 @@
 -- TODO
 -- exec('xwinwrap') + windows-live.mp4 + netscape
 -- animated SVG for battery monitor, CPU graph
+-- cargo install / AUR / AppImage (appimagetool)
 --
 -- input: pressing enter doesnt unfocus properly
 -- button/input style

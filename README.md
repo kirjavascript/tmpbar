@@ -25,6 +25,6 @@ view the [examples](./examples)
 
 ### notes
 
-this project is a reimagining of [another bar](https://github.com/kirjavascript/cakeybar). tmpbar has much stronger primitives
+this project is a reimagining of [another bar](https://github.com/kirjavascript/cakeybar)
 
 wayland support is missing but not a huge undertaking to add
