@@ -36,6 +36,7 @@ for _, monitor in ui.monitors() do
             }),
             ui.label({
                 text = 'Default font with default color',
+
             }),
             ui.label({
                 text = 'Large custom font',

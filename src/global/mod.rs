@@ -60,7 +60,12 @@ impl Global {
         }
     }
 
-    pub fn signals(&mut self) {
+    pub fn frame(&mut self) {
+        self.set_theme_families();
+        self.signals();
+    }
+
+    fn signals(&mut self) {
         for event in self.xcb_signal.read() {
             match event {
                 xcb::Event::WindowTitle(title) => {
@@ -98,10 +103,21 @@ impl Global {
         }
     }
 
+    pub fn set_theme_families(&mut self) {
+        let mut fonts = self.ctx.fonts(|f| f.families()).iter().map(|font| {
+            format!("{}", font)
+        }).collect::<Vec<String>>()[2..].to_vec();
+
+        fonts.push("monospace".to_string());
+
+        self.theme.families = fonts;
+    }
+
+    // on config load
     pub fn set_theme(&mut self, config: &crate::config::ConfigScript) {
         use crate::config::Property;
 
-        let default = Theme::default();
+        self.theme = Default::default();
 
         if let Some(bar) = config.bars.get(0) {
             if let Some(Property::Object(style)) = bar.container.props_ref().get("style") {
@@ -116,26 +132,16 @@ impl Global {
                         },
                         Err(err) => error!("{}", err),
                     }
-                } else {
-                    self.theme.color = default.color;
                 }
 
                 if let Some(Property::String(family)) = style.get("font_family") {
-                    if family == "monospace" {
-                        self.theme.font_family = egui::FontFamily::Monospace;
-                    } else {
-                        self.theme.font_family = egui::FontFamily::Name(family.to_owned().into());
-                    }
-                } else {
-                    self.theme.font_family = default.font_family;
+                    self.theme.font_family = Some(family.clone());
                 }
 
                 if let Some(Property::Integer(size)) = style.get("font_size") {
                     self.theme.font_size = *size as _;
                 } else if let Some(Property::Float(size)) = style.get("font_size") {
                     self.theme.font_size = *size as _;
-                } else {
-                    self.theme.font_size = default.font_size;
                 }
             }
         }
