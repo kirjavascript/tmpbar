@@ -10,6 +10,7 @@
 -- mnousemove event
 -- shader x y position
 -- win95 bar
+-- ui.is_mouse_down() / bbox on component - store in global?
 
 local ui = require('ui')
 local wm = require('wm')

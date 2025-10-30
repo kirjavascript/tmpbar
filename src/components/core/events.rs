@@ -3,6 +3,10 @@ use crate::global::Global;
 use egui::Ui;
 
 pub fn events(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
+    if let Some(Property::Function(func)) = comp.props().get("frame") {
+        func.call::<(), ()>(()).ok();
+    }
+
     if !global.capture_event {
         return
     }
