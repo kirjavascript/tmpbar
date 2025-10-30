@@ -6,6 +6,7 @@
 -- input: pressing enter doesnt unfocus properly
 -- button/input style
 --
+-- hover images? :/
 -- mnousemove event
 -- shader x y position
 -- win95 bar
