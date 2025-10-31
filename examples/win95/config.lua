@@ -70,7 +70,7 @@ for _, monitor in ui.monitors() do
                             width = 54,
                             padding = 0,
                             margin_right = 4,
-                            font_family = 'W95FA',
+                            font_family = 'MSGothic',
                             font_size = 11,
                             font_weight = 'bold',
                             text_align = 'center',
@@ -79,7 +79,7 @@ for _, monitor in ui.monitors() do
                                 return win95_border(not ui.local_mousedown())(svg)
                             end,
                         },
-                        text = 'Start',
+                        text = 'スタート',
                         click = function()
                             -- Could integrate with rofi/dmenu here
                             sys.exec('rofi -show drun')
