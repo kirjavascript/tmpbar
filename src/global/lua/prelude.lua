@@ -29,6 +29,9 @@ end
 
 local ui = {}
 
+package.loaded['ui'] = ui
+builtin_modules['ui'] = true
+
 function ui.monitors()
     ---@diagnostic disable: undefined-global
     return ipairs(xcake_monitors)
@@ -41,6 +44,14 @@ end
 function ui.load_font(name, path)
     xcake_load_font(name, path)
 end
+
+-- events
+
+function ui.local_mousedown()
+    return xcake_event_local_mousedown
+end
+
+-- components
 
 function ui.component(name, config)
     config = config or {}
@@ -57,10 +68,10 @@ mt.__index = function(_, key)
 end
 setmetatable(ui, mt)
 
-package.loaded['ui'] = ui
-builtin_modules['ui'] = true
-
 local wm = {}
+
+package.loaded['wm'] = wm
+builtin_modules['wm'] = true
 
 xcake_window_title = ''
 xcake_i3_mode = 'default'
@@ -81,10 +92,10 @@ function wm.set_workspace(value)
     end
 end
 
-package.loaded['wm'] = wm
-builtin_modules['wm'] = true
-
 local sys = {}
+
+package.loaded['sys'] = sys
+builtin_modules['sys'] = true
 
 function sys.exec(cmd)
     local handle, err = io.popen(cmd)
@@ -142,10 +153,10 @@ function sys.volume.set(...)
     return xcake_set_volume(...)
 end
 
-package.loaded['sys'] = sys
-builtin_modules['sys'] = true
-
 local util = {}
+
+package.loaded['util'] = util
+builtin_modules['util'] = true
 
 function util.trim(s)
     return (s:gsub('^%s*(.-)%s*$', '%1'))
@@ -191,10 +202,7 @@ function util.read_file(filePath)
     return content
 end
 
-package.loaded['util'] = util
-builtin_modules['util'] = true
-
-function log(...)
+function util.log(...)
     local args = {...}
     local result = {}
 

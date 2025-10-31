@@ -58,6 +58,21 @@ for monitor_index, monitor in ui.monitors() do
                 },
                 text = 'JS',
             }),
+            ui.container({
+                style = {
+                    flex_direction = 'column',
+                },
+                items = {
+                    ui.image({
+                        path = 'https://sharey.org/8ilgDQ.png',
+                        style = { padding = 3, size = 60, },
+                    }),
+                    ui.image({
+                        path = './assets/archlinux.svg',
+                        style = { size = 100 },
+                    }),
+                },
+            }),
             ui.label({ -- window title
                 style = {
                     position = 'absolute',
@@ -81,21 +96,6 @@ for monitor_index, monitor in ui.monitors() do
                     local mode = wm.i3_mode()
                     return (mode == 'default') and '' or (' « ' .. mode .. ' » ')
                 end,
-            }),
-            ui.container({
-                style = {
-                    flex_direction = 'column',
-                },
-                items = {
-                    ui.image({
-                        path = 'https://sharey.org/8ilgDQ.png',
-                        style = { padding = 3, size = 60, },
-                    }),
-                    ui.image({
-                        path = './assets/archlinux.svg',
-                        style = { size = 100 },
-                    }),
-                },
             }),
             ui.workspaces({
                 render = function (workspace) return ui.label({

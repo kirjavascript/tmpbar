@@ -70,37 +70,21 @@ for _, monitor in ui.monitors() do
                             width = 54,
                             padding = 0,
                             margin_right = 4,
-                            background = win95_border(true),
                             font_family = 'W95FA',
                             font_size = 11,
                             font_weight = 'bold',
                             text_align = 'center',
                             text_valign = 'center',
+                            background = function(svg)
+                                return win95_border(not ui.local_mousedown())(svg)
+                            end,
                         },
                         text = 'Start',
                         click = function()
                             -- Could integrate with rofi/dmenu here
                             sys.exec('rofi -show drun')
                         end,
-                    }),
-                    ui.label({
-                        style = {
-                            height = 22,
-                            width = 54,
-                            padding = 0,
-                            margin_right = 4,
-                            background = win95_border(false),
-                            font_family = 'W95FA',
-                            font_size = 11,
-                            font_weight = 'bold',
-                            text_align = 'center',
-                            text_valign = 'center',
-                        },
-                        text = 'Start',
-                        click = function()
-                            -- Could integrate with rofi/dmenu here
-                            sys.exec('rofi -show drun')
-                        end,
+
                     }),
 
                     ui.container({

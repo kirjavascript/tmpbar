@@ -15,6 +15,7 @@ mod workspaces;
 
 pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
     core::render_background(comp, ui, global);
+    core::events_state(ui, global);
 
     match comp.name() {
         "input" => input::render(comp, ui),
