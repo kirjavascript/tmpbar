@@ -1,6 +1,6 @@
 use mlua::{Result, FromLuaMulti};
 
-pub fn handle_call<'lua, T>(result: Result<T>)
+pub fn handle_result<'lua, T>(result: Result<T>)
     where
         T: FromLuaMulti<'lua>,
 {

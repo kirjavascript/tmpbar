@@ -5,13 +5,13 @@ mod signal;
 mod throttle;
 mod format_bytes;
 mod csscolor;
-mod handle_call;
+mod handle_result;
 
 pub use signal::*;
 pub use throttle::*;
 pub use format_bytes::*;
 pub use csscolor::*;
-pub use handle_call::*;
+pub use handle_result::*;
 
 pub fn fnv1a_hash<T: AsRef<[u8]>>(input: T) -> u64 {
     const FNV_OFFSET_BASIS: u64 = 0xcbf29ce484222325;

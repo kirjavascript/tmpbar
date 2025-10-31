@@ -1,7 +1,7 @@
 use eframe::egui;
 use egui::Ui;
 use crate::config::{Component, Property, text_mut};
-use crate::util::handle_call;
+use crate::util::handle_result;
 
 // TODO: https://docs.rs/egui/latest/egui/viewport/enum.ViewportCommand.html
 
@@ -24,12 +24,12 @@ pub fn render(comp: &mut Component, ui: &mut Ui) {
 
     if response.changed() {
         if let Some(Property::Function(func)) = props.get("change") {
-            handle_call(func.call::<String, ()>(text.to_owned()));
+            handle_result(func.call::<String, ()>(text.to_owned()));
         }
     }
     if response.lost_focus() && ui.input(|i| i.key_pressed(egui::Key::Enter)) {
         if let Some(Property::Function(func)) = props.get("submit") {
-            handle_call(func.call::<String, ()>(text.to_owned()));
+            handle_result(func.call::<String, ()>(text.to_owned()));
         }
     }
 }

@@ -51,6 +51,10 @@ function ui.local_mousedown()
     return xcake_event_local_mousedown
 end
 
+function ui.local_mouseover()
+    return xcake_event_local_mouseover
+end
+
 -- components
 
 function ui.component(name, config)
