@@ -1,12 +1,12 @@
 local ui = require('ui')
 
--- Fire effect shader converted from Shadertoy
--- Original: https://www.shadertoy.com/view/4ttGWM
+-- converted from Shadertoy
+-- original: https://www.shadertoy.com/view/4ttGWM
 
 ui.bar({
     position = 'top',
 
-    min_interval = 16, -- ~60fps for smooth animation
+    min_interval = 16,
 
     style = {
         height = 400,
