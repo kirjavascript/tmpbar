@@ -7,7 +7,6 @@
 -- input: pressing enter doesnt unfocus properly
 -- button/input style
 --
--- shader x y position
 -- win95 bar
 
 local ui = require('ui')

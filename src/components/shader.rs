@@ -28,7 +28,7 @@ impl ShaderState {
             let shader_version = if let Some(Property::String(version)) = props.get("version") {
                 version
             } else {
-                "#version 330"
+                "#version 330 core"
             };
 
             let vertex_shader_source: String = props.get("vertex").unwrap_or_default().into();
