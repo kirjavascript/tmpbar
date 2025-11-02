@@ -10,9 +10,8 @@ struct VolumeInfo {
 }
 
 pub fn bind(lua: &mlua::Lua, globals: &mlua::Table) {
-    let mixer = Mixer::new("default", false).unwrap();
-
-    let get_volume_info = move || -> Option<VolumeInfo> {
+    let get_volume_info = || -> Option<VolumeInfo> {
+        let mixer = Mixer::new("default", false).ok()?;
         let selem_id = SelemId::new("Master", 0);
         let selem = mixer.find_selem(&selem_id)?;
 
@@ -37,7 +36,7 @@ pub fn bind(lua: &mlua::Lua, globals: &mlua::Table) {
         })
     };
 
-    let read = crate::util::throttle_cell(get_volume_info, std::time::Duration::from_millis(500));
+    let read = crate::util::throttle_cell(get_volume_info, std::time::Duration::from_millis(50));
 
     let volume_info = lua.create_function(move |lua, ()| {
         let data = read.borrow_mut()();

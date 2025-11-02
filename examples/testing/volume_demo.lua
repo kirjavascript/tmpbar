@@ -75,8 +75,6 @@ for _, monitor in ui.monitors() do
                                 return '🔇 Error'
                             end
 
-                            print(volume.percent)
-
                             local icon = volume.is_muted and '🔇'
                                 or volume.percent > 66 and '🔊'
                                 or volume.percent > 33 and '🔉'
@@ -94,7 +92,7 @@ for _, monitor in ui.monitors() do
                         scroll = function(delta)
                             local volume = sys.volume.info()
                             if not volume.error then
-                                local new_percent = volume.percent + (delta > 0 and 5 or -5)
+                                local new_percent = volume.percent + (delta > 0 and -5 or 5)
                                 new_percent = math.max(0, math.min(100, new_percent))
                                 sys.volume.set(new_percent)
                             end
