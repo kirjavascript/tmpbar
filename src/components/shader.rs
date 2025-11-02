@@ -96,14 +96,24 @@ struct Shader {
 }
 
 impl Shader {
-    fn paint(&self, gl: &glow::Context) {
+    fn paint(&self, gl: &glow::Context, mouse_pos: egui::Pos2, rect_size: egui::Vec2) {
         use glow::HasContext as _;
 
         unsafe {
             gl.use_program(Some(self.program));
             gl.uniform_1_f32(
-                gl.get_uniform_location(self.program, "time_delta").as_ref(),
+                gl.get_uniform_location(self.program, "u_time").as_ref(),
                 self.start.elapsed().as_secs_f32(),
+            );
+            gl.uniform_2_f32(
+                gl.get_uniform_location(self.program, "u_mouse").as_ref(),
+                mouse_pos.x / rect_size.x,
+                1.0 - (mouse_pos.y / rect_size.y),
+            );
+            gl.uniform_2_f32(
+                gl.get_uniform_location(self.program, "u_resolution").as_ref(),
+                rect_size.x,
+                rect_size.y,
             );
             gl.bind_vertex_array(Some(self.vertex_array));
             gl.draw_arrays(glow::TRIANGLES, 0, 3);
@@ -124,15 +134,19 @@ pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
     if let Some(shader) = &state.inner {
         let available = ui.available_size();
 
-        let (rect, _response) =
-            ui.allocate_exact_size(available, egui::Sense::drag());
+        let (rect, response) =
+            ui.allocate_exact_size(available, egui::Sense::hover());
+
+        let mouse_pos = response.hover_pos().unwrap_or(egui::Pos2::ZERO);
+        let relative_mouse_pos = mouse_pos - rect.min;
+        let rect_size = rect.size();
 
         let shader = shader.clone();
 
         let callback = egui::PaintCallback {
             rect,
             callback: std::sync::Arc::new(eframe::egui_glow::CallbackFn::new(move |_info, painter| {
-                shader.paint(painter.gl());
+                shader.paint(painter.gl(), relative_mouse_pos.to_pos2(), rect_size);
             })),
         };
         ui.painter().add(callback);

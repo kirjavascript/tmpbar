@@ -1,7 +1,6 @@
 local ui = require('ui')
 
 ui.bar({
-    -- monitor = { index = 2 },
     position = 'top',
 
     min_interval = 0,
@@ -88,11 +87,11 @@ ui.bar({
                     vec4(0.0, 0.0, 1.0, 1.0)
                     );
                 out vec4 v_color;
-                uniform float time_delta;
+                uniform float u_time;
                 void main() {
                     v_color = colors[gl_VertexID];
                     gl_Position = vec4(verts[gl_VertexID], 0.0, 1.0);
-                    gl_Position.x *= cos(time_delta);
+                    gl_Position.x *= cos(u_time);
                 }
             ]],
             fragment = [[
@@ -124,12 +123,12 @@ ui.bar({
             fragment = [[
                 in vec2 vUV;
                 out vec4 FragColor;
-                uniform float time_delta;
+                uniform float u_time;
 
                 void main() {
                     vec2 center = vec2(0.5, 0.5);
                     float dist = distance(vUV, center);
-                    float wave = sin(dist * 20.0 - time_delta * 5.0) * 0.5 + 0.5;
+                    float wave = sin(dist * 20.0 - u_time * 5.0) * 0.5 + 0.5;
                     vec3 color = vec3(wave * 0.8, wave * 0.4, wave);
                     FragColor = vec4(color, 1.0);
                 }
@@ -155,14 +154,14 @@ ui.bar({
             fragment = [[
                 in vec2 vUV;
                 out vec4 FragColor;
-                uniform float time_delta;
+                uniform float u_time;
 
                 void main() {
                     vec2 uv = vUV * 2.0 - 1.0;
                     float r = length(uv);
                     float a = atan(uv.y, uv.x);
 
-                    float spiral = sin(r * 10.0 - a * 3.0 + time_delta * 2.0);
+                    float spiral = sin(r * 10.0 - a * 3.0 + u_time * 2.0);
                     vec3 color = vec3(
                         0.5 + 0.5 * cos(spiral + 0.0),
                         0.5 + 0.5 * cos(spiral + 2.094),
@@ -193,7 +192,7 @@ ui.bar({
             fragment = [[
                 in vec2 vUV;
                 out vec4 FragColor;
-                uniform float time_delta;
+                uniform float u_time;
 
                 float noise(vec2 p) {
                     return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
@@ -237,11 +236,11 @@ ui.bar({
             fragment = [[
                 in vec2 vUV;
                 out vec4 FragColor;
-                uniform float time_delta;
+                uniform float u_time;
 
                 void main() {
                     vec2 uv = (vUV - 0.5) * 2.0;
-                    float t = time_delta * 0.5;
+                    float t = u_time * 0.5;
 
                     for(int i = 0; i < 3; i++) {
                         float fi = float(i);
@@ -275,13 +274,13 @@ ui.bar({
             fragment = [[
                 in vec2 vUV;
                 out vec4 FragColor;
-                uniform float time_delta;
+                uniform float u_time;
 
                 void main() {
                     vec2 uv = vUV * 2.0 - 1.0;
                     float d = length(uv);
 
-                    float rings = sin(d * 15.0 - time_delta * 3.0);
+                    float rings = sin(d * 15.0 - u_time * 3.0);
                     float fade = 1.0 - smoothstep(0.0, 1.0, d);
 
                     vec3 color1 = vec3(1.0, 0.3, 0.8);
