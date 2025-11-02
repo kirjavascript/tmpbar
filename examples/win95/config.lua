@@ -81,7 +81,6 @@ for _, monitor in ui.monitors() do
                         },
                         text = 'スタート',
                         click = function()
-                            -- Could integrate with rofi/dmenu here
                             sys.exec('rofi -show drun')
                         end,
 

@@ -118,14 +118,15 @@ impl eframe::App for TmpBar {
                                 style.wrap_mode = Some(egui::TextWrapMode::Extend);
                             });
 
+                            // force default cursor
+                            ui.style_mut().interaction.selectable_labels = false;
+                            ctx.output_mut(|o| o.cursor_icon = egui::CursorIcon::Default);
+
                             crate::components::render(
                                 &mut bar.container,
                                 ui,
                                 &mut self.global
                             );
-
-                            // force default cursor
-                            ctx.output_mut(|o| o.cursor_icon = egui::CursorIcon::Default);
                     });
                 },
             );

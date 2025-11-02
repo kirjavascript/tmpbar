@@ -206,7 +206,7 @@ function util.read_file(filePath)
     return content
 end
 
-function util.log(...)
+function util.inspect(...)
     local args = {...}
     local result = {}
 
