@@ -37,7 +37,6 @@ for _, monitor in ui.monitors() do
                                         or workspace.visible and '#4C566A'
                                         or 'transparent'
                                 end,
-                                border_radius = 3,
                             },
                             text = tostring(workspace.name),
                             click = function()
@@ -65,9 +64,6 @@ for _, monitor in ui.monitors() do
                         style = {
                             margin_right = 15,
                             padding = 5,
-                            background_color = '#3B4252',
-                            border_radius = 3,
-                            cursor = 'pointer',
                         },
                         text = function()
                             local volume = sys.volume.info()

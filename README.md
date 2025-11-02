@@ -9,7 +9,6 @@ customizable statusbar for your windowmanager
 * hot config reloading
 * windowmanager neutral config
 * multibar/multimonitor support
-* more rice than feudal japan
 
 tmpbar is built with egui and XCB
 

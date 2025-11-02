@@ -53,7 +53,7 @@ pub fn bind(lua: &mlua::Lua, globals: &mlua::Table) {
             }
             None => {
                 let table = lua.create_table().unwrap();
-                table.set("error", "Failed to get volume info").unwrap();
+                table.set("error", "failed to get volume info").unwrap();
                 Ok(table)
             }
         }
