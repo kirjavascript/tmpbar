@@ -199,5 +199,65 @@ ui.bar({
                 }
             ]],
         }),
+        ui.shader({
+            style = {
+                size = 300,
+            },
+            version = '#version 330 core',
+            vertex = [[
+                out vec2 vUV;
+                void main() {
+                    const vec2 verts[3] = vec2[3](
+                        vec2(-1.0, -1.0),
+                        vec2( 3.0, -1.0),
+                        vec2(-1.0,  3.0)
+                    );
+                    gl_Position = vec4(verts[gl_VertexID], 0.0, 1.0);
+                    vUV = gl_Position.xy * 0.5 + 0.5;
+                }
+            ]],
+            fragment = [[
+                in vec2 vUV;
+                out vec4 FragColor;
+                uniform vec2 u_mouse;
+                uniform vec2 u_resolution;
+                uniform float u_time;
+                uniform float u_zoom;
+
+                void main() {
+                    vec2 uv = vUV;
+                    vec2 mouse = u_mouse;
+                    
+                    // Apply zoom centered on mouse position
+                    vec2 center = mouse;
+                    uv = (uv - center) / u_zoom + center;
+                    
+                    // Create a fractal pattern that benefits from zooming
+                    vec2 c = uv * 4.0 - 2.0;
+                    vec2 z = vec2(0.0);
+                    float iterations = 0.0;
+                    
+                    for (int i = 0; i < 100; i++) {
+                        if (dot(z, z) > 4.0) break;
+                        z = vec2(z.x * z.x - z.y * z.y, 2.0 * z.x * z.y) + c;
+                        iterations += 1.0;
+                    }
+                    
+                    // Color based on iterations and time
+                    float t = iterations / 100.0;
+                    vec3 color = vec3(
+                        0.5 + 0.5 * sin(t * 6.28 + u_time),
+                        0.5 + 0.5 * sin(t * 6.28 + u_time + 2.09),
+                        0.5 + 0.5 * sin(t * 6.28 + u_time + 4.18)
+                    );
+                    
+                    // Add zoom indicator
+                    float zoom_indicator = smoothstep(0.98, 1.0, length(uv - vec2(0.9, 0.1)));
+                    color = mix(color, vec3(1.0, 1.0, 0.0), zoom_indicator * (u_zoom - 1.0) * 0.5);
+                    
+                    FragColor = vec4(color, 1.0);
+                }
+            ]],
+        }),
     },
 })

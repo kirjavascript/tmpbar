@@ -82,6 +82,7 @@ impl ShaderState {
                     program,
                     vertex_array,
                     start: Instant::now(),
+                    zoom: 1.0,
                 });
             }
         }
@@ -93,6 +94,7 @@ struct Shader {
     program: glow::Program,
     vertex_array: glow::VertexArray,
     start: Instant,
+    zoom: f32,
 }
 
 impl Shader {
@@ -115,9 +117,18 @@ impl Shader {
                 rect_size.x,
                 rect_size.y,
             );
+            gl.uniform_1_f32(
+                gl.get_uniform_location(self.program, "u_zoom").as_ref(),
+                self.zoom,
+            );
             gl.bind_vertex_array(Some(self.vertex_array));
             gl.draw_arrays(glow::TRIANGLES, 0, 3);
         }
+    }
+
+    fn update_zoom(&mut self, delta: f32) {
+        self.zoom *= 1.0 + delta * 0.001;
+        // self.zoom = self.zoom.clamp(0.1, 10.0);
     }
 }
 
@@ -131,11 +142,18 @@ pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
 
     state.init(comp, &*global.gl);
 
-    if let Some(shader) = &state.inner {
+    if let Some(shader) = &mut state.inner {
         let available = ui.available_size();
 
         let (rect, response) =
-            ui.allocate_exact_size(available, egui::Sense::hover());
+            ui.allocate_exact_size(available, egui::Sense::hover().union(egui::Sense::click()));
+
+        // Handle mouse wheel for zoom
+        if response.hovered() {
+            ui.input(|i| {
+                shader.update_zoom(i.raw_scroll_delta.y);
+            });
+        }
 
         let mouse_pos = response.hover_pos().unwrap_or(egui::Pos2::ZERO);
         let relative_mouse_pos = mouse_pos - rect.min;
