@@ -258,5 +258,140 @@ ui.bar({
                 }
             ]],
         }),
+        ui.shader({
+            style = {
+                size = 300,
+            },
+            version = '#version 330 core',
+            vertex = [[
+                out vec2 vUV;
+                void main() {
+                    const vec2 verts[3] = vec2[3](
+                        vec2(-1.0, -1.0),
+                        vec2( 3.0, -1.0),
+                        vec2(-1.0,  3.0)
+                    );
+                    gl_Position = vec4(verts[gl_VertexID], 0.0, 1.0);
+                    vUV = gl_Position.xy * 0.5 + 0.5;
+                }
+            ]],
+            fragment = [[
+                in vec2 vUV;
+                out vec4 FragColor;
+                uniform vec2 u_mouse;
+                uniform float u_time;
+
+                // Mandelbulb distance function
+                float mandelbulb(vec3 pos) {
+                    vec3 z = pos;
+                    float dr = 1.0;
+                    float r = 0.0;
+                    float power = 8.0;
+                    
+                    for (int i = 0; i < 15; i++) {
+                        r = length(z);
+                        if (r > 2.0) break;
+                        
+                        // Convert to polar coordinates
+                        float theta = acos(z.z / r);
+                        float phi = atan(z.y, z.x);
+                        dr = pow(r, power - 1.0) * power * dr + 1.0;
+                        
+                        // Scale and rotate the point
+                        float zr = pow(r, power);
+                        theta = theta * power;
+                        phi = phi * power;
+                        
+                        // Convert back to cartesian coordinates
+                        z = zr * vec3(sin(theta) * cos(phi), sin(phi) * sin(theta), cos(theta));
+                        z += pos;
+                    }
+                    
+                    return 0.5 * log(r) * r / dr;
+                }
+
+                // Raymarching function
+                float raymarch(vec3 ro, vec3 rd) {
+                    float t = 0.0;
+                    for (int i = 0; i < 64; i++) {
+                        vec3 pos = ro + t * rd;
+                        float d = mandelbulb(pos);
+                        if (d < 0.001 || t > 10.0) break;
+                        t += d * 0.5;
+                    }
+                    return t;
+                }
+
+                // Calculate normal using finite differences
+                vec3 calcNormal(vec3 pos) {
+                    vec2 e = vec2(0.001, 0.0);
+                    return normalize(vec3(
+                        mandelbulb(pos + e.xyy) - mandelbulb(pos - e.xyy),
+                        mandelbulb(pos + e.yxy) - mandelbulb(pos - e.yxy),
+                        mandelbulb(pos + e.yyx) - mandelbulb(pos - e.yyx)
+                    ));
+                }
+
+                void main() {
+                    vec2 uv = (vUV - 0.5) * 2.0;
+                    vec2 mouse = (u_mouse - 0.5) * 2.0;
+                    
+                    // Camera setup - mouse controls rotation
+                    float camX = mouse.x * 3.14159;
+                    float camY = mouse.y * 1.57;
+                    
+                    vec3 ro = vec3(
+                        3.0 * cos(camY) * cos(camX),
+                        3.0 * sin(camY),
+                        3.0 * cos(camY) * sin(camX)
+                    );
+                    
+                    vec3 target = vec3(0.0);
+                    vec3 up = vec3(0.0, 1.0, 0.0);
+                    
+                    vec3 forward = normalize(target - ro);
+                    vec3 right = normalize(cross(forward, up));
+                    up = cross(right, forward);
+                    
+                    vec3 rd = normalize(forward + uv.x * right + uv.y * up);
+                    
+                    // Raymarch the scene
+                    float t = raymarch(ro, rd);
+                    
+                    vec3 color = vec3(0.0);
+                    
+                    if (t < 10.0) {
+                        vec3 pos = ro + t * rd;
+                        vec3 normal = calcNormal(pos);
+                        
+                        // Lighting
+                        vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
+                        float diff = max(dot(normal, lightDir), 0.0);
+                        
+                        // Specular
+                        vec3 viewDir = normalize(ro - pos);
+                        vec3 reflectDir = reflect(-lightDir, normal);
+                        float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
+                        
+                        // Color based on position and time
+                        vec3 baseColor = vec3(
+                            0.5 + 0.5 * sin(pos.x * 2.0 + u_time),
+                            0.5 + 0.5 * sin(pos.y * 2.0 + u_time + 2.0),
+                            0.5 + 0.5 * sin(pos.z * 2.0 + u_time + 4.0)
+                        );
+                        
+                        color = baseColor * (0.3 + 0.7 * diff) + vec3(spec);
+                        
+                        // Fog
+                        color = mix(color, vec3(0.1, 0.1, 0.2), smoothstep(2.0, 8.0, t));
+                    } else {
+                        // Background gradient
+                        color = mix(vec3(0.1, 0.1, 0.2), vec3(0.0, 0.0, 0.1), uv.y * 0.5 + 0.5);
+                    }
+                    
+                    FragColor = vec4(color, 1.0);
+                }
+            ]],
+        }),
     },
 })
