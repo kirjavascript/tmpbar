@@ -280,13 +280,20 @@ ui.bar({
                 out vec4 FragColor;
                 uniform vec2 u_mouse;
                 uniform float u_time;
+                uniform float u_zoom;
 
-                // Mandelbulb distance function
-                float mandelbulb(vec3 pos) {
+                // Morphing Mandelbulb distance function
+                float mandelbulb(vec3 pos, float power, float morph) {
                     vec3 z = pos;
                     float dr = 1.0;
                     float r = 0.0;
-                    float power = 8.0;
+                    
+                    // Add morphing offset based on zoom
+                    vec3 offset = vec3(
+                        sin(u_time * 0.5 + morph) * 0.1,
+                        cos(u_time * 0.3 + morph) * 0.1,
+                        sin(u_time * 0.7 + morph) * 0.1
+                    ) * u_zoom * 0.2;
                     
                     for (int i = 0; i < 15; i++) {
                         r = length(z);
@@ -297,25 +304,25 @@ ui.bar({
                         float phi = atan(z.y, z.x);
                         dr = pow(r, power - 1.0) * power * dr + 1.0;
                         
-                        // Scale and rotate the point
+                        // Scale and rotate the point with zoom-based morphing
                         float zr = pow(r, power);
-                        theta = theta * power;
-                        phi = phi * power;
+                        theta = theta * power + morph * 0.1;
+                        phi = phi * power + morph * 0.15;
                         
                         // Convert back to cartesian coordinates
                         z = zr * vec3(sin(theta) * cos(phi), sin(phi) * sin(theta), cos(theta));
-                        z += pos;
+                        z += pos + offset;
                     }
                     
                     return 0.5 * log(r) * r / dr;
                 }
 
                 // Raymarching function
-                float raymarch(vec3 ro, vec3 rd) {
+                float raymarch(vec3 ro, vec3 rd, float power, float morph) {
                     float t = 0.0;
                     for (int i = 0; i < 64; i++) {
                         vec3 pos = ro + t * rd;
-                        float d = mandelbulb(pos);
+                        float d = mandelbulb(pos, power, morph);
                         if (d < 0.001 || t > 10.0) break;
                         t += d * 0.5;
                     }
@@ -323,12 +330,12 @@ ui.bar({
                 }
 
                 // Calculate normal using finite differences
-                vec3 calcNormal(vec3 pos) {
+                vec3 calcNormal(vec3 pos, float power, float morph) {
                     vec2 e = vec2(0.001, 0.0);
                     return normalize(vec3(
-                        mandelbulb(pos + e.xyy) - mandelbulb(pos - e.xyy),
-                        mandelbulb(pos + e.yxy) - mandelbulb(pos - e.yxy),
-                        mandelbulb(pos + e.yyx) - mandelbulb(pos - e.yyx)
+                        mandelbulb(pos + e.xyy, power, morph) - mandelbulb(pos - e.xyy, power, morph),
+                        mandelbulb(pos + e.yxy, power, morph) - mandelbulb(pos - e.yxy, power, morph),
+                        mandelbulb(pos + e.yyx, power, morph) - mandelbulb(pos - e.yyx, power, morph)
                     ));
                 }
 
@@ -336,14 +343,19 @@ ui.bar({
                     vec2 uv = (vUV - 0.5) * 2.0;
                     vec2 mouse = (u_mouse - 0.5) * 2.0;
                     
-                    // Camera setup - mouse controls rotation
+                    // Zoom-based morphing parameters (no camera zoom)
+                    float zoomMorph = u_zoom * u_time * 0.5;
+                    float power = 8.0 + sin(zoomMorph * 0.3) * 2.0 * u_zoom;
+                    
+                    // Camera setup - mouse controls rotation, fixed distance
                     float camX = mouse.x * 3.14159;
                     float camY = mouse.y * 1.57;
+                    float camDist = 3.0; // Fixed camera distance
                     
                     vec3 ro = vec3(
-                        3.0 * cos(camY) * cos(camX),
-                        3.0 * sin(camY),
-                        3.0 * cos(camY) * sin(camX)
+                        camDist * cos(camY) * cos(camX),
+                        camDist * sin(camY),
+                        camDist * cos(camY) * sin(camX)
                     );
                     
                     vec3 target = vec3(0.0);
@@ -355,14 +367,14 @@ ui.bar({
                     
                     vec3 rd = normalize(forward + uv.x * right + uv.y * up);
                     
-                    // Raymarch the scene
-                    float t = raymarch(ro, rd);
+                    // Raymarch the scene with morphing parameters
+                    float t = raymarch(ro, rd, power, zoomMorph);
                     
                     vec3 color = vec3(0.0);
                     
                     if (t < 10.0) {
                         vec3 pos = ro + t * rd;
-                        vec3 normal = calcNormal(pos);
+                        vec3 normal = calcNormal(pos, power, zoomMorph);
                         
                         // Lighting
                         vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
@@ -373,20 +385,25 @@ ui.bar({
                         vec3 reflectDir = reflect(-lightDir, normal);
                         float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
                         
-                        // Color based on position and time
+                        // Color based on position, time, and zoom
                         vec3 baseColor = vec3(
-                            0.5 + 0.5 * sin(pos.x * 2.0 + u_time),
-                            0.5 + 0.5 * sin(pos.y * 2.0 + u_time + 2.0),
-                            0.5 + 0.5 * sin(pos.z * 2.0 + u_time + 4.0)
+                            0.5 + 0.5 * sin(pos.x * 2.0 + u_time + u_zoom),
+                            0.5 + 0.5 * sin(pos.y * 2.0 + u_time + u_zoom * 1.5 + 2.0),
+                            0.5 + 0.5 * sin(pos.z * 2.0 + u_time + u_zoom * 2.0 + 4.0)
                         );
+                        
+                        // Zoom affects color intensity
+                        baseColor = mix(baseColor, baseColor * 1.5, u_zoom * 0.3);
                         
                         color = baseColor * (0.3 + 0.7 * diff) + vec3(spec);
                         
-                        // Fog
+                        // Fixed fog density
                         color = mix(color, vec3(0.1, 0.1, 0.2), smoothstep(2.0, 8.0, t));
                     } else {
-                        // Background gradient
-                        color = mix(vec3(0.1, 0.1, 0.2), vec3(0.0, 0.0, 0.1), uv.y * 0.5 + 0.5);
+                        // Background gradient affected by zoom
+                        vec3 bgColor1 = vec3(0.1, 0.1, 0.2) * (1.0 + u_zoom * 0.2);
+                        vec3 bgColor2 = vec3(0.0, 0.0, 0.1) * (1.0 + u_zoom * 0.1);
+                        color = mix(bgColor1, bgColor2, uv.y * 0.5 + 0.5);
                     }
                     
                     FragColor = vec4(color, 1.0);
