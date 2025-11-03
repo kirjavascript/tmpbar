@@ -6,6 +6,7 @@
 --
 -- input: pressing enter doesnt unfocus properly
 -- button/input style
+-- audio for shaders
 --
 -- win95 bar
 -- hacker/matrix

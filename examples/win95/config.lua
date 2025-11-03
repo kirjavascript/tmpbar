@@ -3,9 +3,6 @@ local wm = require('wm')
 local sys = require('sys')
 local util = require('util')
 
--- local grey = '#BDB8BE'
--- local darkgrey = '#7f787f'
-
 local grey = '#C0C0C0'
 local darkgrey = '#808080'
 local lightgrey = '#DFDFDF'
@@ -58,7 +55,12 @@ for _, monitor in ui.monitors() do
             font_size = 11,
             padding = 2,
             justify_content = 'space_between',
-            background = win95_border(true),
+            background = function(svg)
+                return string.format([[
+                    <rect width="%d" height="%d" fill="%s" />
+                    <rect x="0" y="1" width="%d" height="1" fill="%s" />
+                ]], svg.width, svg.height, grey, svg.width, white)
+            end,
         },
 
         items = {
@@ -126,16 +128,28 @@ for _, monitor in ui.monitors() do
 
             ui.container({
                 style = {
-                    height = 22,
-                    background = win95_border(false),
-                    padding = 2,
+                    height = 28,
+                    background = function(svg)
+                        return string.format([[
+                            <rect width="%d" height="%d" fill="%s" />
+                            <rect x="0" y="0" width="%d" height="1" fill="%s" />
+                            <rect x="0" y="0" width="1" height="%d" fill="%s" />
+                            <rect x="0" y="%d" width="%d" height="1" fill="%s" />
+                            <rect x="%d" y="0" width="1" height="%d" fill="%s" />
+                            ]], svg.width, svg.height, grey,
+                            svg.width, darkgrey,
+                            svg.height, darkgrey,
+                            svg.height - 1, svg.width, white,
+                            svg.width - 1, svg.height, white)
+                    end,
+                    padding = 12,
+                    margin = 12,
                     gap = 8,
                     align_items = 'center',
                 },
                 items = {
                     ui.tray({
                         style = {
-                            background_color = grey,
                             height = 16,
                             padding_right = 4,
                         },
