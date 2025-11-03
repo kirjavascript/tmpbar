@@ -68,7 +68,7 @@ for _, monitor in ui.monitors() do
                 items = {
                     ui.label({
                         style = {
-                            height = 22,
+                            height = 28,
                             width = 54,
                             padding = 0,
                             margin_right = 4,
@@ -132,8 +132,8 @@ for _, monitor in ui.monitors() do
                     background = function(svg)
                         return string.format([[
                             <rect width="%d" height="%d" fill="%s" />
-                            <rect x="0" y="0" width="%d" height="1" fill="%s" />
-                            <rect x="0" y="0" width="1" height="%d" fill="%s" />
+                            <rect x="0" y="2" width="%d" height="1" fill="%s" />
+                            <rect x="0" y="2" width="1" height="%d" fill="%s" />
                             <rect x="0" y="%d" width="%d" height="1" fill="%s" />
                             <rect x="%d" y="0" width="1" height="%d" fill="%s" />
                             ]], svg.width, svg.height, grey,
@@ -142,8 +142,7 @@ for _, monitor in ui.monitors() do
                             svg.height - 1, svg.width, white,
                             svg.width - 1, svg.height, white)
                     end,
-                    padding = 12,
-                    margin = 12,
+                    padding = 4,
                     gap = 8,
                     align_items = 'center',
                 },

@@ -12,6 +12,9 @@
 -- hacker/matrix
 -- cube
 
+-- bar(function() reparsing
+-- create a new Props that uses Property
+
 local ui = require('ui')
 local wm = require('wm')
 local sys = require('sys')
