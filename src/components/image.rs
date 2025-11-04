@@ -19,27 +19,24 @@ pub fn render(comp: &mut Component, ui: &mut Ui, global: &mut Global) {
 
     let available = ui.available_size();
     let image = image.fit_to_original_size(1.);
-    let size = image.load_and_calc_size(ui, available);
+    let size = image.calc_size(available, image.size());
 
-    if let Some(size) = size {
-        let available = ui.available_size();
-        let width = available.y / size.y * size.x;
+    let width = available.y / size.y * size.x;
 
-        if available.x > 0. && width > available.x {
-            let width = available.x;
-            let height = available.x / size.x * size.y;
-            let size = egui::Vec2 { x: width, y: height };
+    if available.x > 0. && width > available.x {
+        let width = available.x;
+        let height = available.x / size.x * size.y;
+        let size = egui::Vec2 { x: width, y: height };
 
-            ui.centered_and_justified(|ui| {
-                ui.add(image.fit_to_exact_size(size));
-            });
-        } else {
-            let height = available.y;
-            let size = egui::Vec2 { x: width, y: height };
+        ui.centered_and_justified(|ui| {
+            ui.add(image.fit_to_exact_size(size));
+        });
+    } else {
+        let height = available.y;
+        let size = egui::Vec2 { x: width, y: height };
 
-            ui.centered_and_justified(|ui| {
-                ui.add(image.fit_to_exact_size(size));
-            });
-        }
+        ui.centered_and_justified(|ui| {
+            ui.add(image.fit_to_exact_size(size));
+        });
     }
 }
