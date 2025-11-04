@@ -13,7 +13,7 @@
 -- cube
 
 -- bar(function() reparsing
--- create a new Props that uses Property
+-- create a new Props that uses Property and just implements the methods
 
 local ui = require('ui')
 local wm = require('wm')
