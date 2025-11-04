@@ -8,6 +8,8 @@ pub struct Args {
     pub config: Option<String>,
     #[options(help = "Shows information about monitors")]
     pub monitors: bool,
+    #[options(help = "Enable debug profiler")]
+    pub profiler: bool,
 }
 
 pub fn get() -> Args {
