@@ -11,6 +11,8 @@
 -- win95 bar
 -- hacker/matrix
 -- cube
+--
+-- fix slow images
 
 -- bar(function() reparsing
 -- create a new Props that uses Property and just implements the methods
